@@ -6,7 +6,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 class Window {
 public:
-	bool Create(const wchar_t* title, int width, int height, HINSTANCE hInstance, int nCmdShow);
+	bool Create(const wchar_t* title, HINSTANCE hInstance, int nCmdShow);
 	void Destroy();
 	void PollEvents();
 	HWND GetHWND() const { return hwnd; }

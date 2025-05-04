@@ -111,7 +111,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Debug;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022_Win10\x64\Debug;</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -134,9 +134,13 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="ImGuiLayer.cpp" />
+    <ClCompile Include="ImGuiRenderPass.cpp" />
     <ClCompile Include="NeuralCluster.cpp" />
     <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderGraph.cpp" />
+    <ClCompile Include="RenderPass.cpp" />
+    <ClCompile Include="SensoryNeuron.cpp" />
     <ClCompile Include="Synapse.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -144,9 +148,13 @@
   <ItemGroup>
     <ClInclude Include="App.h" />
     <ClInclude Include="ImGuiLayer.h" />
+    <ClInclude Include="ImGuiRenderPass.h" />
     <ClInclude Include="NeuralCluster.h" />
     <ClInclude Include="Neuron.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderGraph.h" />
+    <ClInclude Include="RenderPass.h" />
+    <ClInclude Include="SensoryNeuron.h" />
     <ClInclude Include="Synapse.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Window.h" />

@@ -1,18 +1,37 @@
 #include "Window.h"
 
-bool Window::Create(const wchar_t* title, int width, int height, HINSTANCE hInstance, int nCmdShow)
+bool Window::Create(const wchar_t* title, HINSTANCE hInstance, int nCmdShow)
 {
 	wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, hInstance, nullptr, nullptr, nullptr, nullptr, title, nullptr };
 	::RegisterClassEx(&wc);
-	hwnd = ::CreateWindow(wc.lpszClassName, title, WS_OVERLAPPEDWINDOW, 100, 100, width, height, nullptr, nullptr, wc.hInstance, nullptr);
 
-	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	// Get primary monitor resolution
+	MONITORINFO mi = { sizeof(mi) };
+	GetMonitorInfo(MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY), &mi);
+	int monitorWidth = mi.rcMonitor.right - mi.rcMonitor.left;
+	int monitorHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
-	::ShowWindow(hwnd, nCmdShow);
+	// Create window using full monitor dimensions
+	hwnd = ::CreateWindow(wc.lpszClassName, title, WS_POPUP,
+		mi.rcMonitor.left, mi.rcMonitor.top,
+		monitorWidth, monitorHeight,
+		nullptr, nullptr, wc.hInstance, nullptr);
+
+	if (!hwnd)
+		return false;
+
+	// Show the window
+	::ShowWindow(hwnd, SW_SHOW);
 	::UpdateWindow(hwnd);
+
+	// COM init
+	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	return hwnd != nullptr;
 }
+
+
+
 
 void Window::Destroy()
 {

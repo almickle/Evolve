@@ -1,9 +1,13 @@
 #pragma once
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <dxgidebug.h>
+#include <memory>
 #include <wrl.h>
 
 using Microsoft::WRL::ComPtr;
+
+class RenderGraph;
 
 class Renderer {
 public:
@@ -14,6 +18,7 @@ public:
 	void WaitForGpu();
 	void CreateRenderTargets();
 	void CleanupRenderTargets();
+	void SetRenderGraph(std::shared_ptr<RenderGraph> graph);
 
 public:
 	ID3D12Device* GetDevice() const { return device.Get(); }
@@ -36,5 +41,6 @@ private:
 	UINT frameIndex = 0;
 	HANDLE fenceEvent = nullptr;
 	UINT64 currentFenceValue = 0;
-
+private:
+	std::shared_ptr<RenderGraph> renderGraph;
 };

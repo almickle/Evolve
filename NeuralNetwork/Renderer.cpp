@@ -1,5 +1,8 @@
 #include "Renderer.h"
-#include <dxgidebug.h>
+#include "RenderGraph.h"
+#include <queue>
+#include <unordered_map>
+#include <unordered_set>
 
 bool Renderer::Init(HWND hwnd)
 {
@@ -13,8 +16,25 @@ bool Renderer::Init(HWND hwnd)
 	}
 #endif
 
-	if (FAILED(D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device))))
+	ComPtr<IDXGIFactory6> factory;
+	if (FAILED(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory))))
 		return false;
+
+	ComPtr<IDXGIAdapter1> adapter;
+	for (UINT adapterIndex = 0; DXGI_ERROR_NOT_FOUND != factory->EnumAdapterByGpuPreference(
+		adapterIndex, DXGI_GPU_PREFERENCE_HIGH_PERFORMANCE, IID_PPV_ARGS(&adapter)); ++adapterIndex)
+	{
+		DXGI_ADAPTER_DESC1 desc;
+		adapter->GetDesc1(&desc);
+
+		// Skip software adapters
+		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+			continue;
+
+		// Try to create device
+		if (SUCCEEDED(D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_12_0, IID_PPV_ARGS(&device))))
+			break;
+	}
 
 #ifdef _DEBUG
 	ComPtr<ID3D12InfoQueue> infoQueue;
@@ -59,9 +79,6 @@ bool Renderer::Init(HWND hwnd)
 	if (!fenceEvent)
 		return false;
 
-	ComPtr<IDXGIFactory6> factory;
-	if (FAILED(CreateDXGIFactory2(dxgiFactoryFlags, IID_PPV_ARGS(&factory))))
-		return false;
 
 	DXGI_SWAP_CHAIN_DESC1 scDesc = {};
 	scDesc.BufferCount = BackBufferCount;
@@ -112,11 +129,17 @@ void Renderer::BeginFrame()
 
 	// Clear the render target
 	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // RGBA
-	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	commandList->OMSetRenderTargets(1, &rtDescHandles[frameIndex], FALSE, nullptr);
+	commandList->ClearRenderTargetView(rtDescHandles[frameIndex], clearColor, 0, nullptr);
+	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
 
-	// Set the shader visible descriptor heap (for ImGui or any SRV access)
-	ID3D12DescriptorHeap* heaps[] = { srvHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(heaps), heaps);
+	// Execute the render graph
+	if (renderGraph)
+		renderGraph->Execute(*this);
+}
+
+void Renderer::SetRenderGraph(std::shared_ptr<RenderGraph> graph) {
+	renderGraph = graph;
 }
 
 void Renderer::EndFrame()
