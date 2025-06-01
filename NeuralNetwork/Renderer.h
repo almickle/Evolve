@@ -22,17 +22,22 @@ public:
 
 public:
 	ID3D12Device* GetDevice() const { return device.Get(); }
-	ID3D12GraphicsCommandList* GetCommandList() const { return commandList.Get(); }
+	ID3D12GraphicsCommandList* GetCommandListBegin() const { return commandListBegin.Get(); }
+	ID3D12GraphicsCommandList* GetCommandListEnd() const { return commandListEnd.Get(); }
+	ID3D12CommandQueue* GetCommandQueue() const { return commandQueue.Get(); }
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCurrentRtvHandle() const { return rtDescHandles[frameIndex]; }
 	ID3D12DescriptorHeap* GetSrvHeap() const { return srvHeap.Get(); }
+	UINT GetCurrentFrameIndex() const { return frameIndex; }
 
 private:
 	static const UINT BackBufferCount = 3;
 	D3D12_CPU_DESCRIPTOR_HANDLE rtDescHandles[BackBufferCount];
-
 	ComPtr<ID3D12Device> device;
-	ComPtr<ID3D12CommandAllocator> commandAllocators[BackBufferCount];
+	ComPtr<ID3D12CommandAllocator> commandAllocatorsBegin[BackBufferCount];
+	ComPtr<ID3D12CommandAllocator> commandAllocatorsEnd[BackBufferCount];
 	ComPtr<ID3D12CommandQueue> commandQueue;
-	ComPtr<ID3D12GraphicsCommandList> commandList;
+	ComPtr<ID3D12GraphicsCommandList> commandListBegin;
+	ComPtr<ID3D12GraphicsCommandList> commandListEnd;
 	ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	ComPtr<ID3D12DescriptorHeap> srvHeap;
 	ComPtr<IDXGISwapChain3> swapChain;

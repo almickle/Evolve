@@ -64,13 +64,22 @@ bool Renderer::Init(HWND hwnd)
 		return false;
 
 	for (UINT i = 0; i < BackBufferCount; ++i) {
-		if (FAILED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocators[i]))))
+		if (FAILED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocatorsBegin[i]))))
 			return false;
 	}
 
-	if (FAILED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocators[0].Get(), nullptr, IID_PPV_ARGS(&commandList))))
+	for (UINT i = 0; i < BackBufferCount; ++i) {
+		if (FAILED(device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocatorsEnd[i]))))
+			return false;
+	}
+
+	if (FAILED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocatorsBegin[0].Get(), nullptr, IID_PPV_ARGS(&commandListBegin))))
 		return false;
-	commandList->Close();
+	commandListBegin->Close();
+
+	if (FAILED(device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocatorsEnd[0].Get(), nullptr, IID_PPV_ARGS(&commandListEnd))))
+		return false;
+	commandListEnd->Close();
 
 	if (FAILED(device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence))))
 		return false;
@@ -87,6 +96,8 @@ bool Renderer::Init(HWND hwnd)
 	scDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	scDesc.SampleDesc.Count = 1;
 
+	//DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc = {};
+
 	ComPtr<IDXGISwapChain1> tempSwapChain;
 	if (FAILED(factory->CreateSwapChainForHwnd(commandQueue.Get(), hwnd, &scDesc, nullptr, nullptr, &tempSwapChain)))
 		return false;
@@ -94,7 +105,7 @@ bool Renderer::Init(HWND hwnd)
 	if (FAILED(tempSwapChain.As(&swapChain)))
 		return false;
 
-	swapChain->SetFullscreenState(TRUE, nullptr);
+	//swapChain->SetFullscreenState(TRUE, nullptr);
 
 	RECT rect;
 	GetClientRect(hwnd, &rect);
@@ -124,8 +135,8 @@ void Renderer::BeginFrame()
 {
 	frameIndex = swapChain->GetCurrentBackBufferIndex();
 
-	commandAllocators[frameIndex]->Reset();
-	commandList->Reset(commandAllocators[frameIndex].Get(), nullptr);
+	commandAllocatorsBegin[frameIndex]->Reset();
+	commandListBegin->Reset(commandAllocatorsBegin[frameIndex].Get(), nullptr);
 
 	// Transition the back buffer to RENDER_TARGET
 	D3D12_RESOURCE_BARRIER barrier = {};
@@ -135,17 +146,19 @@ void Renderer::BeginFrame()
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	commandList->ResourceBarrier(1, &barrier);
+	commandListBegin->ResourceBarrier(1, &barrier);
 
 	// Set render target
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtDescHandles[frameIndex];
-	commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+	commandListBegin->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
 
 	// Clear the render target
 	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // RGBA
-	commandList->OMSetRenderTargets(1, &rtDescHandles[frameIndex], FALSE, nullptr);
-	commandList->ClearRenderTargetView(rtDescHandles[frameIndex], clearColor, 0, nullptr);
-	commandList->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
+	commandListBegin->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+	commandListBegin->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	commandListBegin->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
+
+	commandListBegin->Close();
 
 	// Execute the render graph
 	if (renderGraph)
@@ -158,31 +171,50 @@ void Renderer::SetRenderGraph(std::shared_ptr<RenderGraph> graph) {
 
 void Renderer::EndFrame()
 {
-	// Transition the back buffer to PRESENT
-	D3D12_RESOURCE_BARRIER barrier = {};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Transition.pResource = backBuffers[frameIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+	commandAllocatorsEnd[frameIndex]->Reset();
+	commandListEnd->Reset(commandAllocatorsEnd[frameIndex].Get(), nullptr);
 
-	commandList->ResourceBarrier(1, &barrier);
+    // Transition the back buffer to PRESENT
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Transition.pResource = backBuffers[frameIndex].Get();
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
-	commandList->Close();
+	commandListEnd->ResourceBarrier(1, &barrier);
 
-	ID3D12CommandList* cmdsLists[] = { commandList.Get() };
-	commandQueue->ExecuteCommandLists(1, cmdsLists);
-	// Without V-Sync
-	swapChain->Present(0, 0);
-	// With V-Sync
-	//swapChain->Present(1, 0);
+	commandListEnd->Close();
 
-	const UINT64 fenceToWait = ++currentFenceValue;
-	commandQueue->Signal(fence.Get(), fenceToWait);
-	if (fence->GetCompletedValue() < fenceToWait) {
-		fence->SetEventOnCompletion(fenceToWait, fenceEvent);
-		WaitForSingleObject(fenceEvent, INFINITE);
-	}
+    // Gather all command lists: the main command list and all from the render graph
+    std::vector<ID3D12CommandList*> allCmdLists;
+	allCmdLists.push_back(commandListBegin.Get());
+    if (renderGraph) {
+        auto graphCmdLists = renderGraph->GetAllCommandLists();
+
+        // Add a resource barrier and close each render pass command list
+        for (size_t i = 0; i < graphCmdLists.size(); ++i) {
+            auto* cmdList = static_cast<ID3D12GraphicsCommandList*>(graphCmdLists[i]);
+            cmdList->Close();
+        }
+
+        allCmdLists.insert(allCmdLists.end(), graphCmdLists.begin(), graphCmdLists.end());
+    }
+	allCmdLists.push_back(commandListEnd.Get());
+
+    commandQueue->ExecuteCommandLists(static_cast<UINT>(allCmdLists.size()), allCmdLists.data());
+
+    // Without V-Sync
+    swapChain->Present(0, 0);
+    // With V-Sync
+    //swapChain->Present(1, 0);
+
+    const UINT64 fenceToWait = ++currentFenceValue;
+    commandQueue->Signal(fence.Get(), fenceToWait);
+    if (fence->GetCompletedValue() < fenceToWait) {
+        fence->SetEventOnCompletion(fenceToWait, fenceEvent);
+        WaitForSingleObject(fenceEvent, INFINITE);
+    }
 }
 
 void Renderer::WaitForGpu()
@@ -229,8 +261,10 @@ void Renderer::Shutdown()
 	}
 	CloseHandle(fenceEvent);
 	fence.Reset();
-	commandList.Reset();
-	for (auto& allocator : commandAllocators) allocator.Reset();
+	commandListBegin.Reset();
+	commandListEnd.Reset();
+	for (auto& allocator : commandAllocatorsBegin) allocator.Reset();
+	for (auto& allocator : commandAllocatorsEnd) allocator.Reset();
 	commandQueue.Reset();
 	srvHeap.Reset();
 	rtvHeap.Reset();

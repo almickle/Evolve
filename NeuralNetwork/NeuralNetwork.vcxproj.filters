@@ -45,7 +45,7 @@
     <ClCompile Include="SensoryNeuron.cpp">
       <Filter>Source Files\Neuron</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiRenderPass.cpp">
+    <ClCompile Include="UIRenderPass.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
     <ClCompile Include="RenderPass.cpp">
@@ -104,7 +104,7 @@
     <ClInclude Include="RenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiRenderPass.h">
+    <ClInclude Include="UIRenderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SensoryNeuron.h">

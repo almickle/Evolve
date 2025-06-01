@@ -1,5 +1,5 @@
 #include "App.h"
-#include "ImGuiRenderPass.h"
+#include "UIRenderPass.h"
 #include "SceneRenderPass.h"
 #include "RenderGraph.h"
 
@@ -33,12 +33,13 @@ bool App::Init(HINSTANCE hInstance, int nCmdShow)
 std::shared_ptr<RenderGraph> App::BuildRenderGraph(Renderer& renderer, ImGuiLayer& imguiLayer) {
 	auto graph = std::make_shared<RenderGraph>();
 
-	auto imguiPass = std::make_shared<ImGuiRenderPass>(&imguiLayer);
-	auto scenePass = std::make_shared<SceneRenderPass>(&scene, renderer);
+	auto uiPass = std::make_shared<UIRenderPass>(renderer, &imguiLayer);
+	//auto scenePass = std::make_shared<SceneRenderPass>(&scene, renderer);
+
+	//uiPass->AddDependency(scenePass); // Ensure UI renders after the scene
 	// Add other passes and dependencies here as you expand the system
 
-	graph->AddPass(imguiPass);
-	graph->AddPass(scenePass);
+	graph->AddPass(uiPass);
 	return graph;
 }
 

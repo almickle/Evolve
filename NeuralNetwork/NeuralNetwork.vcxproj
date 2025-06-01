@@ -144,7 +144,7 @@
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ImGuiLayer.cpp" />
-    <ClCompile Include="ImGuiRenderPass.cpp" />
+    <ClCompile Include="UIRenderPass.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="NeuralCluster.cpp" />
@@ -163,7 +163,7 @@
     <ClInclude Include="App.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ImGuiLayer.h" />
-    <ClInclude Include="ImGuiRenderPass.h" />
+    <ClInclude Include="UIRenderPass.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="NeuralCluster.h" />
