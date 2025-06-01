@@ -2,6 +2,7 @@
 #include "ImGuiLayer.h"
 #include "Renderer.h"
 #include "Window.h"
+#include "Scene.h"
 
 class App {
 public:
@@ -13,4 +14,5 @@ private:
 	Window window;
 	Renderer renderer;
 	ImGuiLayer imgui;
+	Scene scene;
 };

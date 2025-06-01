@@ -1,5 +1,6 @@
 #include "App.h"
 #include "ImGuiRenderPass.h"
+#include "SceneRenderPass.h"
 #include "RenderGraph.h"
 
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
@@ -33,10 +34,11 @@ std::shared_ptr<RenderGraph> App::BuildRenderGraph(Renderer& renderer, ImGuiLaye
 	auto graph = std::make_shared<RenderGraph>();
 
 	auto imguiPass = std::make_shared<ImGuiRenderPass>(&imguiLayer);
-
+	auto scenePass = std::make_shared<SceneRenderPass>(&scene, renderer);
 	// Add other passes and dependencies here as you expand the system
 
 	graph->AddPass(imguiPass);
+	graph->AddPass(scenePass);
 	return graph;
 }
 
@@ -46,18 +48,12 @@ void App::Run()
 		window.PollEvents();
 
 		renderer.BeginFrame();
-		//imgui.BeginFrame();
-
-		//imgui.RenderUI();
-
-		//imgui.EndFrame(renderer.GetCommandList());
 		renderer.EndFrame();
 	}
 }
 
 void App::Shutdown()
 {
-	imgui.Shutdown();
 	renderer.Shutdown();
 	window.Destroy();
 }

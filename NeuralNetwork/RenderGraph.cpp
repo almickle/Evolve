@@ -37,3 +37,10 @@ void RenderGraph::Execute(Renderer& renderer) {
 		}
 	}
 }
+
+void RenderGraph::Shutdown() {
+	for (auto& pass : passes) {
+		pass->Shutdown();
+	}
+	passes.clear();
+}

@@ -1,9 +1,8 @@
 #pragma once
+#include "Renderer.h"
 #include <memory>
 #include <string>
 #include <vector>
-
-class Renderer;
 
 class RenderPass {
 public:
@@ -11,6 +10,7 @@ public:
 	virtual ~RenderPass() = default;
 public:
 	virtual void Execute(Renderer& renderer) = 0;
+	virtual void Shutdown() = 0;
 	void AddDependency(std::shared_ptr<RenderPass> dependency);
 	const std::vector<RenderPass*>& GetDependencies() const;
 	const std::string& GetName() const;

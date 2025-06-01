@@ -10,6 +10,9 @@ public:
 		imguiLayer->RenderUI();
 		imguiLayer->EndFrame(renderer.GetCommandList());
 	}
+	void Shutdown() override {
+		imguiLayer->Shutdown();
+	}
 private:
 	ImGuiLayer* imguiLayer;
 };

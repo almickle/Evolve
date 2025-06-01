@@ -94,6 +94,20 @@ bool Renderer::Init(HWND hwnd)
 	if (FAILED(tempSwapChain.As(&swapChain)))
 		return false;
 
+	swapChain->SetFullscreenState(TRUE, nullptr);
+
+	RECT rect;
+	GetClientRect(hwnd, &rect);
+	UINT width = rect.right - rect.left;
+	UINT height = rect.bottom - rect.top;
+
+	// Release old render targets if any
+	CleanupRenderTargets();
+
+	// Resize swap chain buffers to match the new mode
+	swapChain->ResizeBuffers(BackBufferCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+
+	// Recreate render targets for the new buffers
 	CreateRenderTargets();
 
 	D3D12_DESCRIPTOR_HEAP_DESC srvDesc = {};
@@ -158,7 +172,10 @@ void Renderer::EndFrame()
 
 	ID3D12CommandList* cmdsLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists(1, cmdsLists);
-	swapChain->Present(1, 0);
+	// Without V-Sync
+	swapChain->Present(0, 0);
+	// With V-Sync
+	//swapChain->Present(1, 0);
 
 	const UINT64 fenceToWait = ++currentFenceValue;
 	commandQueue->Signal(fence.Get(), fenceToWait);
@@ -198,11 +215,22 @@ void Renderer::Shutdown()
 	WaitForGpu();
 	CleanupRenderTargets();
 
+	renderGraph->Shutdown();
+
+	if (swapChain) {
+		BOOL isFullscreen = FALSE;
+		ComPtr<IDXGIOutput> pOutput;
+		swapChain->GetFullscreenState(&isFullscreen, &pOutput);
+		if (isFullscreen) {
+			swapChain->SetFullscreenState(FALSE, nullptr);
+		}
+		swapChain.Reset();
+		pOutput.Reset();
+	}
 	CloseHandle(fenceEvent);
 	fence.Reset();
 	commandList.Reset();
 	for (auto& allocator : commandAllocators) allocator.Reset();
-	swapChain.Reset();
 	commandQueue.Reset();
 	srvHeap.Reset();
 	rtvHeap.Reset();

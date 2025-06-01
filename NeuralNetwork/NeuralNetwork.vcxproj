@@ -102,17 +102,19 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Debug;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022_Win10\x64\Debug;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;$(CoreLibraryDependencies);%(AdditionalDependencies);assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Debug;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\x64\Debug;C:\source\libraries\assimp\lib\Debug</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -121,25 +123,37 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include</AdditionalIncludeDirectories>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Release;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\x64\Release;C:\source\libraries\assimp\lib\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);assimp-vc143-mt.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ImGuiLayer.cpp" />
     <ClCompile Include="ImGuiRenderPass.cpp" />
+    <ClCompile Include="Light.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="NeuralCluster.cpp" />
     <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderGraph.cpp" />
     <ClCompile Include="RenderPass.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="SensoryNeuron.cpp" />
     <ClCompile Include="Synapse.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -147,19 +161,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ImGuiLayer.h" />
     <ClInclude Include="ImGuiRenderPass.h" />
+    <ClInclude Include="Light.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="NeuralCluster.h" />
     <ClInclude Include="Neuron.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderGraph.h" />
     <ClInclude Include="RenderPass.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneCB.h" />
+    <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="SensoryNeuron.h" />
     <ClInclude Include="Synapse.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
