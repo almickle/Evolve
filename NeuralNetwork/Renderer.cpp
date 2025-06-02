@@ -3,6 +3,8 @@
 #include <queue>
 #include <unordered_map>
 #include <unordered_set>
+#include <fstream>
+#include <d3dcompiler.h>
 
 bool Renderer::Init(HWND hwnd)
 {
@@ -109,8 +111,8 @@ bool Renderer::Init(HWND hwnd)
 
 	RECT rect;
 	GetClientRect(hwnd, &rect);
-	UINT width = rect.right - rect.left;
-	UINT height = rect.bottom - rect.top;
+	width = rect.right - rect.left;
+	height = rect.bottom - rect.top;
 
 	// Release old render targets if any
 	CleanupRenderTargets();
@@ -121,6 +123,9 @@ bool Renderer::Init(HWND hwnd)
 	// Recreate render targets for the new buffers
 	CreateRenderTargets();
 
+	// Create depth stencil buffer
+	CreateDepthStencil(width, height);
+
 	D3D12_DESCRIPTOR_HEAP_DESC srvDesc = {};
 	srvDesc.NumDescriptors = 100;
 	srvDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
@@ -128,41 +133,58 @@ bool Renderer::Init(HWND hwnd)
 	if (FAILED(device->CreateDescriptorHeap(&srvDesc, IID_PPV_ARGS(&srvHeap))))
 		return false;
 
+	#if defined(_DEBUG)
+		srvHeap->SetName(L"SRV Heap");
+	#endif
+
 	return true;
+}
+
+ComPtr<ID3DBlob> Renderer::LoadShaderBlob(const wchar_t* filename) {
+	std::ifstream file(filename, std::ios::binary | std::ios::ate);
+	if (!file) return nullptr;
+	std::streamsize size = file.tellg();
+	file.seekg(0, std::ios::beg);
+	ComPtr<ID3DBlob> blob;
+	if (FAILED(D3DCreateBlob(static_cast<SIZE_T>(size), &blob))) return nullptr;
+	file.read(reinterpret_cast<char*>(blob->GetBufferPointer()), size);
+	return blob;
 }
 
 void Renderer::BeginFrame()
 {
-	frameIndex = swapChain->GetCurrentBackBufferIndex();
+    frameIndex = swapChain->GetCurrentBackBufferIndex();
 
-	commandAllocatorsBegin[frameIndex]->Reset();
-	commandListBegin->Reset(commandAllocatorsBegin[frameIndex].Get(), nullptr);
+    commandAllocatorsBegin[frameIndex]->Reset();
+    commandListBegin->Reset(commandAllocatorsBegin[frameIndex].Get(), nullptr);
 
-	// Transition the back buffer to RENDER_TARGET
-	D3D12_RESOURCE_BARRIER barrier = {};
-	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = backBuffers[frameIndex].Get();
-	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-	commandListBegin->ResourceBarrier(1, &barrier);
+    // Transition the back buffer to RENDER_TARGET
+    D3D12_RESOURCE_BARRIER barrier = {};
+    barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+    barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+    barrier.Transition.pResource = backBuffers[frameIndex].Get();
+    barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
+    barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
+    barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+    commandListBegin->ResourceBarrier(1, &barrier);
 
-	// Set render target
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtDescHandles[frameIndex];
-	commandListBegin->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+    // Set render target and depth stencil view
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = rtDescHandles[frameIndex];
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = dsvDescHandles[frameIndex];
+    commandListBegin->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
 
-	// Clear the render target
-	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // RGBA
-	commandListBegin->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
-	commandListBegin->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-	commandListBegin->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
+    // Clear the render target and depth buffer
+    const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f }; // RGBA
+    commandListBegin->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+    commandListBegin->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-	commandListBegin->Close();
+    commandListBegin->SetDescriptorHeaps(1, srvHeap.GetAddressOf());
 
-	// Execute the render graph
-	if (renderGraph)
-		renderGraph->Execute(*this);
+    commandListBegin->Close();
+
+    // Execute the render graph
+    if (renderGraph)
+        renderGraph->Execute(*this);
 }
 
 void Renderer::SetRenderGraph(std::shared_ptr<RenderGraph> graph) {
@@ -233,6 +255,61 @@ void Renderer::CreateRenderTargets()
 		device->CreateRenderTargetView(buffer.Get(), nullptr, rtDescHandles[i]);
 		backBuffers[i] = buffer;
 	}
+}
+
+void Renderer::CreateDepthStencil(UINT width, UINT height) {
+    D3D12_DESCRIPTOR_HEAP_DESC dsvHeapDesc = {};
+    dsvHeapDesc.NumDescriptors = BackBufferCount;
+    dsvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    dsvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    device->CreateDescriptorHeap(&dsvHeapDesc, IID_PPV_ARGS(&dsvHeap));
+
+    D3D12_CLEAR_VALUE clearValue = {};
+    clearValue.Format = DXGI_FORMAT_D32_FLOAT;
+    clearValue.DepthStencil.Depth = 1.0f;
+    clearValue.DepthStencil.Stencil = 0;
+
+    D3D12_RESOURCE_DESC depthDesc = {};
+    depthDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    depthDesc.Width = width;
+    depthDesc.Height = height;
+    depthDesc.DepthOrArraySize = 1;
+    depthDesc.MipLevels = 1;
+    depthDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    depthDesc.SampleDesc.Count = 1;
+    depthDesc.SampleDesc.Quality = 0;
+    depthDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+    depthDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+
+    // Create a named variable for the heap properties
+    CD3DX12_HEAP_PROPERTIES heapProperties(D3D12_HEAP_TYPE_DEFAULT);
+
+    // Use the address of the named variable
+    device->CreateCommittedResource(
+        &heapProperties,
+        D3D12_HEAP_FLAG_NONE,
+        &depthDesc,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        &clearValue,
+        IID_PPV_ARGS(&depthStencilBuffer)
+    );
+
+	#if defined(_DEBUG)
+		depthStencilBuffer->SetName(L"Depth Buffer");
+	#endif
+
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+    SIZE_T dsvDescriptorSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+    auto handle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
+    for (UINT i = 0; i < BackBufferCount; ++i) {
+        dsvDescHandles[i] = handle;
+        device->CreateDepthStencilView(depthStencilBuffer.Get(), &dsvDesc, handle);
+        handle.ptr += dsvDescriptorSize;
+    }
 }
 
 void Renderer::CleanupRenderTargets()

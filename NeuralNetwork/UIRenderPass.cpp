@@ -56,4 +56,6 @@ void UIRenderPass::Execute(Renderer& renderer) {
 
 void UIRenderPass::Shutdown() {
     imguiLayer->Shutdown();
+    commandLists.clear();
+    commandAllocators.clear();
 }

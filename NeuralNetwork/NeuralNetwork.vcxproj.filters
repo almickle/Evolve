@@ -19,6 +19,9 @@
     <Filter Include="Source Files\Render">
       <UniqueIdentifier>{16270c6e-5137-466d-b630-7773de029b33}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{2d9f043f-db75-475f-acf3-6a1f04e2c136}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
@@ -128,5 +131,16 @@
     <ClInclude Include="SceneCB.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Actor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\hlsl NeuralNetwork\ActorPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="..\hlsl NeuralNetwork\ActorVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

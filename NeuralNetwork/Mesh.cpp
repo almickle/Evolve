@@ -47,69 +47,99 @@ Mesh::Mesh(const std::string& path)
     indexCount = static_cast<UINT>(indices.size());
 }
 
-void Mesh::CreateGPUResources(Renderer& renderer)
+void Mesh::CreateGPUResources(Renderer& renderer, ID3D12GraphicsCommandList* cmdList)
 {
-    //ID3D12Device* device = renderer.GetDevice();
-    //ID3D12GraphicsCommandList* cmdList = renderer.GetCommandList();
+    ID3D12Device* device = renderer.GetDevice();
 
-    //// Vertex Buffer
-    //UINT vbSize = static_cast<UINT>(vertices.size() * sizeof(Vertex));
-    //ComPtr<ID3D12Resource> vbUpload;
+    // Vertex Buffer
+    UINT vbSize = static_cast<UINT>(vertices.size() * sizeof(Vertex));
 
-    //CD3DX12_HEAP_PROPERTIES defaultHeap(D3D12_HEAP_TYPE_DEFAULT);
-    //CD3DX12_RESOURCE_DESC vbDesc = CD3DX12_RESOURCE_DESC::Buffer(vbSize);
-    //device->CreateCommittedResource(
-    //    &defaultHeap, D3D12_HEAP_FLAG_NONE, &vbDesc,
-    //    D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&vertexBuffer));
+    CD3DX12_HEAP_PROPERTIES defaultHeap(D3D12_HEAP_TYPE_DEFAULT);
+    CD3DX12_RESOURCE_DESC vbDesc = CD3DX12_RESOURCE_DESC::Buffer(vbSize);
+    HRESULT hr = device->CreateCommittedResource(
+        &defaultHeap, D3D12_HEAP_FLAG_NONE, &vbDesc,
+        D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&vertexBuffer));
+    if (FAILED(hr)) {
+        throw std::runtime_error("Failed to create vertex buffer resource. HRESULT: " + std::to_string(hr));
+    }
 
-    //CD3DX12_HEAP_PROPERTIES uploadHeap(D3D12_HEAP_TYPE_UPLOAD);
-    //device->CreateCommittedResource(
-    //    &uploadHeap, D3D12_HEAP_FLAG_NONE, &vbDesc,
-    //    D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vbUpload));
+    #if defined(_DEBUG)
+        vertexBuffer->SetName(L"Vertex Buffer");
+    #endif
 
-    //void* mapped = nullptr;
-    //vbUpload->Map(0, nullptr, &mapped);
-    //memcpy(mapped, vertices.data(), vbSize);
-    //vbUpload->Unmap(0, nullptr);
+    CD3DX12_RESOURCE_BARRIER copyBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        vertexBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
+    cmdList->ResourceBarrier(1, &copyBarrier);
 
-    //cmdList->CopyBufferRegion(vertexBuffer.Get(), 0, vbUpload.Get(), 0, vbSize);
+    CD3DX12_HEAP_PROPERTIES uploadHeap(D3D12_HEAP_TYPE_UPLOAD);
+    device->CreateCommittedResource(
+        &uploadHeap, D3D12_HEAP_FLAG_NONE, &vbDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&vbUpload));
 
-    //CD3DX12_RESOURCE_BARRIER vbBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-    //    vertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-    //cmdList->ResourceBarrier(1, &vbBarrier);
+    #if defined(_DEBUG)
+        vbUpload->SetName(L"Vertex Upload Buffer");
+    #endif
 
-    //vbView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
-    //vbView.SizeInBytes = vbSize;
-    //vbView.StrideInBytes = sizeof(Vertex);
+    void* mapped = nullptr;
+    vbUpload->Map(0, nullptr, &mapped);
+    memcpy(mapped, vertices.data(), vbSize);
+    vbUpload->Unmap(0, nullptr);
 
-    //// Index Buffer
-    //UINT ibSize = static_cast<UINT>(indices.size() * sizeof(uint32_t));
-    //ComPtr<ID3D12Resource> ibUpload;
-    //CD3DX12_RESOURCE_DESC ibDesc = CD3DX12_RESOURCE_DESC::Buffer(ibSize);
+    cmdList->CopyBufferRegion(vertexBuffer.Get(), 0, vbUpload.Get(), 0, vbSize);
 
-    //device->CreateCommittedResource(
-    //    &defaultHeap, D3D12_HEAP_FLAG_NONE, &ibDesc,
-    //    D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&indexBuffer));
+    CD3DX12_RESOURCE_BARRIER vbBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        vertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+    cmdList->ResourceBarrier(1, &vbBarrier);
 
-    //device->CreateCommittedResource(
-    //    &uploadHeap, D3D12_HEAP_FLAG_NONE, &ibDesc,
-    //    D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&ibUpload));
+    vbView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
+    vbView.SizeInBytes = vbSize;
+    vbView.StrideInBytes = sizeof(Vertex);
 
-    //ibUpload->Map(0, nullptr, &mapped);
-    //memcpy(mapped, indices.data(), ibSize);
-    //ibUpload->Unmap(0, nullptr);
+    // Index Buffer
+    UINT ibSize = static_cast<UINT>(indices.size() * sizeof(uint32_t));
+    CD3DX12_RESOURCE_DESC ibDesc = CD3DX12_RESOURCE_DESC::Buffer(ibSize);
 
-    //cmdList->CopyBufferRegion(indexBuffer.Get(), 0, ibUpload.Get(), 0, ibSize);
+    device->CreateCommittedResource(
+        &defaultHeap, D3D12_HEAP_FLAG_NONE, &ibDesc,
+        D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&indexBuffer));
 
-    //CD3DX12_RESOURCE_BARRIER ibBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-    //    indexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
-    //cmdList->ResourceBarrier(1, &ibBarrier);
+    #if defined(_DEBUG)
+        vbUpload->SetName(L"Index Buffer");
+    #endif
 
-    //ibView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
-    //ibView.SizeInBytes = ibSize;
-    //ibView.Format = DXGI_FORMAT_R32_UINT;
+    CD3DX12_RESOURCE_BARRIER ibCpBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        indexBuffer.Get(), D3D12_RESOURCE_STATE_COMMON, D3D12_RESOURCE_STATE_COPY_DEST);
+    cmdList->ResourceBarrier(1, &ibCpBarrier);
+
+    device->CreateCommittedResource(
+        &uploadHeap, D3D12_HEAP_FLAG_NONE, &ibDesc,
+        D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&ibUpload));
+
+    #if defined(_DEBUG)
+        vbUpload->SetName(L"Index Upload Buffer");
+    #endif
+
+    ibUpload->Map(0, nullptr, &mapped);
+    memcpy(mapped, indices.data(), ibSize);
+    ibUpload->Unmap(0, nullptr);
+
+    cmdList->CopyBufferRegion(indexBuffer.Get(), 0, ibUpload.Get(), 0, ibSize);
+
+    CD3DX12_RESOURCE_BARRIER ibBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        indexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+    cmdList->ResourceBarrier(1, &ibBarrier);
+
+    ibView.BufferLocation = indexBuffer->GetGPUVirtualAddress();
+    ibView.SizeInBytes = ibSize;
+    ibView.Format = DXGI_FORMAT_R32_UINT;
 
     // Note: Keep vbUpload and ibUpload alive until the GPU is done with the copy.
+}
+
+void Mesh::Bind(ID3D12GraphicsCommandList* cmdList) const {
+    cmdList->IASetVertexBuffers(0, 1, &vbView);
+    cmdList->IASetIndexBuffer(&ibView);
+    cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Mesh::Cleanup() {

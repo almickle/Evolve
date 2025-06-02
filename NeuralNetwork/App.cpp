@@ -34,12 +34,13 @@ std::shared_ptr<RenderGraph> App::BuildRenderGraph(Renderer& renderer, ImGuiLaye
 	auto graph = std::make_shared<RenderGraph>();
 
 	auto uiPass = std::make_shared<UIRenderPass>(renderer, &imguiLayer);
-	//auto scenePass = std::make_shared<SceneRenderPass>(&scene, renderer);
+	auto scenePass = std::make_shared<SceneRenderPass>(&scene, renderer);
 
 	//uiPass->AddDependency(scenePass); // Ensure UI renders after the scene
 	// Add other passes and dependencies here as you expand the system
 
 	graph->AddPass(uiPass);
+	graph->AddPass(scenePass);
 	return graph;
 }
 
