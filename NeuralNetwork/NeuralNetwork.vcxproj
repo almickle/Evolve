@@ -117,8 +117,12 @@
       <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Debug;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\x64\Debug;C:\source\libraries\assimp\lib\Debug</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
-      <ObjectFileOutput>$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderModel>6.7</ShaderModel>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy /Y /I "$(ProjectDir)\Shaders\*.cso" "$(OutDir)\Shaders"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -143,12 +147,17 @@
       <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);assimp-vc143-mt.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;</AdditionalDependencies>
     </Link>
     <FxCompile>
-      <ObjectFileOutput>$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput>$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ShaderModel>6.7</ShaderModel>
     </FxCompile>
+    <PostBuildEvent>
+      <Command>xcopy /Y /I "$(ProjectDir)\Shaders\*.cso" "$(OutDir)\Shaders"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="ImGuiLayer.cpp" />
     <ClCompile Include="UIRenderPass.cpp" />
     <ClCompile Include="Light.cpp" />
@@ -169,6 +178,7 @@
     <ClInclude Include="Actor.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="FPCamera.h" />
     <ClInclude Include="ImGuiLayer.h" />
     <ClInclude Include="UIRenderPass.h" />
     <ClInclude Include="Light.h" />
@@ -187,17 +197,17 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\hlsl NeuralNetwork\ActorPS.hlsl">
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
+    <FxCompile Include="ActorPS.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.7</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="..\hlsl NeuralNetwork\ActorVS.hlsl">
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    <FxCompile Include="ActorVS.hlsl">
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.7</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

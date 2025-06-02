@@ -4,7 +4,7 @@
 class Camera {
 public:
     Camera();
-
+public:
     void SetPosition(const DirectX::XMFLOAT3& pos) { position = pos; }
     void SetTarget(const DirectX::XMFLOAT3& tgt) { target = tgt; }
     void SetUp(const DirectX::XMFLOAT3& upVec) { up = upVec; }
@@ -12,7 +12,7 @@ public:
     void SetAspect(float a) { aspect = a; }
     void SetNearZ(float n) { nearZ = n; }
     void SetFarZ(float f) { farZ = f; }
-
+public:
     const DirectX::XMFLOAT3& GetPosition() const { return position; }
     const DirectX::XMFLOAT3& GetTarget() const { return target; }
     const DirectX::XMFLOAT3& GetUp() const { return up; }
@@ -20,11 +20,14 @@ public:
     float GetAspect() const { return aspect; }
     float GetNearZ() const { return nearZ; }
     float GetFarZ() const { return farZ; }
-
-    DirectX::XMMATRIX GetViewMatrix() const;
+public:
+    virtual DirectX::XMMATRIX GetViewMatrix() const = 0;
     DirectX::XMMATRIX GetProjMatrix() const;
-
-private:
+public:
+    virtual void MoveForward(float amount) = 0;
+    virtual void MoveRight(float amount) = 0;
+    virtual void Rotate(float yawDelta, float pitchDelta) = 0;
+protected:
     DirectX::XMFLOAT3 position{0, 0, -5};
     DirectX::XMFLOAT3 target{0, 0, 0};
     DirectX::XMFLOAT3 up{0, 1, 0};
@@ -32,4 +35,6 @@ private:
     float aspect = 2.333f; // 21:9
     float nearZ = 0.1f;
     float farZ = 1000.0f;
+    float yaw = 0.0f;
+    float pitch = 0.0f;
 };

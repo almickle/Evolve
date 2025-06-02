@@ -1,22 +1,27 @@
 #include "Scene.h"
 #include "Mesh.h"
 #include "Light.h"
-#include "Camera.h"
+#include "FPCamera.h"
 #include "Actor.h"
 
 Scene::Scene() {
     // Add a default camera
-    AddCamera(std::make_shared<Camera>());
+    AddCamera(std::make_shared<FPCamera>());
 	SetActiveCamera(cameras[0]);
-    GetActiveCamera()->SetPosition({0.0f, 2.0f, -10.0f});
+    GetActiveCamera()->SetPosition({0.0f, 0.0f, -10.0f});
     GetActiveCamera()->SetTarget({ 0.0f, 0.0f, 0.0f });
     GetActiveCamera()->SetUp({ 0.0f, 1.0f, 0.0f });
 
 	// Add a default light
     AddLight(std::make_shared<Light>());
-    lights[0]->SetDirection({-0.5f, -1.0f, 0.5f}); // Normalized in your code
+    lights[0]->SetPosition({-1.0f, 2.0f, -1.0f}); // Normalized in your code
     lights[0]->SetColor({ 1.0f, 1.0f, 1.0f });
     lights[0]->SetIntensity(1.0f);
+
+    AddLight(std::make_shared<Light>());
+    lights[1]->SetPosition({ 1.0f, -2.0f, -1.0f }); // Normalized in your code
+    lights[1]->SetColor({ 1.0f, 1.0f, 1.0f });
+    lights[1]->SetIntensity(1.0f);
 
 	// Add a default actor with a primitive mesh
     auto mesh = std::make_shared<Mesh>("C:/source/assets/primitives/sphere.fbx");

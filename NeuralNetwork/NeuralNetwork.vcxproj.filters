@@ -75,6 +75,9 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FPCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Neuron.h">
@@ -134,12 +137,15 @@
     <ClInclude Include="Actor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FPCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\hlsl NeuralNetwork\ActorPS.hlsl">
+    <FxCompile Include="ActorPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="..\hlsl NeuralNetwork\ActorVS.hlsl">
+    <FxCompile Include="ActorVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

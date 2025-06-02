@@ -19,8 +19,8 @@ SceneRenderPass::SceneRenderPass(Scene* scene, Renderer& renderer)
     InitActorWorldMatrixBuffer(renderer);
 
     // Load shaders
-    vsBlob = renderer.LoadShaderBlob(L"ActorVS.cso");
-    psBlob = renderer.LoadShaderBlob(L"ActorPS.cso");
+    vsBlob = renderer.LoadShaderBlob(L"Shaders\\ActorVS.cso");
+    psBlob = renderer.LoadShaderBlob(L"Shaders\\ActorPS.cso");
 
     CreateRootSignature(renderer);
     CreateSRVs(renderer);
@@ -51,7 +51,6 @@ void SceneRenderPass::Execute(Renderer& renderer) {
         DirectX::XMStoreFloat4x4(&cbData.camera.proj, DirectX::XMMatrixTranspose(cam.GetProjMatrix()));
         cbData.camera.position = cam.GetPosition();
     }
-
     // Fill light data
     const auto& lights = scene->GetLights();
     cbData.numLights = static_cast<int>(lights.size());
