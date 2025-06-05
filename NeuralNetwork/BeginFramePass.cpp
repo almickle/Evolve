@@ -2,6 +2,7 @@
 #include <d3d12.h>
 #include <Windows.h>
 #include "BeginFramePass.h"
+#include "DescriptorHeapManager.h"
 #include "Renderer.h"
 
 void BeginFramePass::Execute( Renderer& renderer )

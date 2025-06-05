@@ -12,10 +12,11 @@ using uint = unsigned int;
 
 class IndexBuffer : public GpuResource {
 public:
-	IndexBuffer( const std::vector<uint32_t>& indices, const std::string& debugName = "IndexBuffer" )
+	IndexBuffer( const std::vector<uint32_t>& indices, const std::string& debugName = "IndexBuffer", DXGI_FORMAT format = DXGI_FORMAT_R32_UINT )
 		: GpuResource( D3D12_RESOURCE_STATE_INDEX_BUFFER, debugName ),
 		indexCount( static_cast<uint>(indices.size()) ),
-		indices( indices )
+		indices( indices ),
+		format( format )
 	{
 	}
 	~IndexBuffer()

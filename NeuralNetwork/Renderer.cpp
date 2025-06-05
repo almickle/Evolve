@@ -19,9 +19,18 @@
 #include <wrl\client.h>
 #include "DescriptorHeapManager.h"
 #include "ExecutionGraph.h"
+#include "GpuResourceManager.h"
 #include "Renderer.h"
 #include "ThreadManager.h"
 #include "UploadManager.h"
+
+Renderer::Renderer()
+{
+}
+
+Renderer::~Renderer()
+{
+}
 
 bool Renderer::Init( HWND hwnd )
 {
@@ -256,7 +265,10 @@ void Renderer::Shutdown()
 		uploadManager->Shutdown();
 		uploadManager.reset();
 	}
-
+	if( gpuResourceManager ) {
+		gpuResourceManager->~GpuResourceManager();
+		gpuResourceManager.reset();
+	}
 	renderGraph->Shutdown();
 
 	if( swapChain ) {

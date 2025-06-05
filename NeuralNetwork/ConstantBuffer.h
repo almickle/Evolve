@@ -17,8 +17,11 @@ public:
 		bufferData( data ),
 		bufferSize( static_cast<uint>(data.size()) )
 	{
+		bufferData.clear();
 	}
 	~ConstantBuffer() = default;
+public:
+	void Update( const void* data, size_t size ) override {};
 public:
 	const std::vector<byte>& GetData() const { return bufferData; }
 	uint GetBufferSize() const { return bufferSize; }

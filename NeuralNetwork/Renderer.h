@@ -6,18 +6,21 @@
 #include <memory>
 #include <Windows.h>
 #include <wrl\client.h>
-#include "DescriptorHeapManager.h"
-#include "ExecutionGraph.h"
-#include "GpuResourceManager.h"
-#include "ThreadManager.h"
-#include "UploadManager.h"
 
 using Microsoft::WRL::ComPtr;
 using uint64 = uint64_t;
+using uint = unsigned int;
 
 class ExecutionGraph;
+class GpuResourceManager;
+class DescriptorHeapManager;
+class ThreadManager;
+class UploadManager;
 
 class Renderer {
+public:
+	Renderer();
+	~Renderer();
 public:
 	bool Init( HWND hwnd );
 	void Present();
@@ -73,6 +76,7 @@ private:
 	std::shared_ptr<ExecutionGraph> initializationGraph;
 	std::shared_ptr<ExecutionGraph> simulationGraph;
 	std::shared_ptr<ExecutionGraph> renderGraph;
+private:
 	std::unique_ptr<UploadManager> uploadManager;
 	std::unique_ptr<GpuResourceManager> gpuResourceManager;
 	std::unique_ptr<DescriptorHeapManager> srvHeapManager;

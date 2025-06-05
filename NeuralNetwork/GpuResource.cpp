@@ -4,7 +4,6 @@
 #include <d3dx12_core.h>
 #include <memory>
 #include <string>
-#include <utility>
 #include <Windows.h>
 #include <wrl\client.h>
 #include "DescriptorHeapManager.h"

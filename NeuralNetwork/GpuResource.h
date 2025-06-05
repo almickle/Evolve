@@ -25,6 +25,7 @@ public:
 	virtual ~GpuResource() = default;
 public:
 	virtual std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const;
+	virtual void Update( const void* data, size_t size ) {};
 public:
 	ID3D12Resource* GetResource() const { return resource.Get(); }
 	D3D12_RESOURCE_DESC GetDesc() const { return resource->GetDesc(); }
