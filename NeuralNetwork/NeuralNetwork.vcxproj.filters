@@ -22,6 +22,42 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{2d9f043f-db75-475f-acf3-6a1f04e2c136}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Render">
+      <UniqueIdentifier>{765cafbe-6064-4e58-af00-1d469f7d5f06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resources">
+      <UniqueIdentifier>{f85933f3-8ab4-4689-bed6-aefc01bc5522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resources">
+      <UniqueIdentifier>{458cff70-e4c3-4897-8471-a04bbe2aa1ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Neuron">
+      <UniqueIdentifier>{2c687ecb-acfd-4561-87ca-e33e848c7e88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Render\Passes">
+      <UniqueIdentifier>{85cca647-dd04-4782-9cd6-a4ed04aaf688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Render\Passes">
+      <UniqueIdentifier>{f83da41f-d2fc-4ba1-af54-7f17e6118675}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{15399e3b-f2ed-43b9-8a9b-fca44ec423b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resources\Primary">
+      <UniqueIdentifier>{d3f5b556-af75-49dc-9685-c318af6cd5fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Resources\Complex">
+      <UniqueIdentifier>{477f2383-ff7a-4452-808a-d2e95d4c6d8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resources\Primary">
+      <UniqueIdentifier>{411d08db-da0b-4c5f-8fc7-93a7fce9f57c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resources\Complex">
+      <UniqueIdentifier>{b80178b6-c93b-4b0d-a3aa-b0e7b0ba2937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scene">
+      <UniqueIdentifier>{29537a32-b259-4542-9be7-50f252111ac3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Utils.cpp">
@@ -48,47 +84,95 @@
     <ClCompile Include="SensoryNeuron.cpp">
       <Filter>Source Files\Neuron</Filter>
     </ClCompile>
-    <ClCompile Include="UIRenderPass.cpp">
-      <Filter>Source Files\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPass.cpp">
-      <Filter>Source Files\Render</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderGraph.cpp">
-      <Filter>Source Files\Render</Filter>
-    </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneRenderPass.cpp">
+    <ClCompile Include="UploadManager.cpp">
       <Filter>Source Files\Render</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SceneRenderPass.cpp">
+      <Filter>Source Files\Render\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="UIRenderPass.cpp">
+      <Filter>Source Files\Render\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="Actor.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
     <ClCompile Include="FPCamera.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuResource.cpp">
+      <Filter>Source Files\Resources\Primary</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Source Files\Resources\Primary</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Resources\Primary</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Source Files\Resources\Primary</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Resources\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Resources\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files\Resources\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorHeapManager.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Landscape.cpp">
+      <Filter>Source Files\Resources\Complex</Filter>
+    </ClCompile>
+    <ClCompile Include="InstanceManager.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphPass.cpp">
+      <Filter>Source Files\Render\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneInitPass.cpp">
+      <Filter>Source Files\Render\Passes</Filter>
+    </ClCompile>
+    <ClCompile Include="ExecutionGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>Source Files\Resources\Primary</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredBuffer.cpp">
+      <Filter>Source Files\Resources\Primary</Filter>
+    </ClCompile>
+    <ClCompile Include="BeginFramePass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EndFramePass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InitializationGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Neuron.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Synapse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NeuralCluster.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,54 +182,129 @@
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImGuiLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderGraph.h">
+    <ClInclude Include="DataStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderPass.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NeuralCluster.h">
+      <Filter>Header Files\Neuron</Filter>
     </ClInclude>
-    <ClInclude Include="UIRenderPass.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Neuron.h">
+      <Filter>Header Files\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="Synapse.h">
+      <Filter>Header Files\Neuron</Filter>
     </ClInclude>
     <ClInclude Include="SensoryNeuron.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Neuron</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Render</Filter>
     </ClInclude>
     <ClInclude Include="SceneRenderPass.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Render\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="SceneCB.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="UIRenderPass.h">
+      <Filter>Header Files\Render\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadManager.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="LandscapePass.h">
+      <Filter>Header Files\Render\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadPass.h">
+      <Filter>Header Files\Render\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuResource.h">
+      <Filter>Header Files\Resources\Primary</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>Header Files\Resources\Primary</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Resources\Primary</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Header Files\Resources\Primary</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Resources\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Resources\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Resources\Complex</Filter>
     </ClInclude>
     <ClInclude Include="Actor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="DescriptorHeapManager.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="FPCamera.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Landscape.h">
+      <Filter>Header Files\Resources\Complex</Filter>
+    </ClInclude>
+    <ClInclude Include="InstanceManager.h">
+      <Filter>Header Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphPass.h">
+      <Filter>Header Files\Render\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneInitPass.h">
+      <Filter>Header Files\Render\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="ExecutionGraph.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BeginFramePass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EndFramePass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InitializationGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Header Files\Resources\Primary</Filter>
+    </ClInclude>
+    <ClInclude Include="StructuredBuffer.h">
+      <Filter>Header Files\Resources\Primary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="ActorPS.hlsl">
+    <FxCompile Include="PbrPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="ActorVS.hlsl">
+    <FxCompile Include="PbrVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="LandscapeVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="LandscapePS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

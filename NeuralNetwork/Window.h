@@ -1,12 +1,12 @@
 #pragma once
-#include "imgui_impl_win32.h"
+#include <imgui.h>
 #include <Windows.h>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 class Window {
 public:
-	bool Create(const wchar_t* title, HINSTANCE hInstance, int nCmdShow);
+	bool Create( const wchar_t* title, HINSTANCE hInstance, int nCmdShow );
 	void Destroy();
 	void PollEvents();
 	HWND GetHWND() const { return hwnd; }
@@ -16,5 +16,5 @@ private:
 	WNDCLASSEX wc;
 	HWND hwnd = nullptr;
 	bool quit = false;
-	static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+	static LRESULT CALLBACK WndProc( HWND, UINT, WPARAM, LPARAM );
 };

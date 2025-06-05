@@ -1,31 +1,34 @@
+#include <combaseapi.h>
+#include <objbase.h>
+#include <Windows.h>
 #include "Window.h"
 
-bool Window::Create(const wchar_t* title, HINSTANCE hInstance, int nCmdShow)
+bool Window::Create( const wchar_t* title, HINSTANCE hInstance, int nCmdShow )
 {
-	wc = { sizeof(WNDCLASSEX), CS_CLASSDC, WndProc, 0L, 0L, hInstance, nullptr, nullptr, nullptr, nullptr, title, nullptr };
-	::RegisterClassEx(&wc);
+	wc = { sizeof( WNDCLASSEX ), CS_CLASSDC, WndProc, 0L, 0L, hInstance, nullptr, nullptr, nullptr, nullptr, title, nullptr };
+	::RegisterClassEx( &wc );
 
 	// Get primary monitor resolution
-	MONITORINFO mi = { sizeof(mi) };
-	GetMonitorInfo(MonitorFromPoint({ 0, 0 }, MONITOR_DEFAULTTOPRIMARY), &mi);
+	MONITORINFO mi = { sizeof( mi ) };
+	GetMonitorInfo( MonitorFromPoint( { 0, 0 }, MONITOR_DEFAULTTOPRIMARY ), &mi );
 	int monitorWidth = mi.rcMonitor.right - mi.rcMonitor.left;
 	int monitorHeight = mi.rcMonitor.bottom - mi.rcMonitor.top;
 
 	// Create window using full monitor dimensions
-	hwnd = ::CreateWindow(wc.lpszClassName, title, WS_POPUP,
-		mi.rcMonitor.left, mi.rcMonitor.top,
-		monitorWidth, monitorHeight,
-		nullptr, nullptr, wc.hInstance, nullptr);
+	hwnd = ::CreateWindow( wc.lpszClassName, title, WS_POPUP,
+						   mi.rcMonitor.left, mi.rcMonitor.top,
+						   monitorWidth, monitorHeight,
+						   nullptr, nullptr, wc.hInstance, nullptr );
 
-	if (!hwnd)
+	if( !hwnd )
 		return false;
 
 	// Show the window
-	::ShowWindow(hwnd, SW_SHOW);
-	::UpdateWindow(hwnd);
+	::ShowWindow( hwnd, SW_SHOW );
+	::UpdateWindow( hwnd );
 
 	// COM init
-	HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+	HRESULT hr = CoInitializeEx( nullptr, COINIT_MULTITHREADED );
 
 	return hwnd != nullptr;
 }
@@ -35,32 +38,32 @@ bool Window::Create(const wchar_t* title, HINSTANCE hInstance, int nCmdShow)
 
 void Window::Destroy()
 {
-	::DestroyWindow(hwnd);
+	::DestroyWindow( hwnd );
 	hwnd = nullptr;
-	::UnregisterClassW(wc.lpszClassName, wc.hInstance);
+	::UnregisterClassW( wc.lpszClassName, wc.hInstance );
 }
 
 void Window::PollEvents()
 {
 	MSG msg;
-	while (::PeekMessage(&msg, nullptr, 0U, 0U, PM_REMOVE)) {
-		::TranslateMessage(&msg);
-		::DispatchMessage(&msg);
-		if (msg.message == WM_QUIT)
+	while( ::PeekMessage( &msg, nullptr, 0U, 0U, PM_REMOVE ) ) {
+		::TranslateMessage( &msg );
+		::DispatchMessage( &msg );
+		if( msg.message == WM_QUIT )
 			quit = true;
 	}
 }
 
-LRESULT CALLBACK Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK Window::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+	if( ImGui_ImplWin32_WndProcHandler( hWnd, msg, wParam, lParam ) )
 		return true;
 
-	switch (msg) {
-	case WM_DESTROY:
-		::PostQuitMessage(0);
-		return 0;
-	default:
-		return ::DefWindowProc(hWnd, msg, wParam, lParam);
+	switch( msg ) {
+		case WM_DESTROY:
+			::PostQuitMessage( 0 );
+			return 0;
+		default:
+			return ::DefWindowProc( hWnd, msg, wParam, lParam );
 	}
 }

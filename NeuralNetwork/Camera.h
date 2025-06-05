@@ -30,7 +30,7 @@ public:
 protected:
     DirectX::XMFLOAT3 position{0, 0, -5};
     DirectX::XMFLOAT3 target{0, 0, 0};
-    DirectX::XMFLOAT3 up{0, 1, 0};
+    DirectX::XMFLOAT3 up{0, 0, 1};
     float fovY = DirectX::XM_PIDIV4;
     float aspect = 2.333f; // 21:9
     float nearZ = 0.1f;

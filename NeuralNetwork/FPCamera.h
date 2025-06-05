@@ -4,18 +4,23 @@
 class FPCamera : public Camera {
 public:
     FPCamera();
-public:
+
     float GetSensitivity() const { return sensitivity; }
-public:
+    float GetSpeed() const { return speed; }
+    
     void SetSensitivity(float s) { sensitivity = s; }
-public:
+    void SetSpeed(float s) { speed = s; }
+	void SetForwardVec(const DirectX::XMFLOAT3& forward) { forwardVec = forward; }
+
     void MoveForward(float amount) override;
     void MoveRight(float amount) override;
     void Rotate(float yawDelta, float pitchDelta) override;
-public:
+
     DirectX::XMMATRIX GetViewMatrix() const override;
+
 private:
     float sensitivity = 0.3f; // Default sensitivity
+    float speed = 1.0f;       // Default movement speed
     DirectX::XMFLOAT3 forwardVec{ 0, 0, 1 };
     DirectX::XMFLOAT3 rightVec{ 1, 0, 0 };
 };

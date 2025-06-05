@@ -1,36 +1,33 @@
-
 cbuffer SceneCB : register(b0)
 {
     float4x4 view;
     float4x4 proj;
     float3 cameraPosition;
     float pad0;
-    // ... add light data as needed ...
 };
-
-StructuredBuffer<float4x4> gActorWorldMatrices : register(t0);
 
 struct VSInput
 {
     float3 position : POSITION;
-    float3 normal   : NORMAL;
-    uint   instanceID : SV_InstanceID;
+    float3 normal : NORMAL;
+    float2 texcoord : TEXCOORD;
 };
 
 struct VSOutput
 {
     float4 position : SV_POSITION;
     float3 worldPos : TEXCOORD0;
-    float3 normal   : NORMAL;
+    float3 normal : NORMAL;
+    float2 texcoord : TEXCOORD1;
 };
 
 VSOutput main(VSInput input)
 {
     VSOutput output;
-    float4x4 world = gActorWorldMatrices[input.instanceID];
-    float4 worldPos = mul(float4(input.position, 1.0f), world);
+    float4 worldPos = float4(input.position, 1.0f); // No transform
     output.worldPos = worldPos.xyz;
-    output.normal = mul((float3x3)world, input.normal);
+    output.normal = input.normal;
+    output.texcoord = input.texcoord;
     float4 viewPos = mul(worldPos, view);
     output.position = mul(viewPos, proj);
     return output;
