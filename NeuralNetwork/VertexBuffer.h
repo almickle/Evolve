@@ -4,11 +4,10 @@
 #include <vector>
 #include "DataStructures.h"
 #include "GpuResource.h"
+#include "Types.h"
 
 class Renderer;
 class GpuResourceManager;
-
-using uint = unsigned int;
 
 class VertexBuffer : public GpuResource {
 public:

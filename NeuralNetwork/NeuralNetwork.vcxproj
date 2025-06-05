@@ -217,6 +217,7 @@
     <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ThreadManager.h" />
+    <ClInclude Include="Types.h" />
     <ClInclude Include="UIRenderPass.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Mesh.h" />

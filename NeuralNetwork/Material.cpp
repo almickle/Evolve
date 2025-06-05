@@ -12,7 +12,7 @@
 //#include <unordered_map>
 //#include <Windows.h>
 //#include <wrl\client.h>
-//#include "Material.h"
+#include "Material.h"
 //#include "Renderer.h"
 //#include "Texture.h"
 //

@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <combaseapi.h>
 #include <cstdint>
 #include <cstring>
@@ -6,6 +7,7 @@
 #include <d3dx12_core.h>
 #include <dxgiformat.h>
 #include <memory>
+#include <rpcndr.h>
 #include <string>
 #include <unordered_map>
 #include <utility>
@@ -16,36 +18,35 @@
 #include "GpuResource.h"
 #include "Renderer.h"
 #include "StructuredBuffer.h"
-
-using uint = unsigned int;
-using byte = uint8_t;
-using ResourceID = std::string;
+#include "Types.h"
 
 class GpuResourceManager {
 public:
 	GpuResourceManager( Renderer& renderer );
 	~GpuResourceManager();
 public:
-	bool RegisterResource( std::unique_ptr<GpuResource> resource );
-	bool RegisterPerFrameResource( const GpuResource& resource );
+	bool RegisterResource( ResourceID id, std::unique_ptr<GpuResource> resource );
+	bool RegisterPerFrameResource( ResourceID id, const GpuResource& resource );
 	void RemoveResource( const ResourceID& id );
+	ResourceID GenerateUniqueResourceId( const std::string& prefix = "Resource" );
 public:
-	void CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName = "VertexBuffer" );
-	void CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& debugName = "IndexBuffer" );
-	void CreateConstantBuffer( const std::vector<byte>& data, const std::string& debugName = "ConstantBuffer" );
+	ResourceID CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName = "VertexBuffer" );
+	ResourceID CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& debugName = "IndexBuffer" );
+	ResourceID CreateConstantBuffer( const std::vector<byte>& data, const std::string& debugName = "ConstantBuffer" );
 	template<typename T>
-	void CreateStructuredBuffer( const std::vector<T>& data, const std::string& debugName = "StructuredBuffer" );
-	//void CreateTexture2D();
+	ResourceID CreateStructuredBuffer( const std::vector<T>& data, const std::string& debugName = "StructuredBuffer" );
+	void CreateTexture();
 public:
 	GpuResource* GetResource( const ResourceID& id );
 private:
 	Renderer* renderer;
 	std::unordered_map<ResourceID, std::unique_ptr<GpuResource>> resourceHeap;
 	std::unordered_map<ResourceID, std::vector<std::unique_ptr<GpuResource>>> perFrameResourceHeap;
+	std::atomic<uint64_t> g_resourceIdCounter{ 0 };
 };
 
 template<typename T>
-void GpuResourceManager::CreateStructuredBuffer( const std::vector<T>& data, const std::string& debugName )
+ResourceID GpuResourceManager::CreateStructuredBuffer( const std::vector<T>& data, const std::string& debugName )
 {
 	if( data.empty() ) return;
 
@@ -67,7 +68,7 @@ void GpuResourceManager::CreateStructuredBuffer( const std::vector<T>& data, con
 		nullptr,
 		IID_PPV_ARGS( &gpuResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	// Create upload heap
 	CD3DX12_HEAP_PROPERTIES uploadHeapProps( D3D12_HEAP_TYPE_UPLOAD );
@@ -80,7 +81,7 @@ void GpuResourceManager::CreateStructuredBuffer( const std::vector<T>& data, con
 		nullptr,
 		IID_PPV_ARGS( &uploadResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	// Copy data to upload heap
 	void* mapped = nullptr;
@@ -104,5 +105,7 @@ void GpuResourceManager::CreateStructuredBuffer( const std::vector<T>& data, con
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 	sb->CreateSRV( *renderer, srvDesc );
 
-	RegisterResource( std::move( sb ) );
+	ResourceID id = GenerateUniqueResourceId();
+	RegisterResource( id, std::move( sb ) );
+	return id;
 }

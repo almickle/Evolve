@@ -17,9 +17,9 @@ class GpuResource {
 	using ResourceID = std::string;
 public:
 	GpuResource(
-		D3D12_RESOURCE_STATES finalState = D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATES finalState,
 		const std::string& debugName = "default" )
-		: state{ D3D12_RESOURCE_STATE_COMMON, finalState }, debugName( debugName )
+		: state( finalState ), debugName( debugName )
 	{
 	}
 	virtual ~GpuResource() = default;

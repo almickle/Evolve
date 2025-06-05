@@ -5,10 +5,9 @@
 #include <string>
 #include <vector>
 #include "GpuResource.h"
+#include "Types.h"
 
 class Renderer;
-
-using uint = unsigned int;
 
 class IndexBuffer : public GpuResource {
 public:

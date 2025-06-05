@@ -19,13 +19,7 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 
-namespace {
-	std::atomic<uint64_t> g_resourceIdCounter{ 0 };
-	std::string GenerateUniqueResourceId( const std::string& prefix = "Resource" )
-	{
-		return prefix + "_" + std::to_string( g_resourceIdCounter.fetch_add( 1 ) );
-	}
-}
+using ResourceID = std::string;
 
 GpuResourceManager::GpuResourceManager( Renderer& renderer )
 {
@@ -38,16 +32,19 @@ GpuResourceManager::~GpuResourceManager()
 	perFrameResourceHeap.clear();
 }
 
-bool GpuResourceManager::RegisterResource( std::unique_ptr<GpuResource> resource )
+bool GpuResourceManager::RegisterResource( ResourceID id, std::unique_ptr<GpuResource> resource )
 {
-	std::string id = GenerateUniqueResourceId();
 	resource->SetResourceId( id );
 	return resourceHeap.emplace( id, std::move( resource ) ).second;
 }
 
-bool GpuResourceManager::RegisterPerFrameResource( const GpuResource& resource )
+ResourceID GpuResourceManager::GenerateUniqueResourceId( const std::string& prefix )
 {
-	std::string id = GenerateUniqueResourceId();
+	return prefix + "_" + std::to_string( g_resourceIdCounter.fetch_add( 1 ) );
+}
+
+bool GpuResourceManager::RegisterPerFrameResource( ResourceID id, const GpuResource& resource )
+{
 	std::vector<std::unique_ptr<GpuResource>> resources;
 	auto framesInFlight = Renderer::BackBufferCount;
 	resources.reserve( framesInFlight );
@@ -79,7 +76,7 @@ void GpuResourceManager::RemoveResource( const ResourceID& id )
 	perFrameResourceHeap.erase( id );
 }
 
-void GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName )
+ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName )
 {
 	auto device = renderer->GetDevice();
 	uint bufferSize = static_cast<uint>(vertices.size() * sizeof( Vertex ));
@@ -97,7 +94,7 @@ void GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices
 		nullptr,
 		IID_PPV_ARGS( &vbResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	// Create the upload heap
 	CD3DX12_HEAP_PROPERTIES uploadHeapProps( D3D12_HEAP_TYPE_UPLOAD );
@@ -110,7 +107,7 @@ void GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices
 		nullptr,
 		IID_PPV_ARGS( &uploadResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	// Copy data to upload heap
 	void* mapped = nullptr;
@@ -123,10 +120,12 @@ void GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices
 	vb->SetResource( std::move( vbResource ) );
 	vb->SetUploadResource( std::move( uploadResource ) );
 	vb->SetResourceSize( bufferSize );
-	RegisterResource( std::move( vb ) );
+	ResourceID id = GenerateUniqueResourceId();
+	RegisterResource( id, std::move( vb ) );
+	return id;
 }
 
-void GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, const std::string& debugName )
+ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, const std::string& debugName )
 {
 	auto device = renderer->GetDevice();
 	uint bufferSize = static_cast<uint>(indices.size() * sizeof( uint ));
@@ -143,7 +142,7 @@ void GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, co
 		nullptr,
 		IID_PPV_ARGS( &ibResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	CD3DX12_HEAP_PROPERTIES uploadHeapProps( D3D12_HEAP_TYPE_UPLOAD );
 	Microsoft::WRL::ComPtr<ID3D12Resource> uploadResource;
@@ -155,7 +154,7 @@ void GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, co
 		nullptr,
 		IID_PPV_ARGS( &uploadResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	void* mapped = nullptr;
 	uploadResource->Map( 0, nullptr, &mapped );
@@ -166,10 +165,12 @@ void GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, co
 	ib->SetResource( std::move( ibResource ) );
 	ib->SetUploadResource( std::move( uploadResource ) );
 	ib->SetResourceSize( bufferSize );
-	RegisterResource( std::move( ib ) );
+	ResourceID id = GenerateUniqueResourceId();
+	RegisterResource( id, std::move( ib ) );
+	return id;
 }
 
-void GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& data, const std::string& debugName )
+ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& data, const std::string& debugName )
 {
 	auto device = renderer->GetDevice();
 	uint bufferSize = static_cast<uint>(data.size());
@@ -186,7 +187,7 @@ void GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& data, co
 		nullptr,
 		IID_PPV_ARGS( &cbResource )
 	);
-	if( FAILED( hr ) ) return;
+	if( FAILED( hr ) ) return "resource not found";
 
 	void* mapped = nullptr;
 	cbResource->Map( 0, nullptr, &mapped );
@@ -196,5 +197,12 @@ void GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& data, co
 	auto cb = std::make_unique<ConstantBuffer>( data, debugName );
 	cb->SetResource( std::move( cbResource ) );
 	cb->SetResourceSize( bufferSize );
-	RegisterResource( std::move( cb ) );
+	ResourceID id = GenerateUniqueResourceId();
+	RegisterResource( id, std::move( cb ) );
+	return id;
+}
+
+void GpuResourceManager::CreateTexture()
+{
+
 }

@@ -6,10 +6,9 @@
 #include <memory>
 #include <Windows.h>
 #include <wrl\client.h>
+#include "Types.h"
 
 using Microsoft::WRL::ComPtr;
-using uint64 = uint64_t;
-using uint = unsigned int;
 
 class ExecutionGraph;
 class GpuResourceManager;
@@ -69,7 +68,7 @@ private:
 	ComPtr<ID3D12Fence> fence;
 	uint frameIndex = 0;
 	HANDLE fenceEvent = nullptr;
-	uint64 currentFenceValue = 0;
+	uint64_t currentFenceValue = 0;
 	uint width = 0;
 	uint height = 0;
 private:

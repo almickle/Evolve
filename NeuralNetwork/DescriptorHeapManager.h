@@ -3,8 +3,7 @@
 #include <mutex>
 #include <queue>
 #include <wrl\client.h>
-
-using uint = unsigned int;
+#include "Types.h"
 
 class DescriptorHeapManager {
 public:

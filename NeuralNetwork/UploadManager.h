@@ -10,8 +10,6 @@
 #include <wrl/client.h>
 #include "d3d12.h"
 
-using uint64 = uint64_t;
-
 class Renderer; // Forward declaration
 
 struct UploadRequest {
@@ -39,6 +37,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> uploadCmdList;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> uploadCommandQueue;
 	Microsoft::WRL::ComPtr<ID3D12Fence> uploadFence;
-	uint64 uploadFenceValue = 0;
+	uint64_t uploadFenceValue = 0;
 	HANDLE uploadFenceEvent = nullptr;
 };

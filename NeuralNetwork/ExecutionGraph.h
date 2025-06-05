@@ -2,11 +2,10 @@
 #include <d3d12.h>
 #include <memory>
 #include <vector>
+#include "Types.h"
 
 class Renderer;
 class GraphPass;
-
-using uint = unsigned int;
 
 class ExecutionGraph {
 public:

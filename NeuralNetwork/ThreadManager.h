@@ -1,25 +1,30 @@
 #pragma once
 #include <atomic>
+#include <condition_variable>
 #include <functional>
+#include <mutex>
+#include <queue>
 #include <thread>
 #include <vector>
+#include "Types.h"
 
 class ThreadManager {
 public:
-	ThreadManager();
+	ThreadManager( uint threadCount = std::thread::hardware_concurrency() );
 	~ThreadManager();
-
-	// Returns the number of hardware threads available
-	unsigned int GetThreadCount() const;
-
-	// Launch a worker thread with a given function
+public:
 	void Launch( std::function<void()> func );
-
-	// Wait for all threads to finish
 	void JoinAll();
-
+public:
+	uint GetThreadCount() const { return threadCount; }
 private:
-	unsigned int threadCount;
+	void WorkerLoop();
+private:
+	uint threadCount;
 	std::vector<std::thread> threads;
+	std::queue<std::function<void()>> tasks;
+	std::mutex tasksMutex;
+	std::condition_variable tasksCv;
 	std::atomic<bool> running{ true };
+	std::atomic<uint> activeTasks{ 0 };
 };
