@@ -1,7 +1,5 @@
 #include <atomic>
 #include <combaseapi.h>
-#include <cstdint>
-#include <cstring>
 #include <d3d12.h>
 #include <d3dx12_core.h>
 #include <memory>
@@ -17,6 +15,9 @@
 #include "GpuResourceManager.h"
 #include "IndexBuffer.h"
 #include "Renderer.h"
+#include "Texture.h"
+#include "Types.h"
+#include "UploadManager.h"
 #include "VertexBuffer.h"
 
 using ResourceID = std::string;
@@ -43,13 +44,13 @@ ResourceID GpuResourceManager::GenerateUniqueResourceId( const std::string& pref
 	return prefix + "_" + std::to_string( g_resourceIdCounter.fetch_add( 1 ) );
 }
 
-bool GpuResourceManager::RegisterPerFrameResource( ResourceID id, const GpuResource& resource )
+bool GpuResourceManager::RegisterPerFrameResource( ResourceID id, std::unique_ptr<GpuResource> resource )
 {
 	std::vector<std::unique_ptr<GpuResource>> resources;
 	auto framesInFlight = Renderer::BackBufferCount;
 	resources.reserve( framesInFlight );
 	for( unsigned int i = 0; i < framesInFlight; ++i ) {
-		auto clone = resource.Clone( *renderer );
+		auto clone = resource->Clone( *renderer );
 		if( !clone ) return false;
 		clone->SetResourceId( id + "_frame" + std::to_string( i ) );
 		resources.push_back( std::move( clone ) );
@@ -57,7 +58,7 @@ bool GpuResourceManager::RegisterPerFrameResource( ResourceID id, const GpuResou
 	return perFrameResourceHeap.emplace( id, std::move( resources ) ).second;
 }
 
-GpuResource* GpuResourceManager::GetResource( const ResourceID& id )
+GpuResource* GpuResourceManager::GetResource( const ResourceID& id ) const
 {
 	auto perFrameIt = perFrameResourceHeap.find( id );
 	if( perFrameIt != perFrameResourceHeap.end() ) {
@@ -70,10 +71,45 @@ GpuResource* GpuResourceManager::GetResource( const ResourceID& id )
 	return (singleIt != resourceHeap.end()) ? singleIt->second.get() : nullptr;
 }
 
+std::vector<GpuResource*> GpuResourceManager::GetAllResources() const
+{
+	std::vector<GpuResource*> allResources;
+	for( auto& pair : resourceHeap ) {
+		allResources.push_back( pair.second.get() );
+	}
+	for( auto& pair : perFrameResourceHeap ) {
+		for( auto& resource : pair.second ) {
+			allResources.push_back( resource.get() );
+		}
+	}
+	return allResources;
+}
+
 void GpuResourceManager::RemoveResource( const ResourceID& id )
 {
 	resourceHeap.erase( id );
 	perFrameResourceHeap.erase( id );
+}
+
+void GpuResourceManager::UploadResource( const ResourceID& id )
+{
+	auto* resource = GetResource( id );
+	if( !resource ) return;
+
+	auto* uploadManager = renderer->GetUploadManager();
+	if( !uploadManager ) return;
+
+	// Enqueue the upload request
+	uploadManager->Enqueue( {
+		// recordFunc: called on the upload thread, records the copy/upload
+		[resource]( ID3D12GraphicsCommandList* cmdList ) {
+			resource->Upload( cmdList );
+			},
+							// onComplete: set resource as ready
+							[resource]() {
+								resource->SetIsReady( true );
+							}
+							} );
 }
 
 ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName )
@@ -90,7 +126,7 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 		&heapProps,
 		D3D12_HEAP_FLAG_NONE,
 		&bufferDesc,
-		D3D12_RESOURCE_STATE_COMMON,
+		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
 		IID_PPV_ARGS( &vbResource )
 	);
@@ -109,19 +145,26 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	// Copy data to upload heap
-	void* mapped = nullptr;
-	uploadResource->Map( 0, nullptr, &mapped );
-	memcpy( mapped, vertices.data(), bufferSize );
-	uploadResource->Unmap( 0, nullptr );
-
 	// Create and register the GpuResource
 	auto vb = std::make_unique<VertexBuffer>( vertices, debugName );
 	vb->SetResource( std::move( vbResource ) );
+	vb->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
 	vb->SetUploadResource( std::move( uploadResource ) );
 	vb->SetResourceSize( bufferSize );
+
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( vb ) );
+
+	// Set vertex buffer view for the resource
+	auto* vbPtr = static_cast<VertexBuffer*>(GetResource( id ));
+	if( vbPtr ) {
+		D3D12_VERTEX_BUFFER_VIEW view = {};
+		view.BufferLocation = vbPtr->GetResource()->GetGPUVirtualAddress();
+		view.SizeInBytes = bufferSize;
+		view.StrideInBytes = sizeof( Vertex );
+		vbPtr->SetVertexBufferView( view );
+	}
+
 	return id;
 }
 
@@ -156,17 +199,25 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	void* mapped = nullptr;
-	uploadResource->Map( 0, nullptr, &mapped );
-	memcpy( mapped, indices.data(), bufferSize );
-	uploadResource->Unmap( 0, nullptr );
-
 	auto ib = std::make_unique<IndexBuffer>( indices, debugName );
 	ib->SetResource( std::move( ibResource ) );
+	ib->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
 	ib->SetUploadResource( std::move( uploadResource ) );
 	ib->SetResourceSize( bufferSize );
+
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( ib ) );
+
+	// Set index buffer view for the resource
+	auto* ibPtr = static_cast<IndexBuffer*>(GetResource( id ));
+	if( ibPtr ) {
+		D3D12_INDEX_BUFFER_VIEW view = {};
+		view.BufferLocation = ibPtr->GetResource()->GetGPUVirtualAddress();
+		view.SizeInBytes = bufferSize;
+		view.Format = ibPtr->GetFormat();
+		ibPtr->SetIndexBufferView( view );
+	}
+
 	return id;
 }
 
@@ -189,20 +240,62 @@ ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& da
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	void* mapped = nullptr;
-	cbResource->Map( 0, nullptr, &mapped );
-	memcpy( mapped, data.data(), bufferSize );
-	cbResource->Unmap( 0, nullptr );
-
 	auto cb = std::make_unique<ConstantBuffer>( data, debugName );
 	cb->SetResource( std::move( cbResource ) );
+	cb->SetCurrentState( D3D12_RESOURCE_STATE_GENERIC_READ );
 	cb->SetResourceSize( bufferSize );
+
 	ResourceID id = GenerateUniqueResourceId();
-	RegisterResource( id, std::move( cb ) );
+	RegisterPerFrameResource( id, std::move( cb ) );
 	return id;
 }
 
-void GpuResourceManager::CreateTexture()
+ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& debugName )
 {
+	auto device = renderer->GetDevice();
+	uint numSubresources = static_cast<uint>(subresourceData.size());
 
+	// 1. Create the default heap resource (GPU local)
+	CD3DX12_HEAP_PROPERTIES heapProps( D3D12_HEAP_TYPE_DEFAULT );
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource;
+	HRESULT hr = device->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&texDesc,
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS( &textureResource )
+	);
+	if( FAILED( hr ) ) return "resource not found";
+
+	// 2. Create the upload heap
+	UINT64 uploadBufferSize = 0;
+	device->GetCopyableFootprints(
+		&texDesc, 0, numSubresources, 0, nullptr, nullptr, nullptr, &uploadBufferSize );
+
+	CD3DX12_HEAP_PROPERTIES uploadHeapProps( D3D12_HEAP_TYPE_UPLOAD );
+	CD3DX12_RESOURCE_DESC uploadBufferDesc = CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize );
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> uploadResource;
+	hr = device->CreateCommittedResource(
+		&uploadHeapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&uploadBufferDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS( &uploadResource )
+	);
+	if( FAILED( hr ) ) return "resource not found";
+
+	// 3. Create the Texture resource object
+	auto tex = std::make_unique<Texture>( subresourceData, debugName );
+	tex->SetResource( std::move( textureResource ) );
+	tex->SetUploadResource( std::move( uploadResource ) );
+	tex->SetResourceSize( uploadBufferSize );
+	tex->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
+
+	ResourceID id = GenerateUniqueResourceId();
+	RegisterResource( id, std::move( tex ) );
+
+	return id;
 }

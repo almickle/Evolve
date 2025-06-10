@@ -3,9 +3,9 @@ struct Light
     float3 direction;
     float  intensity;
     float3 color;
-    int    type;      // 0 = directional, 1 = point (expand as needed)
-    float3 position;  // for point lights
-    float  pad;       // padding for alignment
+    int    type;      // 0 = directional, 1 = point
+    float3 position;
+    float  pad; 
 };
 
 cbuffer SceneCB : register(b0)
@@ -14,9 +14,9 @@ cbuffer SceneCB : register(b0)
     float4x4 proj;
     float3   cameraPos;
     float    pad0;
-    Light lights[8]; // Match max light count with C++ side
+    Light    lights[8];  // Match max light count with C++ side
     int      numLights;
-    int3   pad1;
+    int3     pad1;
 };
 
 struct VSOutput

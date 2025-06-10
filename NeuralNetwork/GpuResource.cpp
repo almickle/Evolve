@@ -1,10 +1,7 @@
-#include <combaseapi.h>
+#include <cstring>
 #include <d3d12.h>
 #include <d3dx12_barriers.h>
-#include <d3dx12_core.h>
-#include <memory>
 #include <string>
-#include <Windows.h>
 #include <wrl\client.h>
 #include "DescriptorHeapManager.h"
 #include "GpuResource.h"
@@ -21,28 +18,18 @@ void GpuResource::CreateSRV( Renderer& renderer, const D3D12_SHADER_RESOURCE_VIE
 	device->CreateShaderResourceView( resource.Get(), &srvDesc, srvCpuHandle );
 }
 
-std::unique_ptr<GpuResource> GpuResource::Clone( Renderer& renderer ) const
+void GpuResource::Upload( ID3D12GraphicsCommandList* cmdList )
 {
-	// Example for a buffer; adapt for textures as needed
-	auto desc = resource->GetDesc();
-	Microsoft::WRL::ComPtr<ID3D12Resource> newResource;
-	CD3DX12_HEAP_PROPERTIES heapProps( D3D12_HEAP_TYPE_UPLOAD );
-	HRESULT hr = renderer.GetDevice()->CreateCommittedResource(
-		&heapProps,
-		D3D12_HEAP_FLAG_NONE,
-		&desc,
-		state.target,
-		nullptr,
-		IID_PPV_ARGS( &newResource )
-	);
-	if( FAILED( hr ) ) return nullptr;
+	void* mapped = nullptr;
+	uploadResource->Map( 0, nullptr, &mapped );
+	memcpy( mapped, GetData(), GetDataSize() );
+	uploadResource->Unmap( 0, nullptr );
 
-	auto clone = std::make_unique<GpuResource>( state.target, debugName );
-	clone->resource = newResource;
-	clone->resourceSize = resourceSize;
-	clone->debugName = debugName;
-	// Copy other relevant metadata as needed
-	return clone;
+	cmdList->CopyBufferRegion(
+		resource.Get(), 0,
+		uploadResource.Get(), 0,
+		GetDataSize()
+	);
 }
 
 void GpuResource::TransitionToTargetState( ID3D12GraphicsCommandList* commandList )

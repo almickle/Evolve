@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include <DirectXMath.h>
 
 // Light constant buffer

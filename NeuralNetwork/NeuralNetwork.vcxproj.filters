@@ -25,12 +25,6 @@
     <Filter Include="Header Files\Render">
       <UniqueIdentifier>{765cafbe-6064-4e58-af00-1d469f7d5f06}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Resources">
-      <UniqueIdentifier>{f85933f3-8ab4-4689-bed6-aefc01bc5522}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Resources">
-      <UniqueIdentifier>{458cff70-e4c3-4897-8471-a04bbe2aa1ec}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Neuron">
       <UniqueIdentifier>{2c687ecb-acfd-4561-87ca-e33e848c7e88}</UniqueIdentifier>
     </Filter>
@@ -43,23 +37,8 @@
     <Filter Include="Source Files\Scene">
       <UniqueIdentifier>{15399e3b-f2ed-43b9-8a9b-fca44ec423b5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Resources\Primary">
-      <UniqueIdentifier>{d3f5b556-af75-49dc-9685-c318af6cd5fa}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Resources\Complex">
-      <UniqueIdentifier>{477f2383-ff7a-4452-808a-d2e95d4c6d8b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Resources\Primary">
-      <UniqueIdentifier>{411d08db-da0b-4c5f-8fc7-93a7fce9f57c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Resources\Complex">
-      <UniqueIdentifier>{b80178b6-c93b-4b0d-a3aa-b0e7b0ba2937}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{29537a32-b259-4542-9be7-50f252111ac3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Render\Managers">
-      <UniqueIdentifier>{362d2c43-6ba6-4768-adbd-6d87a2da7d45}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\UI">
       <UniqueIdentifier>{81a454f8-464a-4a11-a651-80b91cca82ec}</UniqueIdentifier>
@@ -70,9 +49,6 @@
     <Filter Include="Header Files\Render\Graphs">
       <UniqueIdentifier>{a1ab680a-5d77-4cee-89be-6042f1f9ae0a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Render\Managers">
-      <UniqueIdentifier>{9d16dc52-0a56-47a7-9c0c-b568c39b2d9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Render\Graphs">
       <UniqueIdentifier>{d0015645-90ac-458e-a1d5-02e2d8ce235c}</UniqueIdentifier>
     </Filter>
@@ -81,6 +57,45 @@
     </Filter>
     <Filter Include="Source Files\Common">
       <UniqueIdentifier>{d37a04fd-a83a-49e3-9e43-ee341367c20f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets">
+      <UniqueIdentifier>{b80178b6-c93b-4b0d-a3aa-b0e7b0ba2937}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets">
+      <UniqueIdentifier>{9f2a5307-2ced-4429-8dcf-04cd585d63de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\SubAssets">
+      <UniqueIdentifier>{b4a93ec3-11e8-41a2-a085-85026414c042}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Resources">
+      <UniqueIdentifier>{f85933f3-8ab4-4689-bed6-aefc01bc5522}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Managers">
+      <UniqueIdentifier>{362d2c43-6ba6-4768-adbd-6d87a2da7d45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Managers">
+      <UniqueIdentifier>{9d16dc52-0a56-47a7-9c0c-b568c39b2d9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Resources">
+      <UniqueIdentifier>{458cff70-e4c3-4897-8471-a04bbe2aa1ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\SubAssets">
+      <UniqueIdentifier>{fd1db63e-066c-4919-85ed-0c039329fd87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Assets">
+      <UniqueIdentifier>{8bb6d231-ec9f-41bb-a37a-8077d40a13bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Material Graph">
+      <UniqueIdentifier>{6f3ea7da-0b11-4768-b740-d3781a5d95a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Assets">
+      <UniqueIdentifier>{70e68596-c268-443c-8aa6-fd8ea44c1349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Material Graph">
+      <UniqueIdentifier>{aebdb90f-4644-4cbb-b7ec-11ddc2dd21e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Material Graph\Nodes">
+      <UniqueIdentifier>{68345bd9-6603-49ed-a9bc-3be59d359a3a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -123,32 +138,8 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="GpuResource.cpp">
-      <Filter>Source Files\Resources\Primary</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBuffer.cpp">
-      <Filter>Source Files\Resources\Primary</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\Resources\Primary</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Source Files\Resources\Primary</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files\Resources\Complex</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files\Resources\Complex</Filter>
-    </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Source Files\Resources\Complex</Filter>
-    </ClCompile>
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Landscape.cpp">
-      <Filter>Source Files\Resources\Complex</Filter>
     </ClCompile>
     <ClCompile Include="InstanceManager.cpp">
       <Filter>Source Files\Scene</Filter>
@@ -159,23 +150,17 @@
     <ClCompile Include="SceneInitPass.cpp">
       <Filter>Source Files\Render\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>Source Files\Resources\Primary</Filter>
-    </ClCompile>
-    <ClCompile Include="StructuredBuffer.cpp">
-      <Filter>Source Files\Resources\Primary</Filter>
-    </ClCompile>
     <ClCompile Include="DescriptorHeapManager.cpp">
-      <Filter>Source Files\Render\Managers</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="UploadManager.cpp">
-      <Filter>Source Files\Render\Managers</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="GpuResourceManager.cpp">
-      <Filter>Source Files\Render\Managers</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="ThreadManager.cpp">
-      <Filter>Source Files\Render\Managers</Filter>
+      <Filter>Source Files\Managers</Filter>
     </ClCompile>
     <ClCompile Include="ExecutionGraph.cpp">
       <Filter>Source Files\Render\Graphs</Filter>
@@ -194,6 +179,54 @@
     </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>Source Files\Assets\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuResource.cpp">
+      <Filter>Source Files\Assets\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>Source Files\Assets\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="StructuredBuffer.cpp">
+      <Filter>Source Files\Assets\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Assets\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexBuffer.cpp">
+      <Filter>Source Files\Assets\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="SubMesh.cpp">
+      <Filter>Source Files\Assets\SubAssets</Filter>
+    </ClCompile>
+    <ClCompile Include="FileIOManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Landscape.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureAsset.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialNode.cpp">
+      <Filter>Source Files\Assets\Material Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialGraph.cpp">
+      <Filter>Source Files\Assets\Material Graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -230,27 +263,6 @@
     <ClInclude Include="UploadPass.h">
       <Filter>Header Files\Render\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="GpuResource.h">
-      <Filter>Header Files\Resources\Primary</Filter>
-    </ClInclude>
-    <ClInclude Include="IndexBuffer.h">
-      <Filter>Header Files\Resources\Primary</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\Resources\Primary</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Header Files\Resources\Primary</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files\Resources\Complex</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files\Resources\Complex</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files\Resources\Complex</Filter>
-    </ClInclude>
     <ClInclude Include="Actor.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
@@ -266,9 +278,6 @@
     <ClInclude Include="Scene.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Landscape.h">
-      <Filter>Header Files\Resources\Complex</Filter>
-    </ClInclude>
     <ClInclude Include="InstanceManager.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
@@ -278,23 +287,17 @@
     <ClInclude Include="SceneInitPass.h">
       <Filter>Header Files\Render\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Header Files\Resources\Primary</Filter>
-    </ClInclude>
-    <ClInclude Include="StructuredBuffer.h">
-      <Filter>Header Files\Resources\Primary</Filter>
-    </ClInclude>
     <ClInclude Include="DescriptorHeapManager.h">
-      <Filter>Header Files\Render\Managers</Filter>
+      <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="UploadManager.h">
-      <Filter>Header Files\Render\Managers</Filter>
+      <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="GpuResourceManager.h">
-      <Filter>Header Files\Render\Managers</Filter>
+      <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="ThreadManager.h">
-      <Filter>Header Files\Render\Managers</Filter>
+      <Filter>Header Files\Managers</Filter>
     </ClInclude>
     <ClInclude Include="BeginFramePass.h">
       <Filter>Header Files\Render\Passes</Filter>
@@ -320,6 +323,69 @@
     <ClInclude Include="ExecutionGraph.h">
       <Filter>Header Files\Render\Graphs</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Header Files\Assets\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuResource.h">
+      <Filter>Header Files\Assets\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>Header Files\Assets\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="StructuredBuffer.h">
+      <Filter>Header Files\Assets\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Assets\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexBuffer.h">
+      <Filter>Header Files\Assets\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileIOManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Landscape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SubAsset.h">
+      <Filter>Header Files\Assets\SubAssets</Filter>
+    </ClInclude>
+    <ClInclude Include="SubMesh.h">
+      <Filter>Header Files\Assets\SubAssets</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureAsset.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialGraph.h">
+      <Filter>Header Files\Assets\Material Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialNode.h">
+      <Filter>Header Files\Assets\Material Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureSamplerNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialOutputNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLibrary.h">
+      <Filter>Header Files\Assets\Material Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeTypes.h">
+      <Filter>Header Files\Assets\Material Graph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PbrPS.hlsl">
@@ -332,6 +398,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="LandscapePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Material.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="scratch.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

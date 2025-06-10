@@ -1,57 +1,64 @@
+#include <assimp/Importer.hpp>
+#include <assimp/mesh.h>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <cstdint>
-#include <d3d12.h>
+#include <DirectXMath.h>
+#include <memory>
+#include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
-#include <wrl\client.h>
 #include "DataStructures.h"
 #include "GpuResourceManager.h"
-#include "IndexBuffer.h"
 #include "Mesh.h"
-#include "VertexBuffer.h"
+#include "SubMesh.h"
 
-using Microsoft::WRL::ComPtr;
-using uint = unsigned int;
-
-void Mesh::Create( GpuResourceManager& manager, const std::vector<Vertex>& vertices, const std::vector<uint32_t>& indices )
+void Mesh::Load( const std::string& path, GpuResourceManager& manager )
 {
-	vertexBufferID = manager.CreateVertexBuffer( vertices, name + "VertexBuffer" );
-	indexBufferID = manager.CreateIndexBuffer( indices, name + "IndexBuffer" );
-}
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile( path,
+											  aiProcess_Triangulate |
+											  aiProcess_GenSmoothNormals |
+											  aiProcess_CalcTangentSpace |
+											  aiProcess_JoinIdenticalVertices );
 
-void Mesh::Bind( GpuResourceManager& manager, ID3D12GraphicsCommandList* cmdList ) const
-{
-	auto vertexBuffer = GetVertexBuffer( manager );
-	auto indexBuffer = GetIndexBuffer( manager );
+	if( !scene || !scene->HasMeshes() ) {
+		throw std::runtime_error( "Failed to load model: " + path + " " + importer.GetErrorString() );
+	}
 
-	cmdList->IASetVertexBuffers( 0, 1, &vertexBuffer->GetView() );
-	cmdList->IASetIndexBuffer( &indexBuffer->GetView() );
-	cmdList->IASetPrimitiveTopology( topology );
-}
+	for( unsigned int m = 0; m < scene->mNumMeshes; ++m ) {
+		const aiMesh* mesh = scene->mMeshes[m];
+		std::vector<Vertex> vertices;
+		std::vector<uint32_t> indices;
 
-VertexBuffer* Mesh::GetVertexBuffer( GpuResourceManager& manager ) const
-{
-	return static_cast<VertexBuffer*>(manager.GetResource( vertexBufferID ));
-}
+		vertices.reserve( mesh->mNumVertices );
+		for( unsigned int i = 0; i < mesh->mNumVertices; ++i ) {
+			Vertex v{};
+			v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+			v.normal = mesh->HasNormals() ? DirectX::XMFLOAT3( mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z ) : DirectX::XMFLOAT3( 0, 0, 0 );
+			if( mesh->HasTextureCoords( 0 ) )
+				v.texcoord = { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y };
+			else
+				v.texcoord = { 0, 0 };
+			if( mesh->HasTangentsAndBitangents() )
+				v.tangent = { mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z };
+			else
+				v.tangent = { 0, 0, 0 };
+			vertices.push_back( v );
+		}
 
-IndexBuffer* Mesh::GetIndexBuffer( GpuResourceManager& manager ) const
-{
-	return static_cast<IndexBuffer*>(manager.GetResource( indexBufferID ));
-}
+		indices.reserve( static_cast<std::vector<uint32_t, std::allocator<uint32_t>>::size_type>(mesh->mNumFaces) * 3 );
+		for( unsigned int i = 0; i < mesh->mNumFaces; ++i ) {
+			const aiFace& face = mesh->mFaces[i];
+			for( unsigned int j = 0; j < face.mNumIndices; ++j )
+				indices.push_back( face.mIndices[j] );
+		}
 
-const std::vector<Vertex>& Mesh::GetVertices( GpuResourceManager& manager ) const
-{
-	auto vertexBuffer = GetVertexBuffer( manager );
-	return static_cast<VertexBuffer*>(vertexBuffer)->GetVertices();
-}
+		auto vbId = manager.CreateVertexBuffer( vertices, debugName );
+		auto ibId = manager.CreateIndexBuffer( indices, debugName );
 
-const std::vector<uint32_t>& Mesh::GetIndices( GpuResourceManager& manager ) const
-{
-	auto indexBuffer = GetIndexBuffer( manager );
-	return static_cast<IndexBuffer*>(indexBuffer)->GetIndices();
-}
-
-uint Mesh::GetIndexCount( GpuResourceManager& manager ) const
-{
-	auto indexBuffer = GetIndexBuffer( manager );
-	return static_cast<IndexBuffer*>(indexBuffer)->GetIndexCount();
+		auto subMesh = std::make_unique<SubMesh>( vbId, ibId, debugName );
+		AddSubAsset( std::move( subMesh ) );
+	}
 }

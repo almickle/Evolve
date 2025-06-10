@@ -10,11 +10,17 @@
 #include "ExecutionGraph.h"
 #include "ImGuiLayer.h"
 #include "InitializationGraph.h"
+#include "MaterialGraph.h"
 #include "Renderer.h"
 #include "UIRenderPass.h"
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
 {
+	std::vector<NodeTypes> nodes = { NodeTypes::MaterialOutput, NodeTypes::TextureSampler };
+	std::vector<MaterialEdge> edges = { {1, 0, 0, 0} };
+	auto graph = new MaterialGraph( nodes, edges );
+	auto lib = new NodeLibrary();
+	auto shader = graph->GetShaderCode( *lib );
 	App app;
 	if( !app.Init( hInstance, nCmdShow ) )
 		return -1;
@@ -142,7 +148,7 @@ void App::UpdateInputState()
 		if( GetForegroundWindow() == window.GetHWND() ) {
 			RECT rect;
 			GetClientRect( window.GetHWND(), &rect );
-			POINT center;
+			POINT center{};
 			center.x = (rect.right - rect.left) / 2;
 			center.y = (rect.bottom - rect.top) / 2;
 			ClientToScreen( window.GetHWND(), &center );

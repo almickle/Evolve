@@ -12,7 +12,6 @@
 //#include <unordered_map>
 //#include <Windows.h>
 //#include <wrl\client.h>
-#include "Material.h"
 //#include "Renderer.h"
 //#include "Texture.h"
 //
@@ -140,3 +139,10 @@
 //	// Note: Fallback values should be set in a constant buffer and bound as well.
 //	// This is typically done outside the material, or you can add a method to upload a material constant buffer.
 //}
+
+#include "Material.h"
+
+void Material::Load( const std::string& path, GpuResourceManager& resourceManager )
+{
+
+}

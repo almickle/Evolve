@@ -11,7 +11,7 @@ class Renderer;
 
 class IndexBuffer : public GpuResource {
 public:
-	IndexBuffer( const std::vector<uint32_t>& indices, const std::string& debugName = "IndexBuffer", DXGI_FORMAT format = DXGI_FORMAT_R32_UINT )
+	IndexBuffer( const std::vector<uint>& indices, const std::string& debugName = "IndexBuffer", DXGI_FORMAT format = DXGI_FORMAT_R32_UINT )
 		: GpuResource( D3D12_RESOURCE_STATE_INDEX_BUFFER, debugName ),
 		indexCount( static_cast<uint>(indices.size()) ),
 		indices( indices ),
@@ -23,13 +23,18 @@ public:
 		indices.clear();
 	}
 public:
+	const void* GetData() const override { return indices.data(); }
+	size_t GetDataSize() const override { return indices.size() * sizeof( uint ); }
+public:
 	const D3D12_INDEX_BUFFER_VIEW& GetView() const { return ibView; }
 	uint GetIndexCount() const { return indexCount; }
 	DXGI_FORMAT GetFormat() const { return format; }
-	const std::vector<uint32_t>& GetIndices() const { return indices; }
+	const std::vector<uint>& GetIndices() const { return indices; }
+public:
+	void SetIndexBufferView( const D3D12_INDEX_BUFFER_VIEW& view ) { ibView = view; }
 private:
 	D3D12_INDEX_BUFFER_VIEW ibView{};
 	uint indexCount = 0;
 	DXGI_FORMAT format = DXGI_FORMAT_R32_UINT;
-	std::vector<uint32_t> indices;
+	std::vector<uint> indices;
 };

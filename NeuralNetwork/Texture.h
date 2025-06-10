@@ -1,20 +1,29 @@
 #pragma once
 #include <d3d12.h>
 #include <string>
+#include <vector>
 #include "GpuResource.h"
+#include "Types.h"
 
 class Renderer;
 
 class Texture : public GpuResource {
 public:
-	Texture( const std::wstring& filePath, const std::string& debugName = "Texture" )
+	Texture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, const std::string& debugName = "Texture" )
 		: GpuResource( D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, debugName ),
-		filePath( filePath )
+		subresourceData( subresourceData ),
+		numSubresources( static_cast<uint>(subresourceData.size()) )
 	{
 	};
+	~Texture()
+	{
+		subresourceData.clear();
+	}
 public:
-	bool Load();
+	void Upload( ID3D12GraphicsCommandList* cmdList ) override;
+	const void* GetData() const override { return subresourceData.data(); }
+	size_t GetDataSize() const override;
 private:
-	std::wstring filePath;
-	D3D12_RESOURCE_STATES finalState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+	std::vector<D3D12_SUBRESOURCE_DATA> subresourceData;
+	uint numSubresources = 0;
 };

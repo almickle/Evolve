@@ -1,17 +1,16 @@
+#include <atomic>
 #include <combaseapi.h>
 #include <d3d12.h>
-#include <future>
 #include <mutex>
+#include <queue>
 #include <synchapi.h>
-#include <thread>
 #include <utility>
-#include <vector>
 #include <Windows.h>
 #include "Renderer.h"
 #include "UploadManager.h"
 
 UploadManager::UploadManager( Renderer& renderer )
-	: running( true )
+	: threadManager( renderer.GetThreadManager() )
 {
 	// Create upload allocator and command list
 	auto device = renderer.GetDevice();
@@ -29,93 +28,53 @@ UploadManager::UploadManager( Renderer& renderer )
 	device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS( &uploadFence ) );
 	uploadFenceValue = 1;
 	uploadFenceEvent = CreateEvent( nullptr, FALSE, FALSE, nullptr );
-
-	// Start the upload thread
-	uploadThread = std::thread( [this, &renderer]() {
-		this->StartUploadThread( renderer );
-								} );
-}
-
-UploadManager::~UploadManager()
-{
-	Shutdown();
-}
-
-void UploadManager::StartUploadThread( Renderer& renderer )
-{
-	while( running ) {
-		std::unique_lock lock( mutex );
-		cv.wait( lock, [&] { return !queue.empty() || !running; } );
-
-		// Batch all requests currently in the queue
-		std::vector<UploadRequest> batch;
-		while( !queue.empty() ) {
-			batch.push_back( std::move( queue.front() ) );
-			queue.pop();
-		}
-		lock.unlock();
-
-		if( !batch.empty() ) {
-			uploadAllocator->Reset();
-			uploadCmdList->Reset( uploadAllocator.Get(), nullptr );
-
-			// Record all uploads in one command list
-			for( auto& req : batch ) {
-				req.recordFunc( uploadCmdList.Get() );
-			}
-			uploadCmdList->Close();
-
-			ID3D12CommandList* lists[] = { uploadCmdList.Get() };
-			uploadCommandQueue->ExecuteCommandLists( 1, lists );
-			uploadCommandQueue->Signal( uploadFence.Get(), uploadFenceValue );
-
-			// Call all onComplete callbacks
-			for( auto& req : batch ) {
-				if( req.onComplete ) req.onComplete();
-			}
-		}
-	}
 }
 
 void UploadManager::Enqueue( UploadRequest req )
 {
 	{
-		std::lock_guard<std::mutex> lock( mutex );
-		queue.push( std::move( req ) );
-	}
-	cv.notify_one();
-}
-
-void UploadManager::Shutdown()
-{
-	running = false;
-	cv.notify_one();
-	if( uploadThread.joinable() ) {
-		uploadThread.join();
+		std::lock_guard<std::mutex> lock( queueMutex );
+		uploadQueue.push( std::move( req ) );
 	}
 }
 
 void UploadManager::Flush()
 {
-	// Enqueue a no-op upload that captures the current fence value
-	std::promise<void> promise;
-	auto future = promise.get_future();
+	// Only one batch at a time
+	if( batchInProgress.exchange( true ) ) return;
 
-	Enqueue( {
-		// recordFunc: no-op
-		[]( ID3D12GraphicsCommandList* ) {},
-		// onComplete: signal fence and set promise
-		[this, &promise]() {
-			uploadCommandQueue->Signal( uploadFence.Get(), uploadFenceValue );
-			if( uploadFence->GetCompletedValue() < uploadFenceValue ) {
-				uploadFence->SetEventOnCompletion( uploadFenceValue, uploadFenceEvent );
-				WaitForSingleObject( uploadFenceEvent, INFINITE );
-			}
-			++uploadFenceValue;
-			promise.set_value();
+	threadManager->Launch( [this] {
+		std::queue<UploadRequest> localQueue;
+		{
+			std::lock_guard<std::mutex> lock( queueMutex );
+			std::swap( localQueue, uploadQueue );
 		}
-			 } );
 
-	// Wait for the future to complete
-	future.wait();
+		if( localQueue.empty() ) {
+			batchInProgress = false;
+			return;
+		}
+
+		// Reset allocator and command list once
+		uploadAllocator->Reset();
+		uploadCmdList->Reset( uploadAllocator.Get(), nullptr );
+
+		// Record all upload commands
+		while( !localQueue.empty() ) {
+			localQueue.front().recordFunc( uploadCmdList.Get() );
+			localQueue.pop();
+		}
+
+		uploadCmdList->Close();
+		ID3D12CommandList* lists[] = { uploadCmdList.Get() };
+		uploadCommandQueue->ExecuteCommandLists( 1, lists );
+
+		uploadFenceValue++;
+		uploadCommandQueue->Signal( uploadFence.Get(), uploadFenceValue );
+
+		// Optionally, wait for completion and call all callbacks
+		// (You can track callbacks in a vector if needed)
+
+		batchInProgress = false;
+						   } );
 }

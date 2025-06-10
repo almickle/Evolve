@@ -24,8 +24,13 @@ public:
 	}
 	virtual ~GpuResource() = default;
 public:
-	virtual std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const;
+	virtual std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const { return nullptr; };
 	virtual void Update( const void* data, size_t size ) {};
+	virtual void Upload( ID3D12GraphicsCommandList* cmdList );
+	virtual const void* GetData() const = 0;
+	virtual size_t GetDataSize() const = 0;
+public:
+	void TransitionToTargetState( ID3D12GraphicsCommandList* commandList );
 public:
 	ID3D12Resource* GetResource() const { return resource.Get(); }
 	D3D12_RESOURCE_DESC GetDesc() const { return resource->GetDesc(); }
@@ -33,17 +38,17 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetSrvCpuHandle() const { return srvCpuHandle; }
 	D3D12_GPU_DESCRIPTOR_HANDLE GetSrvGpuHandle() const { return srvGpuHandle; }
 	int GetSrvHeapIndex() const { return srvHeapIndex; }
-public:
-	void TransitionToTargetState( ID3D12GraphicsCommandList* commandList );
 	D3D12_RESOURCE_STATES GetCurrentState() const { return state.current; }
 	D3D12_RESOURCE_STATES GetTargetState() const { return state.target; }
 	bool IsStateTransitionNeeded() const { return state.current != state.target; }
+public:
 	void SetCurrentState( D3D12_RESOURCE_STATES newState ) { state.current = newState; }
 	void SetResourceId( const ResourceID& id ) { resourceId = id; }
 	void SetUploadResourceId( const ResourceID& id ) { uploadResourceId = id; }
 	void SetResourceSize( size_t size ) { resourceSize = size; }
 	void SetResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& res );
 	void SetUploadResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& heap );
+	void SetIsReady( bool ready ) { state.ready.store( ready, std::memory_order_release ); }
 public:
 	void CreateSRV( Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
 	bool IsReady() const { return state.ready.load( std::memory_order_acquire ); }

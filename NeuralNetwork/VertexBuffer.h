@@ -21,12 +21,17 @@ public:
 	~VertexBuffer()
 	{
 		vertices.clear();
-	};
+	}
+public:
+	const void* GetData() const override { return vertices.data(); }
+	size_t GetDataSize() const override { return vertices.size() * sizeof( Vertex ); }
 public:
 	const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return vbView; }
 	uint GetVertexCount() const { return vertexCount; }
 	uint GetVertexStride() const { return vertexStride; }
 	const std::vector<Vertex>& GetVertices() const { return vertices; }
+public:
+	void SetVertexBufferView( const D3D12_VERTEX_BUFFER_VIEW& view ) { vbView = view; }
 private:
 	D3D12_VERTEX_BUFFER_VIEW vbView{};
 	uint vertexCount = 0;

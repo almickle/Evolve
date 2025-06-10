@@ -1,14 +1,13 @@
 #pragma once
 #include <atomic>
-#include <condition_variable>
 #include <cstdint>
 #include <functional>
 #include <mutex>
 #include <queue>
-#include <thread>
 #include <Windows.h>
 #include <wrl/client.h>
 #include "d3d12.h"
+#include "ThreadManager.h"
 
 class Renderer; // Forward declaration
 
@@ -20,19 +19,17 @@ struct UploadRequest {
 class UploadManager {
 public:
 	UploadManager( Renderer& renderer );
-	~UploadManager();
+	~UploadManager() = default;
 public:
 	void Enqueue( UploadRequest req );
-	void Shutdown();
 	void Flush();
 private:
-	void StartUploadThread( Renderer& renderer );
 private:
-	std::queue<UploadRequest> queue;
-	std::mutex mutex;
-	std::condition_variable cv;
-	std::thread uploadThread;
-	std::atomic<bool> running{ true };
+private:
+	ThreadManager* threadManager = nullptr;
+	std::mutex queueMutex;
+	std::queue<UploadRequest> uploadQueue;
+	std::atomic<bool> batchInProgress{ false };
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> uploadAllocator;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> uploadCmdList;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> uploadCommandQueue;

@@ -157,11 +157,14 @@
   <ItemGroup>
     <ClCompile Include="Actor.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Asset.cpp" />
+    <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="BeginFramePass.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="DescriptorHeapManager.cpp" />
     <ClCompile Include="EndFramePass.cpp" />
+    <ClCompile Include="FileIOManager.cpp" />
     <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="ExecutionGraph.cpp" />
@@ -172,14 +175,17 @@
     <ClCompile Include="InstanceManager.cpp" />
     <ClCompile Include="Landscape.cpp" />
     <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Model.cpp" />
+    <ClCompile Include="MaterialGraph.cpp" />
+    <ClCompile Include="MaterialNode.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="SceneInitPass.cpp" />
     <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureAsset.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
     <ClCompile Include="UIRenderPass.cpp" />
     <ClCompile Include="Light.cpp" />
-    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="SubMesh.cpp" />
     <ClCompile Include="NeuralCluster.cpp" />
     <ClCompile Include="Neuron.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -196,11 +202,14 @@
   <ItemGroup>
     <ClInclude Include="Actor.h" />
     <ClInclude Include="App.h" />
+    <ClInclude Include="Asset.h" />
+    <ClInclude Include="AssetManager.h" />
     <ClInclude Include="BeginFramePass.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DescriptorHeapManager.h" />
     <ClInclude Include="EndFramePass.h" />
+    <ClInclude Include="FileIOManager.h" />
     <ClInclude Include="FPCamera.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="GpuResourceManager.h" />
@@ -211,16 +220,24 @@
     <ClInclude Include="Landscape.h" />
     <ClInclude Include="LandscapePass.h" />
     <ClInclude Include="Material.h" />
-    <ClInclude Include="Model.h" />
+    <ClInclude Include="MaterialGraph.h" />
+    <ClInclude Include="MaterialOutputNode.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="ExecutionGraph.h" />
+    <ClInclude Include="MaterialNode.h" />
+    <ClInclude Include="NodeLibrary.h" />
+    <ClInclude Include="NodeTypes.h" />
     <ClInclude Include="SceneInitPass.h" />
     <ClInclude Include="StructuredBuffer.h" />
+    <ClInclude Include="SubAsset.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureAsset.h" />
+    <ClInclude Include="TextureSamplerNode.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="UIRenderPass.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="SubMesh.h" />
     <ClInclude Include="NeuralCluster.h" />
     <ClInclude Include="Neuron.h" />
     <ClInclude Include="Renderer.h" />
@@ -237,6 +254,12 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Material.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="PbrPS.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
@@ -260,6 +283,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="scratch.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

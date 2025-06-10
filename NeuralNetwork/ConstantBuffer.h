@@ -1,31 +1,29 @@
 #pragma once
-#include <cstdint>
 #include <d3d12.h>
+#include <memory>
+#include <rpcndr.h>
 #include <string>
 #include <vector>
 #include "GpuResource.h"
 
 class Renderer;
 
-using uint = unsigned int;
-using byte = uint8_t;
-
 class ConstantBuffer : public GpuResource {
 public:
 	ConstantBuffer( const std::vector<byte>& data, const std::string& debugName = "ConstantBuffer" )
 		: GpuResource( D3D12_RESOURCE_STATE_GENERIC_READ, debugName ),
-		bufferData( data ),
-		bufferSize( static_cast<uint>(data.size()) )
+		bufferData( data )
 	{
 		bufferData.clear();
 	}
 	~ConstantBuffer() = default;
 public:
-	void Update( const void* data, size_t size ) override {};
+	void Update( const void* data, size_t size ) override;
+	void Upload( ID3D12GraphicsCommandList* cmdList ) override;
+	std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const override;
 public:
-	const std::vector<byte>& GetData() const { return bufferData; }
-	uint GetBufferSize() const { return bufferSize; }
+	const void* GetData() const override { return bufferData.data(); }
+	size_t GetDataSize() const override { return bufferData.size(); }
 private:
 	std::vector<byte> bufferData;
-	uint bufferSize = 0;
 };

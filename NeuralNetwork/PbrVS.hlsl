@@ -21,6 +21,8 @@ struct VSOutput
     float4 position : SV_POSITION;
     float3 worldPos : TEXCOORD0;
     float3 normal   : NORMAL;
+    float2 uv       : UV;
+    float3 tangent  : TANGENT;
 };
 
 VSOutput main(VSInput input)

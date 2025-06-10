@@ -1,4 +1,5 @@
 #include <combaseapi.h>
+#include <cstdint>
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
 #include <d3dcommon.h>
@@ -22,6 +23,7 @@
 #include "GpuResourceManager.h"
 #include "Renderer.h"
 #include "ThreadManager.h"
+#include "Types.h"
 #include "UploadManager.h"
 
 Renderer::Renderer()
@@ -163,7 +165,7 @@ void Renderer::Present()
 
 void Renderer::WaitForGpu()
 {
-	const uint64 fenceToWait = ++currentFenceValue;
+	const uint64_t fenceToWait = ++currentFenceValue;
 	commandQueue->Signal( fence.Get(), fenceToWait );
 	if( fence->GetCompletedValue() < fenceToWait ) {
 		fence->SetEventOnCompletion( fenceToWait, fenceEvent );
@@ -262,7 +264,6 @@ void Renderer::Shutdown()
 	CleanupRenderTargets();
 
 	if( uploadManager ) {
-		uploadManager->Shutdown();
 		uploadManager.reset();
 	}
 	if( gpuResourceManager ) {

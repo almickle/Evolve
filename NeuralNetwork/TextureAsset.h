@@ -1,17 +1,16 @@
-#pragma once
 #include <string>
 #include "Asset.h"
 #include "Types.h"
 
 class GpuResourceManager;
 
-class Material : public Asset {
+class TextureAsset : public Asset {
 public:
-	Material( const std::string& name = "Material" ) :
-		Asset( AssetType::Material, name )
+	TextureAsset( const std::string& name = "TextureAsset" )
+		: Asset( AssetType::Texture, name )
 	{
 	}
-	~Material() = default;
+	~TextureAsset() = default;
 public:
 	void Load( const std::string& filePath, GpuResourceManager& resourceManager ) override;
 };

@@ -1,5 +1,5 @@
-//#include "StructuredBuffer.h"
-//#include "Renderer.h"
+#include "StructuredBuffer.h"
+
 //#include "UploadManager.h"
 //#include "d3dx12.h"
 //

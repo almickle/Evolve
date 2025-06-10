@@ -1,48 +1,50 @@
-//#include "ConstantBuffer.h"
-//#include "Renderer.h"
-//#include <combaseapi.h>
-//#include <cstdint>
-//#include <cstring>
-//#include <d3d12.h>
-//#include <d3dx12_core.h>
-//#include <Windows.h>
-//
-//static uint Align256( uint size )
-//{
-//	return (size + 255) & ~255u;
-//}
-//
-//bool ConstantBuffer::CreateResource( Renderer& renderer, uint size )
-//{
-//	bufferSize = Align256( size );
-//
-//	// Create upload heap resource
-//	CD3DX12_HEAP_PROPERTIES heapProps( D3D12_HEAP_TYPE_UPLOAD );
-//	CD3DX12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer( bufferSize );
-//
-//	auto device = renderer.GetDevice();
-//	HRESULT hr = device->CreateCommittedResource(
-//		&heapProps,
-//		D3D12_HEAP_FLAG_NONE,
-//		&desc,
-//		D3D12_RESOURCE_STATE_GENERIC_READ,
-//		nullptr,
-//		IID_PPV_ARGS( &resource )
-//	);
-//	return SUCCEEDED( hr );
-//}
-//
-//void ConstantBuffer::Update( const void* data, uint size )
-//{
-//	uint alignedSize = Align256( size );
-//
-//	// Map/Unmap resource directly for updates
-//	void* mapped = nullptr;
-//	resource->Map( 0, nullptr, &mapped );
-//	memcpy( mapped, data, size );
-//	// Zero out the padding if any
-//	if( alignedSize > size ) {
-//		memset( static_cast<uint8_t*>(mapped) + size, 0, alignedSize - size );
-//	}
-//	resource->Unmap( 0, nullptr );
-//}
+#include <combaseapi.h>
+#include <cstring>
+#include <d3d12.h>
+#include <d3dx12_core.h>
+#include <memory>
+#include <Windows.h>
+#include <wrl\client.h>
+#include "ConstantBuffer.h"
+#include "GpuResource.h"
+#include "Renderer.h"
+
+void ConstantBuffer::Update( const void* data, size_t size )
+{
+	if( size == bufferData.size() ) {
+		std::memcpy( bufferData.data(), data, size );
+	}
+	// Optionally handle size mismatch or reallocation
+}
+
+void ConstantBuffer::Upload( ID3D12GraphicsCommandList* cmdList )
+{
+	void* mapped = nullptr;
+	uploadResource->Map( 0, nullptr, &mapped );
+	memcpy( mapped, GetData(), GetDataSize() );
+	uploadResource->Unmap( 0, nullptr );
+}
+
+std::unique_ptr<GpuResource> ConstantBuffer::Clone( Renderer& renderer ) const
+{
+	// Example for a buffer; adapt for textures as needed
+	auto desc = resource->GetDesc();
+	Microsoft::WRL::ComPtr<ID3D12Resource> newResource;
+	CD3DX12_HEAP_PROPERTIES heapProps( D3D12_HEAP_TYPE_UPLOAD );
+	HRESULT hr = renderer.GetDevice()->CreateCommittedResource(
+		&heapProps,
+		D3D12_HEAP_FLAG_NONE,
+		&desc,
+		state.current,
+		nullptr,
+		IID_PPV_ARGS( &newResource )
+	);
+	if( FAILED( hr ) ) return nullptr;
+
+	auto clone = std::make_unique<ConstantBuffer>( bufferData, debugName );
+	clone->resource = newResource;
+	clone->resourceSize = resourceSize;
+	clone->debugName = debugName;
+	// Copy other relevant metadata as needed
+	return clone;
+}
