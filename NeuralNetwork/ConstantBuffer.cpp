@@ -41,10 +41,10 @@ std::unique_ptr<GpuResource> ConstantBuffer::Clone( Renderer& renderer ) const
 	);
 	if( FAILED( hr ) ) return nullptr;
 
-	auto clone = std::make_unique<ConstantBuffer>( bufferData, debugName );
+	auto clone = std::make_unique<ConstantBuffer>( bufferData, name );
 	clone->resource = newResource;
 	clone->resourceSize = resourceSize;
-	clone->debugName = debugName;
+	clone->name = name;
 	// Copy other relevant metadata as needed
 	return clone;
 }

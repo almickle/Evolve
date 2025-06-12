@@ -5,8 +5,8 @@
 
 class SubAsset {
 public:
-	SubAsset( SubAssetType subType = SubAssetType::Unknown, const std::string& debugName = "SubAsset" )
-		: subType( subType ), debugName( debugName )
+	SubAsset( SubAssetType subType = SubAssetType::Unknown, const std::string& name = "SubAsset" )
+		: subType( subType ), name( name )
 	{
 	}
 	virtual ~SubAsset() = default;
@@ -14,6 +14,6 @@ public:
 	void AddResource( const ResourceID& id ) { resourceIDs.push_back( id ); }
 protected:
 	SubAssetType subType;
-	std::string debugName;
+	std::string name;
 	std::vector<ResourceID> resourceIDs;
 };

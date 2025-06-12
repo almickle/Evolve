@@ -2,7 +2,6 @@
 #include <atomic>
 #include <combaseapi.h>
 #include <cstdint>
-#include <cstring>
 #include <d3d12.h>
 #include <d3dx12_core.h>
 #include <dxgiformat.h>
@@ -10,7 +9,6 @@
 #include <rpcndr.h>
 #include <string>
 #include <unordered_map>
-#include <utility>
 #include <vector>
 #include <Windows.h>
 #include <wrl\client.h>
@@ -31,14 +29,14 @@ public:
 	ResourceID GenerateUniqueResourceId( const std::string& prefix = "Resource" );
 	void UploadResource( const ResourceID& id );
 public:
-	ResourceID CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName = "VertexBuffer" );
-	ResourceID CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& debugName = "IndexBuffer" );
-	ResourceID CreateConstantBuffer( const std::vector<byte>& data, const std::string& debugName = "ConstantBuffer" );
+	ResourceID CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name = "VertexBuffer" );
+	ResourceID CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& name = "IndexBuffer" );
+	ResourceID CreateConstantBuffer( const std::vector<byte>& data, const std::string& name = "ConstantBuffer" );
 	template<typename T>
-	ResourceID CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& debugName = "StructuredBuffer" );
+	ResourceID CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& name = "StructuredBuffer" );
 	template<typename T>
-	ResourceID CreateDynamicStructuredBuffer( const std::vector<T>& data, const std::string& debugName );
-	ResourceID CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& debugName = "Texture" );
+	ResourceID CreateDynamicStructuredBuffer( const std::vector<T>& data, const std::string& name );
+	ResourceID CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& name = "Texture" );
 public:
 	GpuResource* GetResource( const ResourceID& id ) const;
 	std::vector<GpuResource*> GetAllResources() const;
@@ -50,7 +48,7 @@ private:
 };
 
 template<typename T>
-ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& debugName )
+ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& name )
 {
 	if( data.empty() ) return;
 
@@ -94,7 +92,7 @@ ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T
 	uploadResource->Unmap( 0, nullptr );
 
 	// Create the StructuredBuffer resource
-	auto sb = std::make_unique<StructuredBuffer<T>>( data, debugName );
+	auto sb = std::make_unique<StructuredBuffer<T>>( data, name );
 	sb->SetResource( std::move( gpuResource ) );
 	sb->SetUploadResource( std::move( uploadResource ) );
 	sb->SetResourceSize( bufferSize );
@@ -115,7 +113,7 @@ ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T
 }
 
 template<typename T>
-ResourceID GpuResourceManager::CreateDynamicStructuredBuffer( const std::vector<T>& data, const std::string& debugName )
+ResourceID GpuResourceManager::CreateDynamicStructuredBuffer( const std::vector<T>& data, const std::string& name )
 {
 	if( data.empty() ) return;
 
@@ -159,7 +157,7 @@ ResourceID GpuResourceManager::CreateDynamicStructuredBuffer( const std::vector<
 	uploadResource->Unmap( 0, nullptr );
 
 	// Create the StructuredBuffer resource
-	auto sb = std::make_unique<StructuredBuffer<T>>( data, debugName );
+	auto sb = std::make_unique<StructuredBuffer<T>>( data, name );
 	sb->SetResource( std::move( gpuResource ) );
 	sb->SetUploadResource( std::move( uploadResource ) );
 	sb->SetResourceSize( bufferSize );

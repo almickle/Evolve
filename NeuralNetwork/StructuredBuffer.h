@@ -16,7 +16,7 @@ using uint = unsigned int;
 template<typename T>
 class StructuredBuffer : public GpuResource {
 public:
-	StructuredBuffer( const std::vector<T>& data, const std::string& debugName = "StructuredBuffer" )
+	StructuredBuffer( const std::vector<T>& data, const std::string& name = "StructuredBuffer" )
 		: GpuResource( D3D12_RESOURCE_STATE_GENERIC_READ ),
 		elementSize( sizeof( T ) ),
 		elementCount( data.size() )
@@ -58,10 +58,10 @@ std::unique_ptr<GpuResource> StructuredBuffer<T>::Clone( Renderer& renderer ) co
 	);
 	if( FAILED( hr ) ) return nullptr;
 
-	auto clone = std::make_unique<StructuredBuffer<T>>( data, debugName );
+	auto clone = std::make_unique<StructuredBuffer<T>>( data, name );
 	clone->resource = newResource;
 	clone->resourceSize = resourceSize;
-	clone->debugName = debugName;
+	clone->name = name;
 
 	// Create SRV
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

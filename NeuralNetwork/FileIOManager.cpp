@@ -3,7 +3,7 @@
 #include "FileIOManager.h"
 #include "ThreadManager.h"
 
-FileIOManager::FileIOManager( ThreadManager* threadManager )
+FileIOManager::FileIOManager( ThreadManager& threadManager )
 	: threadManager( threadManager )
 {
 }
@@ -15,7 +15,7 @@ void FileIOManager::Enqueue( FileTask task )
 		taskQueue.push( std::move( task ) );
 	}
 	// Immediately launch the task on the thread pool
-	threadManager->Launch( [this] {
+	threadManager.Launch( [this] {
 		FileTask localTask;
 		{
 			std::lock_guard<std::mutex> lock( queueMutex );
@@ -25,5 +25,5 @@ void FileIOManager::Enqueue( FileTask task )
 		}
 		if( localTask.taskFunc ) localTask.taskFunc();
 		if( localTask.onComplete ) localTask.onComplete();
-						   } );
+						  } );
 }

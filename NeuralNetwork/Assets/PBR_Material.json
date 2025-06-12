@@ -1,0 +1,30 @@
+{
+  "id": "Asset_2",
+  "name": "PBR_Material",
+  "type": 3,
+  "assetIds": [
+    "Asset_1"
+  ],
+  "materialTemplateId": "Asset_1",
+  "textureBindings": [
+    {
+      "slot": 0,
+      "data": "Asset_3"
+    },
+    {
+      "slot": 1,
+      "data": "Asset_5"
+    },
+    {
+      "slot": 2,
+      "data": "Asset_4"
+    }
+  ],
+  "vectorBindings": [],
+  "scalarBindings": [
+    {
+      "slot": 0,
+      "data": 3.0
+    }
+  ]
+}

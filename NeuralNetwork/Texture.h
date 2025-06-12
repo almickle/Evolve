@@ -9,8 +9,8 @@ class Renderer;
 
 class Texture : public GpuResource {
 public:
-	Texture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, const std::string& debugName = "Texture" )
-		: GpuResource( D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, debugName ),
+	Texture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, const std::string& name = "Texture" )
+		: GpuResource( D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, name ),
 		subresourceData( subresourceData ),
 		numSubresources( static_cast<uint>(subresourceData.size()) )
 	{

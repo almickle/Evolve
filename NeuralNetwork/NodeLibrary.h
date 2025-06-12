@@ -6,15 +6,25 @@
 #include "MaterialNode.h"
 #include "MaterialOutputNode.h"
 #include "NodeTypes.h"
+#include "NormalMapNode.h"
+#include "ScalarParameterNode.h"
 #include "TextureSamplerNode.h"
+#include "VectorBreakNode.h"
+#include "VectorScaleNode.h"
+#include "VertexDataNode.h"
 
 class NodeLibrary {
 public:
 	NodeLibrary()
 	{
-		nodes.reserve( 2 ); // Reserve space for expected node types
-		RegisterNode( NodeTypes::TextureSampler, std::make_unique<TextureSamplerNode>() );
+		nodes.reserve( 7 ); // Reserve space for expected node types
 		RegisterNode( NodeTypes::MaterialOutput, std::make_unique<MaterialOutputNode>() );
+		RegisterNode( NodeTypes::TextureSampler, std::make_unique<TextureSamplerNode>() );
+		RegisterNode( NodeTypes::VertexData, std::make_unique<VertexDataNode>() );
+		RegisterNode( NodeTypes::VectorScale, std::make_unique<VectorScaleNode>() );
+		RegisterNode( NodeTypes::NormalMap, std::make_unique<NormalMapNode>() );
+		RegisterNode( NodeTypes::VectorBreak, std::make_unique<VectorBreakNode>() );
+		RegisterNode( NodeTypes::ScalarParameter, std::make_unique<ScalarParameterNode>() );
 	}
 
 	// Register a node type with a node instance

@@ -10,8 +10,8 @@ class Renderer;
 
 class ConstantBuffer : public GpuResource {
 public:
-	ConstantBuffer( const std::vector<byte>& data, const std::string& debugName = "ConstantBuffer" )
-		: GpuResource( D3D12_RESOURCE_STATE_GENERIC_READ, debugName ),
+	ConstantBuffer( const std::vector<byte>& data, const std::string& name = "ConstantBuffer" )
+		: GpuResource( D3D12_RESOURCE_STATE_GENERIC_READ, name ),
 		bufferData( data )
 	{
 		bufferData.clear();

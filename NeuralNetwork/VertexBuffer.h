@@ -11,8 +11,8 @@ class GpuResourceManager;
 
 class VertexBuffer : public GpuResource {
 public:
-	VertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName = "VertexBuffer" )
-		: GpuResource( D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, debugName ),
+	VertexBuffer( const std::vector<Vertex>& vertices, const std::string& name = "VertexBuffer" )
+		: GpuResource( D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, name ),
 		vertexCount( static_cast<uint>(vertices.size()) ),
 		vertexStride( sizeof( Vertex ) ),
 		vertices( vertices )

@@ -8,11 +8,11 @@ using ResourceID = std::string;
 using AssetID = std::string;
 
 enum class AssetType {
-	Unknown,
 	Texture,
 	Mesh,
 	Model,
 	Material,
+	MaterialTemplate
 };
 
 enum class SubAssetType {

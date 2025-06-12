@@ -11,12 +11,12 @@ struct FileTask {
 
 class FileIOManager {
 public:
-	FileIOManager( ThreadManager* threadManager );
+	FileIOManager( ThreadManager& threadManager );
 	~FileIOManager() = default;
 public:
 	void Enqueue( FileTask task );
 private:
-	ThreadManager* threadManager = nullptr;
+	ThreadManager& threadManager;
 	std::mutex queueMutex;
 	std::queue<FileTask> taskQueue;
 };

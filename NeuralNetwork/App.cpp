@@ -1,26 +1,25 @@
 #include <combaseapi.h>
 #include <memory>
+#include <memory>
 #include <objbase.h>
 #include <sal.h>
 #include <Windows.h>
 #include "App.h"
+#include "AssetManager.h"
 #include "BeginFramePass.h"
 #include "Camera.h"
 #include "EndFramePass.h"
 #include "ExecutionGraph.h"
 #include "ImGuiLayer.h"
+#include "ImportManager.h"
 #include "InitializationGraph.h"
-#include "MaterialGraph.h"
+#include "Material.h"
+#include "MaterialTemplate.h"
 #include "Renderer.h"
 #include "UIRenderPass.h"
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
 {
-	std::vector<NodeTypes> nodes = { NodeTypes::MaterialOutput, NodeTypes::TextureSampler };
-	std::vector<MaterialEdge> edges = { {1, 0, 0, 0} };
-	auto graph = new MaterialGraph( nodes, edges );
-	auto lib = new NodeLibrary();
-	auto shader = graph->GetShaderCode( *lib );
 	App app;
 	if( !app.Init( hInstance, nCmdShow ) )
 		return -1;
@@ -62,6 +61,24 @@ bool App::Init( HINSTANCE hInstance, int nCmdShow )
 	inputState.firstMouse = false;
 
 	initGraph->ExecuteAsync( renderer );
+
+	auto threadManager = new ThreadManager();
+	auto serializer = new JsonSerializer();
+	auto nodeLibrary = new NodeLibrary();
+	auto fileManager = new FileIOManager( *threadManager );
+	auto assetManager = new AssetManager( *serializer, *fileManager, *renderer.GetGpuResourceManager(), *nodeLibrary );
+	auto importManager = new ImportManager( *assetManager, *renderer.GetGpuResourceManager() );
+	auto lib = new NodeLibrary();
+	auto importer = new ImportManager( *assetManager, *renderer.GetGpuResourceManager() );
+
+	//const std::vector<TextureBindings> textureBindings{};
+	//const std::vector<VectorBindings> vectorBindings{};
+	//const std::vector<ScalarBindings> scalarBindings{};
+	//auto mat = std::make_unique<Material>( "Asset_1", textureBindings, vectorBindings, scalarBindings, "PBR" );
+
+	//auto id = assetManager->RegisterAsset( std::move( mat ) );
+	//auto asset = assetManager->GetAsset( id );
+	//assetManager->SaveAsset( id );
 
 	return true;
 }

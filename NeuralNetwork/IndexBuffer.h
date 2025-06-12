@@ -11,8 +11,8 @@ class Renderer;
 
 class IndexBuffer : public GpuResource {
 public:
-	IndexBuffer( const std::vector<uint>& indices, const std::string& debugName = "IndexBuffer", DXGI_FORMAT format = DXGI_FORMAT_R32_UINT )
-		: GpuResource( D3D12_RESOURCE_STATE_INDEX_BUFFER, debugName ),
+	IndexBuffer( const std::vector<uint>& indices, const std::string& name = "IndexBuffer", DXGI_FORMAT format = DXGI_FORMAT_R32_UINT )
+		: GpuResource( D3D12_RESOURCE_STATE_INDEX_BUFFER, name ),
 		indexCount( static_cast<uint>(indices.size()) ),
 		indices( indices ),
 		format( format )

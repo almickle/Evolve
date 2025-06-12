@@ -18,8 +18,8 @@ class GpuResource {
 public:
 	GpuResource(
 		D3D12_RESOURCE_STATES finalState,
-		const std::string& debugName = "default" )
-		: state( finalState ), debugName( debugName )
+		const std::string& name = "default" )
+		: state( finalState ), name( name )
 	{
 	}
 	virtual ~GpuResource() = default;
@@ -62,5 +62,5 @@ protected:
 	int srvHeapIndex = -1;
 	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = {};
 	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = {};
-	std::string debugName;
+	std::string name;
 };

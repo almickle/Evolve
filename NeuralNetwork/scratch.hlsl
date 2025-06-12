@@ -2,26 +2,26 @@ Texture2D<float4> textures[];
 SamplerState samp;
 struct VSOutput
 {
-    float4 position : SV_POSITION;
+    float4 pixelPos : SV_POSITION;
     float3 worldPos : TEXCOORD0;
     float3 normal : NORMAL;
     float2 uv : UV;
-    float3 tangent : TANGENT;
+    float4 tangent : TANGENT;
 };
 cbuffer MaterialTextureSlots : register(b1)
 {
     uint textureSlots[128];
 }
 
-cbuffer MaterialScalarSlots : register(b2)
-{
-    float scalarSlots[128];
-}
-
 cbuffer MaterialVectorSlots : register(b3)
 {
     float4 vectorSlots[128];
 };
+
+cbuffer MaterialScalarSlots : register(b2)
+{
+    float scalarSlots[128];
+}
 
 // Generated code for the material graph
 struct MaterialOutputNodeInput
@@ -66,11 +66,11 @@ TextureSamplerNodeOutput TextureSamplerNode(TextureSamplerNodeInput input, Textu
 
     return output;
 }
-float4 main(VSOutput input) : SV_TARGET
+float4 main(VSOutput vertexData) : SV_TARGET
 {
     TextureSamplerNodeInput TextureSamplerNodeInputData1;
     TextureSamplerNodeParameters TextureSamplerNodeParameterData1;
-    TextureSamplerNodeParameterData1.textureIndex = 0;
+    TextureSamplerNodeParameterData1.textureIndex = textureSlots[0];
     TextureSamplerNodeOutput TextureSamplerNodeOutputData1 = TextureSamplerNode(TextureSamplerNodeInputData1, TextureSamplerNodeParameterData1);
     MaterialOutputNodeInput MaterialOutputNodeInputData0;
     MaterialOutputNodeParameters MaterialOutputNodeParameterData0;
@@ -78,3 +78,13 @@ float4 main(VSOutput input) : SV_TARGET
     MaterialOutputNodeOutput MaterialOutputNodeOutputData0 = MaterialOutputNode(MaterialOutputNodeInputData0, MaterialOutputNodeParameterData0);
     return MaterialOutputNodeOutputData0.color;
 };
+
+struct Vector
+{
+    float3 value;
+};
+
+float3 vectorScale(Vector input)
+{
+    return input.value.x;
+}

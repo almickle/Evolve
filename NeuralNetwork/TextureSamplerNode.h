@@ -11,8 +11,8 @@ public:
 	TextureSamplerNode( const std::string& name = "TextureSamplerNode" )
 		: MaterialNode( 1, 1, 1, name )
 	{
-		AddInput( uvInputSlotIndex, NodeSlot{ "uv", DirectX::XMFLOAT2{0.0f, 0.0f} } );
-		AddOutput( colorOutputSlotIndex, NodeSlot{ "color", DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f} } );
+		AddInput( uvInputSlotIndex, NodeSlot{ "uv", DirectX::XMFLOAT2{ 0.0f, 0.0f } } );
+		AddOutput( colorOutputSlotIndex, NodeSlot{ "color", DirectX::XMFLOAT3{ 1.0f, 1.0f, 1.0f } } );
 		AddParameter( textureParameter, NodeParameter( NodeParameterTypes::Texture, "textureIndex" ) );
 	}
 public:
@@ -32,8 +32,9 @@ public:
 	NodeSlot GetUVSlot() const { return inputs[uvInputSlotIndex]; }
 	NodeSlot GetColorOutputSlot() const { return outputs[colorOutputSlotIndex]; }
 private:
-	uint textureParameter = 0;
 	uint uvInputSlotIndex = 0;
 private:
 	uint colorOutputSlotIndex = 0;
+private:
+	uint textureParameter = 0;
 };

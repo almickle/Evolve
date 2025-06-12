@@ -1,0 +1,13 @@
+{
+    "id": "Asset_6",
+    "name": "DemoModel",
+    "type": 2,
+    "assetIds": [
+        "Asset_0",
+        "Asset_2"
+    ],
+    "meshId": "Asset_0",
+    "materialSlots": [
+        "Asset_2"
+    ]
+}

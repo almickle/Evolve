@@ -32,10 +32,10 @@ UploadManager::UploadManager( Renderer& renderer )
 
 void UploadManager::Enqueue( UploadRequest req )
 {
-	{
-		std::lock_guard<std::mutex> lock( queueMutex );
-		uploadQueue.push( std::move( req ) );
-	}
+
+	std::lock_guard<std::mutex> lock( queueMutex );
+	uploadQueue.push( std::move( req ) );
+
 }
 
 void UploadManager::Flush()

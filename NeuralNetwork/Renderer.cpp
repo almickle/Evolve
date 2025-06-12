@@ -138,6 +138,7 @@ bool Renderer::Init( HWND hwnd )
 	srvHeapManager = std::make_unique<DescriptorHeapManager>( device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024, true );
 	threadManager = std::make_unique<ThreadManager>();
 	uploadManager = std::make_unique<UploadManager>( *this );
+	gpuResourceManager = std::make_unique<GpuResourceManager>( *this );
 
 	return true;
 }

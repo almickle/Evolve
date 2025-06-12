@@ -6,8 +6,13 @@
 
 enum class NodeTypes
 {
+	MaterialOutput,
 	TextureSampler,
-	MaterialOutput
+	VertexData,
+	VectorScale,
+	NormalMap,
+	VectorBreak,
+	ScalarParameter
 };
 
 enum class NodeParameterTypes {

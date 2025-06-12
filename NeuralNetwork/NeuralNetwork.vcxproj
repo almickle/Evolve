@@ -106,7 +106,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
     </ClCompile>
@@ -132,7 +132,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -170,14 +170,18 @@
     <ClCompile Include="ExecutionGraph.cpp" />
     <ClCompile Include="GpuResourceManager.cpp" />
     <ClCompile Include="ImGuiLayer.cpp" />
+    <ClCompile Include="ImportManager.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InitializationGraph.cpp" />
     <ClCompile Include="InstanceManager.cpp" />
+    <ClCompile Include="JsonSerializer.cpp" />
     <ClCompile Include="Landscape.cpp" />
     <ClCompile Include="Material.cpp" />
-    <ClCompile Include="MaterialGraph.cpp" />
+    <ClCompile Include="MaterialTemplate.cpp" />
     <ClCompile Include="MaterialNode.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="NormalMapNode.cpp" />
+    <ClCompile Include="ScalarParameterNode.cpp" />
     <ClCompile Include="SceneInitPass.cpp" />
     <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -196,7 +200,10 @@
     <ClCompile Include="Synapse.cpp" />
     <ClCompile Include="UploadManager.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="VectorBreakNode.cpp" />
+    <ClCompile Include="VectorScaleNode.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="VertexDataNode.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -214,19 +221,23 @@
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="GpuResourceManager.h" />
     <ClInclude Include="ImGuiLayer.h" />
+    <ClInclude Include="ImportManager.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InitializationGraph.h" />
     <ClInclude Include="InstanceManager.h" />
+    <ClInclude Include="JsonSerializer.h" />
     <ClInclude Include="Landscape.h" />
     <ClInclude Include="LandscapePass.h" />
     <ClInclude Include="Material.h" />
-    <ClInclude Include="MaterialGraph.h" />
+    <ClInclude Include="MaterialTemplate.h" />
     <ClInclude Include="MaterialOutputNode.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ExecutionGraph.h" />
     <ClInclude Include="MaterialNode.h" />
     <ClInclude Include="NodeLibrary.h" />
     <ClInclude Include="NodeTypes.h" />
+    <ClInclude Include="NormalMapNode.h" />
+    <ClInclude Include="ScalarParameterNode.h" />
     <ClInclude Include="SceneInitPass.h" />
     <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="SubAsset.h" />
@@ -250,7 +261,10 @@
     <ClInclude Include="UploadManager.h" />
     <ClInclude Include="UploadPass.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="VectorBreakNode.h" />
+    <ClInclude Include="VectorScaleNode.h" />
     <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="VertexDataNode.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>

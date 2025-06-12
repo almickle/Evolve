@@ -1,0 +1,105 @@
+{
+  "id": "Asset_1",
+  "name": "MaterialTemplate",
+  "type": 4,
+  "assetIds": [],
+  "nodes": [
+    0,
+    1,
+    1,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "edges": [
+    {
+      "fromNode": 1,
+      "fromSlot": 0,
+      "toNode": 0,
+      "toSlot": 0
+    },
+    {
+      "fromNode": 7,
+      "fromSlot": 0,
+      "toNode": 0,
+      "toSlot": 2
+    },
+    {
+      "fromNode": 6,
+      "fromSlot": 0,
+      "toNode": 0,
+      "toSlot": 3
+    },
+    {
+      "fromNode": 5,
+      "fromSlot": 0,
+      "toNode": 1,
+      "toSlot": 0
+    },
+    {
+      "fromNode": 5,
+      "fromSlot": 0,
+      "toNode": 2,
+      "toSlot": 0
+    },
+    {
+      "fromNode": 5,
+      "fromSlot": 0,
+      "toNode": 3,
+      "toSlot": 0
+    },
+    {
+      "fromNode": 4,
+      "fromSlot": 3,
+      "toNode": 5,
+      "toSlot": 0
+    },
+    {
+      "fromNode": 8,
+      "fromSlot": 0,
+      "toNode": 5,
+      "toSlot": 1
+    },
+    {
+      "fromNode": 2,
+      "fromSlot": 0,
+      "toNode": 7,
+      "toSlot": 0
+    },
+    {
+      "fromNode": 3,
+      "fromSlot": 0,
+      "toNode": 6,
+      "toSlot": 0
+    }
+  ],
+  "parameterBindings": [
+    {
+      "nodeIndex": 1,
+      "parameterIndex": 0,
+      "parameterType": 0,
+      "cbufferSlot": 0
+    },
+    {
+      "nodeIndex": 2,
+      "parameterIndex": 0,
+      "parameterType": 0,
+      "cbufferSlot": 1
+    },
+    {
+      "nodeIndex": 3,
+      "parameterIndex": 0,
+      "parameterType": 0,
+      "cbufferSlot": 2
+    },
+    {
+      "nodeIndex": 8,
+      "parameterIndex": 0,
+      "parameterType": 2,
+      "cbufferSlot": 0
+    }
+  ]
+}

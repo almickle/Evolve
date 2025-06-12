@@ -97,6 +97,15 @@
     <Filter Include="Header Files\Assets\Material Graph\Nodes">
       <UniqueIdentifier>{68345bd9-6603-49ed-a9bc-3be59d359a3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Serializers">
+      <UniqueIdentifier>{718d1196-72ee-40de-8df2-8834f30255dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Material Graph\Nodes">
+      <UniqueIdentifier>{cc015c00-bc0d-4ac1-881e-0037289a02a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serializers">
+      <UniqueIdentifier>{f409bd13-887f-478b-ba69-a295d59fa1d8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -198,9 +207,6 @@
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Source Files\Assets\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="SubMesh.cpp">
-      <Filter>Source Files\Assets\SubAssets</Filter>
-    </ClCompile>
     <ClCompile Include="FileIOManager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
@@ -209,9 +215,6 @@
     </ClCompile>
     <ClCompile Include="Landscape.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Asset.cpp">
-      <Filter>Source Files\Assets\Assets</Filter>
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Source Files\Assets\Assets</Filter>
@@ -225,8 +228,35 @@
     <ClCompile Include="MaterialNode.cpp">
       <Filter>Source Files\Assets\Material Graph</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialGraph.cpp">
-      <Filter>Source Files\Assets\Material Graph</Filter>
+    <ClCompile Include="MaterialTemplate.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="ImportManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorScaleNode.cpp">
+      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexDataNode.cpp">
+      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="NormalMapNode.cpp">
+      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="ScalarParameterNode.cpp">
+      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="VectorBreakNode.cpp">
+      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="Asset.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="SubMesh.cpp">
+      <Filter>Source Files\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonSerializer.cpp">
+      <Filter>Source Files\Serializers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -350,14 +380,8 @@
     <ClInclude Include="Landscape.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SubAsset.h">
-      <Filter>Header Files\Assets\SubAssets</Filter>
-    </ClInclude>
     <ClInclude Include="SubMesh.h">
       <Filter>Header Files\Assets\SubAssets</Filter>
-    </ClInclude>
-    <ClInclude Include="Asset.h">
-      <Filter>Header Files\Assets\Assets</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
       <Filter>Header Files\Assets\Assets</Filter>
@@ -367,9 +391,6 @@
     </ClInclude>
     <ClInclude Include="TextureAsset.h">
       <Filter>Header Files\Assets\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialGraph.h">
-      <Filter>Header Files\Assets\Material Graph</Filter>
     </ClInclude>
     <ClInclude Include="MaterialNode.h">
       <Filter>Header Files\Assets\Material Graph</Filter>
@@ -385,6 +406,36 @@
     </ClInclude>
     <ClInclude Include="NodeTypes.h">
       <Filter>Header Files\Assets\Material Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialTemplate.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonSerializer.h">
+      <Filter>Header Files\Serializers</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexDataNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorScaleNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ImportManager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalMapNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorBreakNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ScalarParameterNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="Asset.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="SubAsset.h">
+      <Filter>Header Files\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

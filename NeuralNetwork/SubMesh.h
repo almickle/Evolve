@@ -9,8 +9,8 @@ class GpuResourceManager;
 
 class SubMesh : public SubAsset {
 public:
-	SubMesh( ResourceID& vertexBufferID, ResourceID& indexBufferID, const std::string& debugName = "SubMesh" )
-		: SubAsset( SubAssetType::SubMesh, debugName )
+	SubMesh( ResourceID& vertexBufferID, ResourceID& indexBufferID, const std::string& name = "SubMesh" )
+		: SubAsset( SubAssetType::SubMesh, name )
 	{
 		AddResource( vertexBufferID );
 		AddResource( indexBufferID );

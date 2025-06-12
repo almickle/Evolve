@@ -47,7 +47,7 @@ void GpuResource::SetResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& res )
 {
 	resource = res;
 	if( resource ) {
-		resource->SetName( std::wstring( debugName.begin(), debugName.end() ).c_str() );
+		resource->SetName( std::wstring( name.begin(), name.end() ).c_str() );
 	}
 }
 
@@ -55,7 +55,7 @@ void GpuResource::SetUploadResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& re
 {
 	uploadResource = res;
 	if( uploadResource ) {
-		std::wstring wname( debugName.begin(), debugName.end() );
+		std::wstring wname( name.begin(), name.end() );
 		wname += L"_UploadResource";
 		uploadResource->SetName( wname.c_str() );
 	}

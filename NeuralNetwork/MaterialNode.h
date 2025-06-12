@@ -32,10 +32,14 @@ public:
 public:
 	const std::vector<NodeSlot>& GetInputs() const { return inputs; }
 	const std::vector<NodeSlot>& GetOutputs() const { return outputs; }
+	const std::vector<NodeParameter>& GetParameters() const { return parameters; }
+	const NodeSlot& GetInput( const uint& slot ) const { return inputs[slot]; }
+	const NodeSlot& GetOutput( const uint& slot ) const { return outputs[slot]; }
+	const NodeParameter& GetParameter( const uint& slot ) const { return parameters[slot]; }
 public:
-	void AddInput( uint slot, const NodeSlot& input ) { inputs[slot] = input; }
-	void AddOutput( uint slot, const NodeSlot& output ) { outputs[slot] = output; }
-	void AddParameter( uint slot, NodeParameter parameter ) { parameters[slot] = parameter; }
+	void AddInput( const uint& slot, const NodeSlot& input ) { inputs[slot] = input; }
+	void AddOutput( const uint& slot, const NodeSlot& output ) { outputs[slot] = output; }
+	void AddParameter( const uint& slot, NodeParameter parameter ) { parameters[slot] = parameter; }
 protected:
 	std::string GetFunctionName() const;
 	//std::string GetParameterName( const uint& index ) const;

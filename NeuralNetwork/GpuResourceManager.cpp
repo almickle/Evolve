@@ -112,7 +112,7 @@ void GpuResourceManager::UploadResource( const ResourceID& id )
 							} );
 }
 
-ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& debugName )
+ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name )
 {
 	auto device = renderer->GetDevice();
 	uint bufferSize = static_cast<uint>(vertices.size() * sizeof( Vertex ));
@@ -126,7 +126,7 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 		&heapProps,
 		D3D12_HEAP_FLAG_NONE,
 		&bufferDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS( &vbResource )
 	);
@@ -146,7 +146,7 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 	if( FAILED( hr ) ) return "resource not found";
 
 	// Create and register the GpuResource
-	auto vb = std::make_unique<VertexBuffer>( vertices, debugName );
+	auto vb = std::make_unique<VertexBuffer>( vertices, name );
 	vb->SetResource( std::move( vbResource ) );
 	vb->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
 	vb->SetUploadResource( std::move( uploadResource ) );
@@ -168,7 +168,7 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 	return id;
 }
 
-ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, const std::string& debugName )
+ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indices, const std::string& name )
 {
 	auto device = renderer->GetDevice();
 	uint bufferSize = static_cast<uint>(indices.size() * sizeof( uint ));
@@ -181,7 +181,7 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 		&heapProps,
 		D3D12_HEAP_FLAG_NONE,
 		&bufferDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS( &ibResource )
 	);
@@ -199,7 +199,7 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	auto ib = std::make_unique<IndexBuffer>( indices, debugName );
+	auto ib = std::make_unique<IndexBuffer>( indices, name );
 	ib->SetResource( std::move( ibResource ) );
 	ib->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
 	ib->SetUploadResource( std::move( uploadResource ) );
@@ -221,7 +221,7 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 	return id;
 }
 
-ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& data, const std::string& debugName )
+ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& data, const std::string& name )
 {
 	auto device = renderer->GetDevice();
 	uint bufferSize = static_cast<uint>(data.size());
@@ -240,7 +240,7 @@ ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& da
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	auto cb = std::make_unique<ConstantBuffer>( data, debugName );
+	auto cb = std::make_unique<ConstantBuffer>( data, name );
 	cb->SetResource( std::move( cbResource ) );
 	cb->SetCurrentState( D3D12_RESOURCE_STATE_GENERIC_READ );
 	cb->SetResourceSize( bufferSize );
@@ -250,7 +250,7 @@ ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& da
 	return id;
 }
 
-ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& debugName )
+ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& name )
 {
 	auto device = renderer->GetDevice();
 	uint numSubresources = static_cast<uint>(subresourceData.size());
@@ -262,7 +262,7 @@ ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURC
 		&heapProps,
 		D3D12_HEAP_FLAG_NONE,
 		&texDesc,
-		D3D12_RESOURCE_STATE_COPY_DEST,
+		D3D12_RESOURCE_STATE_COMMON,
 		nullptr,
 		IID_PPV_ARGS( &textureResource )
 	);
@@ -288,7 +288,7 @@ ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURC
 	if( FAILED( hr ) ) return "resource not found";
 
 	// 3. Create the Texture resource object
-	auto tex = std::make_unique<Texture>( subresourceData, debugName );
+	auto tex = std::make_unique<Texture>( subresourceData, name );
 	tex->SetResource( std::move( textureResource ) );
 	tex->SetUploadResource( std::move( uploadResource ) );
 	tex->SetResourceSize( uploadBufferSize );
