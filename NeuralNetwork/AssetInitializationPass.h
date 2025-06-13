@@ -3,13 +3,14 @@
 
 class SystemManager;
 
-class EndFramePass :
-	public GraphPass {
+class AssetInitializationPass :
+	public GraphPass
+{
 public:
-	EndFramePass()
-		: GraphPass( "EndFrame" )
-	{
-	}
+	AssetInitializationPass() = default;
+	~AssetInitializationPass() = default;
+public:
 	void Init( SystemManager& systemManager ) override;
 	void Execute( SystemManager& systemManager ) override;
 };
+

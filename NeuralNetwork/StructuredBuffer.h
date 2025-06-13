@@ -10,6 +10,7 @@
 #include <wrl\client.h>
 #include "GpuResource.h"
 #include "Renderer.h"
+#include "SystemManager.h"
 
 using uint = unsigned int;
 
@@ -27,7 +28,7 @@ public:
 		data.clear();
 	};
 public:
-	std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const override;
+	std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const override;
 public:
 	const void* GetData() const override { return data.data(); }
 	size_t GetDataSize() const override { return data.size() * sizeof( T ); }
@@ -42,7 +43,7 @@ private:
 };
 
 template<typename T>
-std::unique_ptr<GpuResource> StructuredBuffer<T>::Clone( Renderer& renderer ) const
+std::unique_ptr<GpuResource> StructuredBuffer<T>::Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const
 {
 	// Example for a buffer; adapt for textures as needed
 	auto desc = resource->GetDesc();
@@ -71,7 +72,7 @@ std::unique_ptr<GpuResource> StructuredBuffer<T>::Clone( Renderer& renderer ) co
 	srvDesc.Buffer.NumElements = elementCount;
 	srvDesc.Buffer.StructureByteStride = elementSize;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	clone->CreateSRV( renderer, srvDesc );
+	clone->CreateSRV( srvHeapManager, renderer, srvDesc );
 	// Copy other relevant metadata as needed
 	return clone;
 }

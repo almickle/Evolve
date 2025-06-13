@@ -3,7 +3,7 @@
 #include <Windows.h>
 #include "Window.h"
 
-bool Window::Create( const wchar_t* title, HINSTANCE hInstance, int nCmdShow )
+bool Window::Init( const wchar_t* title, HINSTANCE hInstance, int nCmdShow )
 {
 	wc = { sizeof( WNDCLASSEX ), CS_CLASSDC, WndProc, 0L, 0L, hInstance, nullptr, nullptr, nullptr, nullptr, title, nullptr };
 	::RegisterClassEx( &wc );
@@ -31,16 +31,6 @@ bool Window::Create( const wchar_t* title, HINSTANCE hInstance, int nCmdShow )
 	HRESULT hr = CoInitializeEx( nullptr, COINIT_MULTITHREADED );
 
 	return hwnd != nullptr;
-}
-
-
-
-
-void Window::Destroy()
-{
-	::DestroyWindow( hwnd );
-	hwnd = nullptr;
-	::UnregisterClassW( wc.lpszClassName, wc.hInstance );
 }
 
 void Window::PollEvents()

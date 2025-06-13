@@ -1,14 +1,21 @@
 #include <d3d12.h>
 #include <dxgiformat.h>
-#include <Windows.h>
 #include "DescriptorHeapManager.h"
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuiLayer.h"
 #include "Renderer.h"
+#include "Window.h"
 
-void ImGuiLayer::Init( HWND hwnd, Renderer& renderer )
+ImGuiLayer::~ImGuiLayer()
+{
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
+
+void ImGuiLayer::Init()
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -19,16 +26,16 @@ void ImGuiLayer::Init( HWND hwnd, Renderer& renderer )
 
 	ImGui::StyleColorsDark();
 
-	imguiFontSrvIndex = renderer.GetSrvHeapManager()->Allocate();
-	D3D12_CPU_DESCRIPTOR_HANDLE imguiFontCpuHandle = renderer.GetSrvHeapManager()->GetCpuHandle( imguiFontSrvIndex );
-	D3D12_GPU_DESCRIPTOR_HANDLE imguiFontGpuHandle = renderer.GetSrvHeapManager()->GetGpuHandle( imguiFontSrvIndex );
+	imguiFontSrvIndex = srvHeapManager->Allocate();
+	D3D12_CPU_DESCRIPTOR_HANDLE imguiFontCpuHandle = srvHeapManager->GetCpuHandle( imguiFontSrvIndex );
+	D3D12_GPU_DESCRIPTOR_HANDLE imguiFontGpuHandle = srvHeapManager->GetGpuHandle( imguiFontSrvIndex );
 
-	ImGui_ImplWin32_Init( hwnd );
+	ImGui_ImplWin32_Init( window->GetHWND() );
 	ImGui_ImplDX12_Init(
-		renderer.GetDevice(), 3,
-		DXGI_FORMAT_R8G8B8A8_UNORM, renderer.GetSrvHeapManager()->GetHeap(),
-		renderer.GetSrvHeapManager()->GetHeap()->GetCPUDescriptorHandleForHeapStart(),
-		renderer.GetSrvHeapManager()->GetHeap()->GetGPUDescriptorHandleForHeapStart()
+		renderer->GetDevice(), 3,
+		DXGI_FORMAT_R8G8B8A8_UNORM, srvHeapManager->GetHeap(),
+		srvHeapManager->GetHeap()->GetCPUDescriptorHandleForHeapStart(),
+		srvHeapManager->GetHeap()->GetGPUDescriptorHandleForHeapStart()
 	);
 }
 
@@ -49,11 +56,4 @@ void ImGuiLayer::EndFrame( ID3D12GraphicsCommandList* commandList )
 {
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData( ImGui::GetDrawData(), commandList );
-}
-
-void ImGuiLayer::Shutdown()
-{
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
 }

@@ -7,12 +7,11 @@
 #include "GpuResource.h"
 #include "Renderer.h"
 
-void GpuResource::CreateSRV( Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc )
+void GpuResource::CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc )
 {
-	auto* srvHeapManager = renderer.GetSrvHeapManager();
-	srvHeapIndex = srvHeapManager->Allocate();
-	srvCpuHandle = srvHeapManager->GetCpuHandle( srvHeapIndex );
-	srvGpuHandle = srvHeapManager->GetGpuHandle( srvHeapIndex );
+	srvHeapIndex = srvHeapManager.Allocate();
+	srvCpuHandle = srvHeapManager.GetCpuHandle( srvHeapIndex );
+	srvGpuHandle = srvHeapManager.GetGpuHandle( srvHeapIndex );
 
 	auto device = renderer.GetDevice();
 	device->CreateShaderResourceView( resource.Get(), &srvDesc, srvCpuHandle );

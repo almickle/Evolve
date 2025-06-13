@@ -25,7 +25,7 @@ void ConstantBuffer::Upload( ID3D12GraphicsCommandList* cmdList )
 	uploadResource->Unmap( 0, nullptr );
 }
 
-std::unique_ptr<GpuResource> ConstantBuffer::Clone( Renderer& renderer ) const
+std::unique_ptr<GpuResource> ConstantBuffer::Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const
 {
 	// Example for a buffer; adapt for textures as needed
 	auto desc = resource->GetDesc();

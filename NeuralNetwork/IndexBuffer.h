@@ -1,13 +1,10 @@
 #pragma once
-#include <cstdint>
 #include <d3d12.h>
 #include <dxgiformat.h>
 #include <string>
 #include <vector>
 #include "GpuResource.h"
 #include "Types.h"
-
-class Renderer;
 
 class IndexBuffer : public GpuResource {
 public:

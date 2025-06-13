@@ -22,11 +22,6 @@
 
 using ResourceID = std::string;
 
-GpuResourceManager::GpuResourceManager( Renderer& renderer )
-{
-	this->renderer = &renderer;
-}
-
 GpuResourceManager::~GpuResourceManager()
 {
 	resourceHeap.clear();
@@ -50,7 +45,7 @@ bool GpuResourceManager::RegisterPerFrameResource( ResourceID id, std::unique_pt
 	auto framesInFlight = Renderer::BackBufferCount;
 	resources.reserve( framesInFlight );
 	for( unsigned int i = 0; i < framesInFlight; ++i ) {
-		auto clone = resource->Clone( *renderer );
+		auto clone = resource->Clone( *srvHeapManager, *renderer );
 		if( !clone ) return false;
 		clone->SetResourceId( id + "_frame" + std::to_string( i ) );
 		resources.push_back( std::move( clone ) );
@@ -95,9 +90,6 @@ void GpuResourceManager::UploadResource( const ResourceID& id )
 {
 	auto* resource = GetResource( id );
 	if( !resource ) return;
-
-	auto* uploadManager = renderer->GetUploadManager();
-	if( !uploadManager ) return;
 
 	// Enqueue the upload request
 	uploadManager->Enqueue( {
@@ -148,7 +140,7 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 	// Create and register the GpuResource
 	auto vb = std::make_unique<VertexBuffer>( vertices, name );
 	vb->SetResource( std::move( vbResource ) );
-	vb->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
+	vb->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 	vb->SetUploadResource( std::move( uploadResource ) );
 	vb->SetResourceSize( bufferSize );
 
@@ -201,7 +193,7 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 
 	auto ib = std::make_unique<IndexBuffer>( indices, name );
 	ib->SetResource( std::move( ibResource ) );
-	ib->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
+	ib->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 	ib->SetUploadResource( std::move( uploadResource ) );
 	ib->SetResourceSize( bufferSize );
 
@@ -292,7 +284,7 @@ ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURC
 	tex->SetResource( std::move( textureResource ) );
 	tex->SetUploadResource( std::move( uploadResource ) );
 	tex->SetResourceSize( uploadBufferSize );
-	tex->SetCurrentState( D3D12_RESOURCE_STATE_COPY_DEST );
+	tex->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( tex ) );

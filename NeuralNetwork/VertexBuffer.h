@@ -6,9 +6,6 @@
 #include "GpuResource.h"
 #include "Types.h"
 
-class Renderer;
-class GpuResourceManager;
-
 class VertexBuffer : public GpuResource {
 public:
 	VertexBuffer( const std::vector<Vertex>& vertices, const std::string& name = "VertexBuffer" )

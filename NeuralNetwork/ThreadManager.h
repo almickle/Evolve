@@ -10,9 +10,13 @@
 
 class ThreadManager {
 public:
-	ThreadManager( uint threadCount = std::thread::hardware_concurrency() );
+	ThreadManager( uint threadCount = std::thread::hardware_concurrency() )
+		: threadCount( threadCount ? threadCount : 1 )
+	{
+	}
 	~ThreadManager();
 public:
+	void Init();
 	void Launch( std::function<void()> func );
 	void JoinAll();
 public:

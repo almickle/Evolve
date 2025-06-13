@@ -1,17 +1,29 @@
 #pragma once
 #include <d3d12.h>
-#include <Windows.h>
+#include "SystemManager.h"
 
+class DescriptorHeapManager;
 class Renderer;
+class Window;
 
 class ImGuiLayer {
 public:
-	void Init( HWND hwnd, Renderer& renderer );
+	ImGuiLayer( SystemManager& systemManager )
+		: srvHeapManager( systemManager.GetSrvHeapManager() ),
+		renderer( systemManager.GetRenderer() ),
+		window( systemManager.GetWindow() )
+	{
+	}
+	~ImGuiLayer();
+public:
+	void Init();
 	void BeginFrame();
 	void RenderUI();
 	void EndFrame( ID3D12GraphicsCommandList* commandList );
-	void Shutdown();
-
 private:
 	int imguiFontSrvIndex = -1;
+private:
+	DescriptorHeapManager* srvHeapManager;
+	Renderer* renderer;
+	Window* window;
 };

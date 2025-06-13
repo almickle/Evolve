@@ -28,7 +28,7 @@ public:
 	std::string GetInputSlotName( uint slot ) const;
 	std::string GetOutputSlotName( uint slot ) const;
 	std::string GetParameterSlotName( uint slot ) const;
-	uint GetParameterCount() const { return parameters.size(); };
+	uint GetParameterCount() const { return (uint)parameters.size(); };
 public:
 	const std::vector<NodeSlot>& GetInputs() const { return inputs; }
 	const std::vector<NodeSlot>& GetOutputs() const { return outputs; }

@@ -1,16 +1,16 @@
 #pragma once
-#include "RenderPass.h"
+#include "GraphPass.h"
+#include "SystemManager.h"
 
 class UploadPass : public GraphPass {
 public:
-    UploadPass() : GraphPass("UploadPass", RenderPassType::Asynchronous) {}
+	UploadPass() : GraphPass( "UploadPass" ) {}
 
-    void Execute(Renderer& renderer) override {
-        // Let the UploadManager process all pending uploads
-        if (renderer.GetUploadManager()) {
-            //renderer.GetUploadManager()->Upload(renderer);
-        }
-    }
-
-    void Shutdown() override {}
+	void Execute( SystemManager& systemManager ) override
+	{
+		// Let the UploadManager process all pending uploads
+		if( systemManager.GetUploadManager() ) {
+			//renderer.GetUploadManager()->Upload(renderer);
+		}
+	}
 };

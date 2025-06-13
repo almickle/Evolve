@@ -5,8 +5,6 @@
 #include "GpuResource.h"
 #include "Types.h"
 
-class Renderer;
-
 class Texture : public GpuResource {
 public:
 	Texture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, const std::string& name = "Texture" )

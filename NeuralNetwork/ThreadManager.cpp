@@ -6,14 +6,6 @@
 #include "ThreadManager.h"
 #include "Types.h"
 
-ThreadManager::ThreadManager( uint threadCount )
-	: threadCount( threadCount ? threadCount : 1 )
-{
-	for( uint i = 0; i < threadCount; ++i ) {
-		threads.emplace_back( &ThreadManager::WorkerLoop, this );
-	}
-}
-
 ThreadManager::~ThreadManager()
 {
 	{
@@ -23,6 +15,13 @@ ThreadManager::~ThreadManager()
 	tasksCv.notify_all();
 	for( auto& t : threads ) {
 		if( t.joinable() ) t.join();
+	}
+}
+
+void ThreadManager::Init()
+{
+	for( uint i = 0; i < threadCount; ++i ) {
+		threads.emplace_back( &ThreadManager::WorkerLoop, this );
 	}
 }
 

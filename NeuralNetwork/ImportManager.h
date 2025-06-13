@@ -2,9 +2,12 @@
 #include <d3d12.h>
 #include <string>
 #include <vector>
-#include "AssetManager.h"
-#include "GpuResourceManager.h"
 #include "Mesh.h"
+#include "System.h"
+#include "SystemManager.h"
+
+class AssetManager;
+class GpuResourceManager;
 
 struct TextureData
 {
@@ -12,21 +15,15 @@ struct TextureData
 	D3D12_RESOURCE_DESC texDesc;
 };
 
-class ImportManager
+class ImportManager : public System
 {
 public:
-	ImportManager( AssetManager& assetManager, GpuResourceManager& resourceManager )
-		: assetManager( assetManager ), resourceManager( resourceManager )
+	ImportManager( SystemManager& systemManager )
 	{
 	}
 	~ImportManager() = default;
 public:
-	void ImportMesh( const std::string& path, const std::string& name );
-	void ImportTexture( const std::string& path, const std::string& name );
 	std::vector<MeshData> LoadMesh( const std::string& path );
 	TextureData LoadTexture( const std::string& path );
-private:
-	AssetManager& assetManager;
-	GpuResourceManager& resourceManager;
 };
 

@@ -3,9 +3,11 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <Windows.h>
 #include <wrl/client.h>
 #include "Renderer.h"
+#include "Types.h"
+
+class SystemManager;
 
 class GraphPass {
 	struct PassState {
@@ -20,9 +22,8 @@ public:
 	}
 	virtual ~GraphPass() = default;
 public:
-	virtual void Init( Renderer& renderer ) = 0;
-	virtual void Execute( Renderer& renderer ) = 0;
-	virtual void Shutdown() = 0;
+	virtual void Init( SystemManager& systemManager ) = 0;
+	virtual void Execute( SystemManager& systemManager ) = 0;
 public:
 	bool IsReady() const;
 	bool IsFinished() const { return state.finished; }

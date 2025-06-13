@@ -20,7 +20,7 @@ public:
 public:
 	void Update( const void* data, size_t size ) override;
 	void Upload( ID3D12GraphicsCommandList* cmdList ) override;
-	std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const override;
+	std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const override;
 public:
 	const void* GetData() const override { return bufferData.data(); }
 	size_t GetDataSize() const override { return bufferData.size(); }

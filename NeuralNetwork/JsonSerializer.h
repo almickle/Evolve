@@ -5,8 +5,9 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include "System.h"
 
-class JsonSerializer {
+class JsonSerializer : public System {
 public:
 	JsonSerializer() = default;
 	void StartDocument();

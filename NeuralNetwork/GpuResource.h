@@ -6,6 +6,7 @@
 #include <wrl\client.h>
 
 class Renderer;
+class DescriptorHeapManager;
 
 struct ResourceState {
 	D3D12_RESOURCE_STATES current = D3D12_RESOURCE_STATE_COMMON;
@@ -24,7 +25,7 @@ public:
 	}
 	virtual ~GpuResource() = default;
 public:
-	virtual std::unique_ptr<GpuResource> Clone( Renderer& renderer ) const { return nullptr; };
+	virtual std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const { return nullptr; };
 	virtual void Update( const void* data, size_t size ) {};
 	virtual void Upload( ID3D12GraphicsCommandList* cmdList );
 	virtual const void* GetData() const = 0;
@@ -50,7 +51,7 @@ public:
 	void SetUploadResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& heap );
 	void SetIsReady( bool ready ) { state.ready.store( ready, std::memory_order_release ); }
 public:
-	void CreateSRV( Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
+	void CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
 	bool IsReady() const { return state.ready.load( std::memory_order_acquire ); }
 protected:
 	ResourceState state;

@@ -1,22 +1,17 @@
 #include <combaseapi.h>
 #include <memory>
-#include <memory>
 #include <objbase.h>
 #include <sal.h>
 #include <Windows.h>
 #include "App.h"
-#include "AssetManager.h"
 #include "BeginFramePass.h"
-#include "Camera.h"
 #include "EndFramePass.h"
 #include "ExecutionGraph.h"
 #include "ImGuiLayer.h"
-#include "ImportManager.h"
 #include "InitializationGraph.h"
-#include "Material.h"
-#include "MaterialTemplate.h"
 #include "Renderer.h"
-#include "UIRenderPass.h"
+#include "SystemManager.h"
+#include "Window.h"
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
 {
@@ -25,8 +20,12 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 		return -1;
 
 	app.Run();
-	app.Shutdown();
 	return 0;
+}
+
+App::~App()
+{
+	CoUninitialize();
 }
 
 bool App::Init( HINSTANCE hInstance, int nCmdShow )
@@ -36,64 +35,43 @@ bool App::Init( HINSTANCE hInstance, int nCmdShow )
 		MessageBox( nullptr, L"Failed to initialize COM library", L"Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
-	if( !window.Create( L"DX12 ImGui App", hInstance, nCmdShow ) )
-		return false;
-	if( !renderer.Init( window.GetHWND() ) )
-		return false;
-	imgui.Init( window.GetHWND(), renderer );
+	systemManager = std::make_unique<SystemManager>();
+	systemManager->Init( { L"Hitari Engine", hInstance, nCmdShow } );
 
-	auto simGraph = BuildSimulationGraph( renderer );
+	/*auto simGraph = BuildSimulationGraph( renderer );
 	auto renderGraph = BuildRenderGraph( renderer, imgui );
-	auto initGraph = BuildInitializationGraph( renderer );
+	auto initGraph = BuildInitializationGraph( renderer );*/
 
 	// Center the mouse in the window
 	RECT rect;
-	GetClientRect( window.GetHWND(), &rect );
+	GetClientRect( systemManager->GetWindow()->GetHWND(), &rect );
 	POINT center{};
 	center.x = (rect.right - rect.left) / 2;
 	center.y = (rect.bottom - rect.top) / 2;
-	ClientToScreen( window.GetHWND(), &center );
-	SetCursorPos( center.x, center.y );
+	ClientToScreen( systemManager->GetWindow()->GetHWND(), &center );
+	//SetCursorPos( center.x, center.y );
 
 	// Initialize input state
 	inputState.lastMouseX = center.x;
 	inputState.lastMouseY = center.y;
 	inputState.firstMouse = false;
 
-	initGraph->ExecuteAsync( renderer );
-
-	auto threadManager = new ThreadManager();
-	auto serializer = new JsonSerializer();
-	auto nodeLibrary = new NodeLibrary();
-	auto fileManager = new FileIOManager( *threadManager );
-	auto assetManager = new AssetManager( *serializer, *fileManager, *renderer.GetGpuResourceManager(), *nodeLibrary );
-	auto importManager = new ImportManager( *assetManager, *renderer.GetGpuResourceManager() );
-	auto lib = new NodeLibrary();
-	auto importer = new ImportManager( *assetManager, *renderer.GetGpuResourceManager() );
-
-	//const std::vector<TextureBindings> textureBindings{};
-	//const std::vector<VectorBindings> vectorBindings{};
-	//const std::vector<ScalarBindings> scalarBindings{};
-	//auto mat = std::make_unique<Material>( "Asset_1", textureBindings, vectorBindings, scalarBindings, "PBR" );
-
-	//auto id = assetManager->RegisterAsset( std::move( mat ) );
-	//auto asset = assetManager->GetAsset( id );
-	//assetManager->SaveAsset( id );
+	//initGraph->ExecuteAsync( renderer );
 
 	return true;
 }
 
 void App::Run()
 {
-	while( !window.ShouldClose() ) {
-		window.PollEvents();
+	while( !systemManager->GetWindow()->ShouldClose() ) {
+		systemManager->GetWindow()->PollEvents();
 		//UpdateInputState();
 		//UpdateCameraFromInput();
 
-		renderer.GetSimulationGraph()->ExecuteAsync( renderer );
+		/*renderer.GetSimulationGraph()->ExecuteAsync( renderer );
 		renderer.GetRenderGraph()->ExecuteAsync( renderer );
 
-		renderer.Present();
+		renderer.Present();*/
 	}
 }
 
@@ -150,7 +128,7 @@ void App::UpdateInputState()
 	// Mouse
 	POINT p;
 	if( GetCursorPos( &p ) ) {
-		ScreenToClient( window.GetHWND(), &p );
+		ScreenToClient( systemManager->GetWindow()->GetHWND(), &p );
 		if( inputState.firstMouse ) {
 			inputState.lastMouseX = p.x;
 			inputState.lastMouseY = p.y;
@@ -162,13 +140,13 @@ void App::UpdateInputState()
 		inputState.lastMouseY = p.y;
 
 		// Only recenter if window is focused
-		if( GetForegroundWindow() == window.GetHWND() ) {
+		if( GetForegroundWindow() == systemManager->GetWindow()->GetHWND() ) {
 			RECT rect;
-			GetClientRect( window.GetHWND(), &rect );
+			GetClientRect( systemManager->GetWindow()->GetHWND(), &rect );
 			POINT center{};
 			center.x = (rect.right - rect.left) / 2;
 			center.y = (rect.bottom - rect.top) / 2;
-			ClientToScreen( window.GetHWND(), &center );
+			ClientToScreen( systemManager->GetWindow()->GetHWND(), &center );
 			SetCursorPos( center.x, center.y );
 			inputState.lastMouseX = center.x;
 			inputState.lastMouseY = center.y;
@@ -194,11 +172,4 @@ void App::UpdateCameraFromInput()
 	//}
 	//inputState.mouseDeltaX = 0;
 	//inputState.mouseDeltaY = 0;
-}
-
-void App::Shutdown()
-{
-	renderer.Shutdown();
-	window.Destroy();
-	CoUninitialize();
 }

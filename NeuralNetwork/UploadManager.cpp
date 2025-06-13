@@ -7,13 +7,13 @@
 #include <utility>
 #include <Windows.h>
 #include "Renderer.h"
+#include "ThreadManager.h"
 #include "UploadManager.h"
 
-UploadManager::UploadManager( Renderer& renderer )
-	: threadManager( renderer.GetThreadManager() )
+void UploadManager::Init()
 {
 	// Create upload allocator and command list
-	auto device = renderer.GetDevice();
+	auto device = renderer->GetDevice();
 	device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_COPY, IID_PPV_ARGS( &uploadAllocator ) );
 	device->CreateCommandList( 0, D3D12_COMMAND_LIST_TYPE_COPY, uploadAllocator.Get(), nullptr, IID_PPV_ARGS( &uploadCmdList ) );
 	uploadCmdList->Close(); // Start closed

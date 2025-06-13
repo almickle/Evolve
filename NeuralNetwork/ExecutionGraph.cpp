@@ -7,18 +7,18 @@
 #include <queue>
 #include <unordered_map>
 #include <vector>
-#include <Windows.h>
 #include "ExecutionGraph.h"
 #include "GraphPass.h"
-#include "Renderer.h"
+#include "SystemManager.h"
 #include "ThreadManager.h"
+#include "Types.h"
 
 void ExecutionGraph::AddPass( std::shared_ptr<GraphPass> pass )
 {
 	passes.push_back( pass );
 }
 
-void ExecutionGraph::ExecuteSync( Renderer& renderer )
+void ExecutionGraph::ExecuteSync( SystemManager& systemManager )
 {
 	std::unordered_map<GraphPass*, int> indegree;
 	std::unordered_map<GraphPass*, std::vector<GraphPass*>> adj;
@@ -41,7 +41,7 @@ void ExecutionGraph::ExecuteSync( Renderer& renderer )
 		ready.pop();
 
 		if( pass->IsReady() ) {
-			pass->Execute( renderer );
+			pass->Execute( systemManager );
 			executed[pass] = true;
 
 			for( GraphPass* neighbor : adj[pass] ) {
@@ -57,13 +57,13 @@ void ExecutionGraph::ExecuteSync( Renderer& renderer )
 	}
 }
 
-void ExecutionGraph::ExecuteAsync( Renderer& renderer )
+void ExecutionGraph::ExecuteAsync( SystemManager& systemManager )
 {
-	ThreadManager* threadManager = renderer.GetThreadManager();
-	if( !threadManager ) {
-		ExecuteSync( renderer );
-		return;
-	}
+	//ThreadManager& threadManager = systemManager.GetThreadManager();
+	//if( !threadManager ) {
+	//	ExecuteSync( renderer );
+	//	return;
+	//}
 
 	// Build dependency graph
 	std::unordered_map<GraphPass*, int> refCount;
@@ -103,7 +103,7 @@ void ExecutionGraph::ExecuteAsync( Renderer& renderer )
 				pass = workQueue.front();
 				workQueue.pop();
 			}
-			pass->Execute( renderer );
+			pass->Execute( systemManager );
 			finishedCount++;
 
 			if( finishedCount == totalPasses ) {
@@ -123,16 +123,16 @@ void ExecutionGraph::ExecuteAsync( Renderer& renderer )
 		};
 
 	// Launch worker threads
-	unsigned int numThreads = std::min( threadManager->GetThreadCount(), static_cast<unsigned int>(totalPasses) );
+	unsigned int numThreads = std::min( systemManager.GetThreadManager()->GetThreadCount(), static_cast<unsigned int>(totalPasses) );
 	for( unsigned int i = 0; i < numThreads; ++i ) {
-		threadManager->Launch( worker );
+		systemManager.GetThreadManager()->Launch( worker );
 	}
 
 	// Notify workers in case work was enqueued before threads started
 	cv.notify_all();
 
 	// Wait for all threads to finish
-	threadManager->JoinAll();
+	systemManager.GetThreadManager()->JoinAll();
 }
 
 std::vector<ID3D12CommandList*> ExecutionGraph::GetAllCommandLists( uint frameIndex ) const
@@ -176,10 +176,4 @@ std::vector<ID3D12CommandList*> ExecutionGraph::GetAllCommandLists( uint frameIn
 		allCmdLists.push_back( pass->GetCurrentCommandList( frameIndex ) );
 	}
 	return allCmdLists;
-}
-
-void ExecutionGraph::Shutdown()
-{
-	for( auto& pass : passes ) pass->Shutdown();
-	passes.clear();
 }

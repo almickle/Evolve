@@ -18,23 +18,41 @@
 #include <vector>
 #include <Windows.h>
 #include <wrl\client.h>
-#include "DescriptorHeapManager.h"
 #include "ExecutionGraph.h"
-#include "GpuResourceManager.h"
 #include "Renderer.h"
-#include "ThreadManager.h"
 #include "Types.h"
-#include "UploadManager.h"
-
-Renderer::Renderer()
-{
-}
+#include "Window.h"
 
 Renderer::~Renderer()
 {
+	WaitForGpu();
+	CleanupRenderTargets();
+
+	if( swapChain ) {
+		BOOL isFullscreen = FALSE;
+		ComPtr<IDXGIOutput> pOutput;
+		swapChain->GetFullscreenState( &isFullscreen, &pOutput );
+		if( isFullscreen ) {
+			swapChain->SetFullscreenState( FALSE, nullptr );
+		}
+		swapChain.Reset();
+		pOutput.Reset();
+	}
+	CloseHandle( fenceEvent );
+	fence.Reset();
+	commandQueue.Reset();
+	rtvHeap.Reset();
+	device.Reset();
+
+#if defined(_DEBUG)
+	ComPtr<IDXGIDebug1> dxgiDebug;
+	if( SUCCEEDED( DXGIGetDebugInterface1( 0, IID_PPV_ARGS( &dxgiDebug ) ) ) ) {
+		dxgiDebug->ReportLiveObjects( DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL );
+	}
+#endif
 }
 
-bool Renderer::Init( HWND hwnd )
+bool Renderer::Init()
 {
 	uint dxgiFactoryFlags = 0;
 
@@ -110,7 +128,7 @@ bool Renderer::Init( HWND hwnd )
 	//DXGI_SWAP_CHAIN_FULLSCREEN_DESC fsDesc = {};
 
 	ComPtr<IDXGISwapChain1> tempSwapChain;
-	if( FAILED( factory->CreateSwapChainForHwnd( commandQueue.Get(), hwnd, &scDesc, nullptr, nullptr, &tempSwapChain ) ) )
+	if( FAILED( factory->CreateSwapChainForHwnd( commandQueue.Get(), window->GetHWND(), &scDesc, nullptr, nullptr, &tempSwapChain ) ) )
 		return false;
 
 	if( FAILED( tempSwapChain.As( &swapChain ) ) )
@@ -119,7 +137,7 @@ bool Renderer::Init( HWND hwnd )
 	//swapChain->SetFullscreenState(TRUE, nullptr);
 
 	RECT rect;
-	GetClientRect( hwnd, &rect );
+	GetClientRect( window->GetHWND(), &rect );
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
 
@@ -134,11 +152,6 @@ bool Renderer::Init( HWND hwnd )
 
 	// Create depth stencil buffer
 	CreateDepthStencil( width, height );
-
-	srvHeapManager = std::make_unique<DescriptorHeapManager>( device.Get(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024, true );
-	threadManager = std::make_unique<ThreadManager>();
-	uploadManager = std::make_unique<UploadManager>( *this );
-	gpuResourceManager = std::make_unique<GpuResourceManager>( *this );
 
 	return true;
 }
@@ -257,42 +270,4 @@ void Renderer::CleanupRenderTargets()
 	for( uint i = 0; i < BackBufferCount; ++i ) {
 		backBuffers[i].Reset();
 	}
-}
-
-void Renderer::Shutdown()
-{
-	WaitForGpu();
-	CleanupRenderTargets();
-
-	if( uploadManager ) {
-		uploadManager.reset();
-	}
-	if( gpuResourceManager ) {
-		gpuResourceManager->~GpuResourceManager();
-		gpuResourceManager.reset();
-	}
-	renderGraph->Shutdown();
-
-	if( swapChain ) {
-		BOOL isFullscreen = FALSE;
-		ComPtr<IDXGIOutput> pOutput;
-		swapChain->GetFullscreenState( &isFullscreen, &pOutput );
-		if( isFullscreen ) {
-			swapChain->SetFullscreenState( FALSE, nullptr );
-		}
-		swapChain.Reset();
-		pOutput.Reset();
-	}
-	CloseHandle( fenceEvent );
-	fence.Reset();
-	commandQueue.Reset();
-	rtvHeap.Reset();
-	device.Reset();
-
-#if defined(_DEBUG)
-	ComPtr<IDXGIDebug1> dxgiDebug;
-	if( SUCCEEDED( DXGIGetDebugInterface1( 0, IID_PPV_ARGS( &dxgiDebug ) ) ) ) {
-		dxgiDebug->ReportLiveObjects( DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_DETAIL );
-	}
-#endif
 }

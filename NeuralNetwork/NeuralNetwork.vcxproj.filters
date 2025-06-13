@@ -70,9 +70,6 @@
     <Filter Include="Source Files\Assets\Resources">
       <UniqueIdentifier>{f85933f3-8ab4-4689-bed6-aefc01bc5522}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Managers">
-      <UniqueIdentifier>{362d2c43-6ba6-4768-adbd-6d87a2da7d45}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Managers">
       <UniqueIdentifier>{9d16dc52-0a56-47a7-9c0c-b568c39b2d9a}</UniqueIdentifier>
     </Filter>
@@ -97,14 +94,38 @@
     <Filter Include="Header Files\Assets\Material Graph\Nodes">
       <UniqueIdentifier>{68345bd9-6603-49ed-a9bc-3be59d359a3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Serializers">
-      <UniqueIdentifier>{718d1196-72ee-40de-8df2-8834f30255dc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Assets\Material Graph\Nodes">
       <UniqueIdentifier>{cc015c00-bc0d-4ac1-881e-0037289a02a9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Serializers">
       <UniqueIdentifier>{f409bd13-887f-478b-ba69-a295d59fa1d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Passes">
+      <UniqueIdentifier>{0eb82cfc-8383-4dfd-ba9a-17e390e29623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Passes\Initialization">
+      <UniqueIdentifier>{aee019c1-016c-48f6-adf7-807d65aaee03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Passes\Render">
+      <UniqueIdentifier>{97f39b11-b0b4-4fc3-9e2b-52d02b77ab90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Passes">
+      <UniqueIdentifier>{766fba96-dcae-4ef6-8dc5-16f7f21072e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Passes\Render">
+      <UniqueIdentifier>{0834e4f0-fad1-4a09-8a2b-94917c7f07eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Passes\Initialization">
+      <UniqueIdentifier>{c517e9bc-bfc6-420b-b9fc-0cd7e722b996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Systems">
+      <UniqueIdentifier>{567fcc9c-c253-4654-9a37-d6773df91390}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Systems\Managers">
+      <UniqueIdentifier>{362d2c43-6ba6-4768-adbd-6d87a2da7d45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Systems\Serializers">
+      <UniqueIdentifier>{718d1196-72ee-40de-8df2-8834f30255dc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -183,9 +204,6 @@
     <ClCompile Include="EndFramePass.cpp">
       <Filter>Source Files\Render\Passes</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiLayer.cpp">
-      <Filter>Source Files\UI</Filter>
-    </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
@@ -258,12 +276,27 @@
     <ClCompile Include="JsonSerializer.cpp">
       <Filter>Source Files\Serializers</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetInitializationPass.cpp">
+      <Filter>Source Files\Passes\Initialization</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemManager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiLayer.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NeuralCluster.h">
@@ -278,19 +311,10 @@
     <ClInclude Include="SensoryNeuron.h">
       <Filter>Header Files\Neuron</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files\Render</Filter>
-    </ClInclude>
     <ClInclude Include="SceneRenderPass.h">
       <Filter>Header Files\Render\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="UIRenderPass.h">
-      <Filter>Header Files\Render\Passes</Filter>
-    </ClInclude>
     <ClInclude Include="LandscapePass.h">
-      <Filter>Header Files\Render\Passes</Filter>
-    </ClInclude>
-    <ClInclude Include="UploadPass.h">
       <Filter>Header Files\Render\Passes</Filter>
     </ClInclude>
     <ClInclude Include="Actor.h">
@@ -311,29 +335,20 @@
     <ClInclude Include="InstanceManager.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="GraphPass.h">
-      <Filter>Header Files\Render\Passes</Filter>
-    </ClInclude>
     <ClInclude Include="SceneInitPass.h">
       <Filter>Header Files\Render\Passes</Filter>
     </ClInclude>
     <ClInclude Include="DescriptorHeapManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="UploadManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="GpuResourceManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="ThreadManager.h">
-      <Filter>Header Files\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="BeginFramePass.h">
-      <Filter>Header Files\Render\Passes</Filter>
-    </ClInclude>
-    <ClInclude Include="EndFramePass.h">
-      <Filter>Header Files\Render\Passes</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="ImGuiLayer.h">
       <Filter>Header Files\UI</Filter>
@@ -356,9 +371,6 @@
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Header Files\Assets\Resources</Filter>
     </ClInclude>
-    <ClInclude Include="GpuResource.h">
-      <Filter>Header Files\Assets\Resources</Filter>
-    </ClInclude>
     <ClInclude Include="IndexBuffer.h">
       <Filter>Header Files\Assets\Resources</Filter>
     </ClInclude>
@@ -372,10 +384,10 @@
       <Filter>Header Files\Assets\Resources</Filter>
     </ClInclude>
     <ClInclude Include="AssetManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="FileIOManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Landscape.h">
       <Filter>Header Files</Filter>
@@ -401,9 +413,6 @@
     <ClInclude Include="MaterialOutputNode.h">
       <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
     </ClInclude>
-    <ClInclude Include="NodeLibrary.h">
-      <Filter>Header Files\Assets\Material Graph</Filter>
-    </ClInclude>
     <ClInclude Include="NodeTypes.h">
       <Filter>Header Files\Assets\Material Graph</Filter>
     </ClInclude>
@@ -411,7 +420,7 @@
       <Filter>Header Files\Assets\Assets</Filter>
     </ClInclude>
     <ClInclude Include="JsonSerializer.h">
-      <Filter>Header Files\Serializers</Filter>
+      <Filter>Header Files\Systems\Serializers</Filter>
     </ClInclude>
     <ClInclude Include="VertexDataNode.h">
       <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
@@ -420,7 +429,7 @@
       <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="ImportManager.h">
-      <Filter>Header Files\Managers</Filter>
+      <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="NormalMapNode.h">
       <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
@@ -436,6 +445,48 @@
     </ClInclude>
     <ClInclude Include="SubAsset.h">
       <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuResource.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetInitializationPass.h">
+      <Filter>Header Files\Passes\Initialization</Filter>
+    </ClInclude>
+    <ClInclude Include="UploadPass.h">
+      <Filter>Header Files\Passes\Initialization</Filter>
+    </ClInclude>
+    <ClInclude Include="BeginFramePass.h">
+      <Filter>Header Files\Passes\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="EndFramePass.h">
+      <Filter>Header Files\Passes\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphPass.h">
+      <Filter>Header Files\Passes</Filter>
+    </ClInclude>
+    <ClInclude Include="UIRenderPass.h">
+      <Filter>Header Files\Passes\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemManager.h">
+      <Filter>Header Files\Systems\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLibrary.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="System.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

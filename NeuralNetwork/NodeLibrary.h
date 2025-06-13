@@ -8,12 +8,13 @@
 #include "NodeTypes.h"
 #include "NormalMapNode.h"
 #include "ScalarParameterNode.h"
+#include "System.h"
 #include "TextureSamplerNode.h"
 #include "VectorBreakNode.h"
 #include "VectorScaleNode.h"
 #include "VertexDataNode.h"
 
-class NodeLibrary {
+class NodeLibrary : public System {
 public:
 	NodeLibrary()
 	{

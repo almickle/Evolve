@@ -14,15 +14,11 @@
 #include <memory>
 #include <stdexcept>
 #include <string>
-#include <utility>
 #include <vector>
 #include <Windows.h>
 #include "DataStructures.h"
-#include "GpuResourceManager.h"
 #include "ImportManager.h"
 #include "Mesh.h"
-#include "SubMesh.h"
-#include "TextureAsset.h"
 
 namespace {
 	enum class ImageType {
@@ -165,31 +161,4 @@ TextureData ImportManager::LoadTexture( const std::string& path )
 	}
 
 	return TextureData{ subresources, texDesc };
-}
-
-void ImportManager::ImportMesh( const std::string& path, const std::string& name )
-{
-
-	auto meshData = LoadMesh( path );
-	auto mesh = std::make_unique<Mesh>( meshData, name );
-	for( const auto& meshDatum : meshData )
-	{
-		auto vbId = resourceManager.CreateVertexBuffer( meshDatum.vertices, name );
-		auto ibId = resourceManager.CreateIndexBuffer( meshDatum.indices, name );
-
-		auto subMesh = std::make_unique<SubMesh>( vbId, ibId, name );
-		mesh->AddSubAsset( std::move( subMesh ) );
-	}
-	auto id = assetManager.RegisterAsset( std::move( mesh ) );
-	assetManager.SaveAsset( id );
-}
-
-void ImportManager::ImportTexture( const std::string& path, const std::string& name )
-{
-	auto textureData = LoadTexture( path );
-	auto texture = std::make_unique<TextureAsset>( *this, name );
-	auto texId = resourceManager.CreateTexture( textureData.subresources, textureData.texDesc, name );
-	texture->AddResource( texId );
-	auto id = assetManager.RegisterAsset( std::move( texture ) );
-	assetManager.SaveAsset( id, "textures" );
 }

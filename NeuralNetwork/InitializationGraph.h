@@ -1,7 +1,7 @@
 #pragma once
 #include "ExecutionGraph.h"
 
-class Renderer;
+class SystemManager;
 
 class InitializationGraph :
 	public ExecutionGraph
@@ -9,7 +9,7 @@ class InitializationGraph :
 public:
 	InitializationGraph() = default;
 public:
-	void ExecuteSync( Renderer& renderer ) override;
-	void ExecuteAsync( Renderer& renderer ) override;
+	void ExecuteSync( SystemManager& systemManager ) override;
+	void ExecuteAsync( SystemManager& systemManager ) override;
 };
 

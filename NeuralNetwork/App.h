@@ -5,7 +5,7 @@
 #include "ImGuiLayer.h"
 #include "InitializationGraph.h"
 #include "Renderer.h"
-#include "Window.h"
+#include "SystemManager.h"
 
 struct InputState {
 	bool keys[256] = {};
@@ -18,19 +18,19 @@ struct InputState {
 
 class App {
 public:
+	App() {};
+	~App();
+public:
 	bool Init( HINSTANCE hInstance, int nCmdShow );
 	void Run();
 	void UpdateInputState();
 	void UpdateCameraFromInput();
-	void Shutdown();
 public:
 	std::shared_ptr<InitializationGraph> BuildInitializationGraph( Renderer& renderer );
 	std::shared_ptr<ExecutionGraph> BuildSimulationGraph( Renderer& renderer );
 	std::shared_ptr<ExecutionGraph> BuildRenderGraph( Renderer& renderer, ImGuiLayer& imguiLayer );
 private:
-	Window window;
-	Renderer renderer;
-	ImGuiLayer imgui;
-	//Scene scene;
 	InputState inputState;
+private:
+	std::unique_ptr<SystemManager> systemManager;
 };

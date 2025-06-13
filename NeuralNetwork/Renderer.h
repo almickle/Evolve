@@ -6,6 +6,8 @@
 #include <memory>
 #include <Windows.h>
 #include <wrl\client.h>
+#include "System.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 using Microsoft::WRL::ComPtr;
@@ -15,15 +17,18 @@ class GpuResourceManager;
 class DescriptorHeapManager;
 class ThreadManager;
 class UploadManager;
+class Window;
 
-class Renderer {
+class Renderer : public System {
 public:
-	Renderer();
+	Renderer( SystemManager& systemManager ) :
+		window( systemManager.GetWindow() )
+	{
+	};
 	~Renderer();
 public:
-	bool Init( HWND hwnd );
+	bool Init();
 	void Present();
-	void Shutdown();
 	void WaitForGpu();
 	void CreateRenderTargets();
 	void CleanupRenderTargets();
@@ -49,11 +54,6 @@ public:
 public:
 	ComPtr<ID3DBlob> LoadShaderBlob( const wchar_t* filename ); // move to utils
 public:
-	ThreadManager* GetThreadManager() const { return threadManager.get(); }
-	UploadManager* GetUploadManager() const { return uploadManager.get(); }
-	DescriptorHeapManager* GetSrvHeapManager() const { return srvHeapManager.get(); }
-	GpuResourceManager* GetGpuResourceManager() const { return gpuResourceManager.get(); }
-public:
 	static const uint BackBufferCount = 3;
 private:
 	D3D12_CPU_DESCRIPTOR_HANDLE rtDescHandles[BackBufferCount];
@@ -76,8 +76,5 @@ private:
 	std::shared_ptr<ExecutionGraph> simulationGraph;
 	std::shared_ptr<ExecutionGraph> renderGraph;
 private:
-	std::unique_ptr<UploadManager> uploadManager;
-	std::unique_ptr<GpuResourceManager> gpuResourceManager;
-	std::unique_ptr<DescriptorHeapManager> srvHeapManager;
-	std::unique_ptr<ThreadManager> threadManager;
+	Window* window;
 };

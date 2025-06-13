@@ -1,14 +1,16 @@
 #pragma once
 #include "GraphPass.h"
-#include "Renderer.h"
 
-class BeginFramePass : public GraphPass {
+class SystemManager;
+
+class BeginFramePass :
+	public GraphPass {
 public:
 	BeginFramePass()
 		: GraphPass( "BeginFrame" )
 	{
 	}
-	void Init( Renderer& renderer ) override;
-	void Execute( Renderer& renderer ) override;
-	void Shutdown() override {}
+public:
+	void Init( SystemManager& systemManager ) override;
+	void Execute( SystemManager& systemManager ) override;
 };

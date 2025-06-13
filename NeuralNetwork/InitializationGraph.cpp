@@ -9,10 +9,10 @@
 #include "ExecutionGraph.h"
 #include "GraphPass.h"
 #include "InitializationGraph.h"
-#include "Renderer.h"
+#include "SystemManager.h"
 #include "ThreadManager.h"
 
-void InitializationGraph::ExecuteSync( Renderer& renderer )
+void InitializationGraph::ExecuteSync( SystemManager& systemManager )
 {
 	std::unordered_map<GraphPass*, int> indegree;
 	std::unordered_map<GraphPass*, std::vector<GraphPass*>> adj;
@@ -35,7 +35,7 @@ void InitializationGraph::ExecuteSync( Renderer& renderer )
 		ready.pop();
 
 		if( pass->IsReady() ) {
-			pass->Init( renderer );
+			pass->Init( systemManager );
 			executed[pass] = true;
 
 			for( GraphPass* neighbor : adj[pass] ) {
@@ -51,13 +51,13 @@ void InitializationGraph::ExecuteSync( Renderer& renderer )
 	}
 }
 
-void InitializationGraph::ExecuteAsync( Renderer& renderer )
+void InitializationGraph::ExecuteAsync( SystemManager& systemManager )
 {
-	ThreadManager* threadManager = renderer.GetThreadManager();
-	if( !threadManager ) {
-		ExecuteSync( renderer );
-		return;
-	}
+	//ThreadManager& threadManager = systemManager.GetThreadManager();
+	//if( !threadManager ) {
+	//	ExecuteSync( renderer );
+	//	return;
+	//}
 
 	// Build dependency graph
 	std::unordered_map<GraphPass*, int> refCount;
@@ -97,7 +97,7 @@ void InitializationGraph::ExecuteAsync( Renderer& renderer )
 				pass = workQueue.front();
 				workQueue.pop();
 			}
-			pass->Init( renderer );
+			pass->Init( systemManager );
 			finishedCount++;
 
 			if( finishedCount == totalPasses ) {
@@ -117,14 +117,14 @@ void InitializationGraph::ExecuteAsync( Renderer& renderer )
 		};
 
 	// Launch worker threads
-	unsigned int numThreads = std::min( threadManager->GetThreadCount(), static_cast<unsigned int>(totalPasses) );
+	unsigned int numThreads = std::min( systemManager.GetThreadManager()->GetThreadCount(), static_cast<unsigned int>(totalPasses) );
 	for( unsigned int i = 0; i < numThreads; ++i ) {
-		threadManager->Launch( worker );
+		systemManager.GetThreadManager()->Launch( worker );
 	}
 
 	// Notify workers in case work was enqueued before threads started
 	cv.notify_all();
 
 	// Wait for all threads to finish
-	threadManager->JoinAll();
+	systemManager.GetThreadManager()->JoinAll();
 }

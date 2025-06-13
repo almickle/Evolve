@@ -7,26 +7,30 @@
 #include <Windows.h>
 #include <wrl/client.h>
 #include "d3d12.h"
-#include "ThreadManager.h"
+#include "System.h"
+#include "SystemManager.h"
 
-class Renderer; // Forward declaration
+class ThreadManager;
+class Renderer;
 
 struct UploadRequest {
 	std::function<void( ID3D12GraphicsCommandList* )> recordFunc;
 	std::function<void()> onComplete; // Optional callback
 };
 
-class UploadManager {
+class UploadManager : public System {
 public:
-	UploadManager( Renderer& renderer );
+	UploadManager( SystemManager& systemManager )
+		: threadManager( systemManager.GetThreadManager() ),
+		renderer( systemManager.GetRenderer() )
+	{
+	}
 	~UploadManager() = default;
 public:
+	void Init();
 	void Enqueue( UploadRequest req );
 	void Flush();
 private:
-private:
-private:
-	ThreadManager* threadManager = nullptr;
 	std::mutex queueMutex;
 	std::queue<UploadRequest> uploadQueue;
 	std::atomic<bool> batchInProgress{ false };
@@ -36,4 +40,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Fence> uploadFence;
 	uint64_t uploadFenceValue = 0;
 	HANDLE uploadFenceEvent = nullptr;
+private:
+	ThreadManager* threadManager;
+	Renderer* renderer;
 };

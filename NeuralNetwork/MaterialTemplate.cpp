@@ -134,7 +134,7 @@ const ParameterBinding* MaterialTemplate::GetParameterBinding( uint nodeIndex, u
 std::string MaterialTemplate::GetParameterValue( uint nodeIndex, uint parameterIndex, NodeParameter parameter ) const
 {
 	for( const auto& binding : parameterBindings ) {
-		if( binding.nodeIndex == nodeIndex && binding.parameterIndex == parameterIndex )
+		if( binding.nodeIndex == nodeIndex && binding.parameterIndex == parameterIndex ) {
 			switch( binding.parameterType )
 			{
 				case NodeParameterTypes::Texture:
@@ -146,7 +146,9 @@ std::string MaterialTemplate::GetParameterValue( uint nodeIndex, uint parameterI
 				default:
 					return "/* invalid parameter type */";
 			}
+		}
 	}
+	return "/* parameter not found */";
 }
 
 std::vector<uint> MaterialTemplate::TopologicalSort() const
