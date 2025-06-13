@@ -37,6 +37,7 @@ void SystemManager::Init( const AppContext& appContext )
 	srvHeapManager->Init( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024, true );
 	uiLayer = std::make_unique<ImGuiLayer>( *this );
 	uiLayer->Init();
+	serializer = std::make_unique<JsonSerializer>();
 	fileManager = std::make_unique<FileIOManager>( *this );
 	nodeLibrary = std::make_unique<NodeLibrary>();
 	resourceManager = std::make_unique<GpuResourceManager>( *this );

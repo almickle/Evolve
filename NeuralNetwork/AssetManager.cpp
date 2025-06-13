@@ -34,9 +34,9 @@ void AssetManager::Init()
 			std::string path = std::filesystem::absolute( entry.path() ).string();
 			FileTask task;
 			task.path = path;
-			// Capture importManager by pointer to avoid dangling reference
 			task.taskFunc = [this]( const std::string& filePath ) {
-				this->LoadAsset( filePath );
+				JsonSerializer localSerializer;
+				this->LoadAsset( filePath, localSerializer );
 				};
 			// Optionally, set onComplete if you want a callback after loading
 			task.onComplete = nullptr;
@@ -47,20 +47,19 @@ void AssetManager::Init()
 	fence.wait();
 }
 
-void AssetManager::LoadAsset( const std::string& path )
+void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serializer )
 {
 	std::filesystem::path assetPath = assetDirectory / path;
-	auto serializer = new JsonSerializer();
-	serializer->LoadFromFile( assetPath.string() );
+	serializer.LoadFromFile( assetPath.string() );
 
-	AssetType assetId = serializer->Read<AssetType>( "type" );
+	AssetType assetId = serializer.Read<AssetType>( "type" );
 
 	switch( assetId )
 	{
 		case AssetType::Texture:
 		{
 			auto asset = std::make_unique<TextureAsset>( *importManager );
-			asset->Load( *resourceManager, *serializer );
+			asset->Load( *resourceManager, serializer );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -68,7 +67,7 @@ void AssetManager::LoadAsset( const std::string& path )
 		case AssetType::Mesh:
 		{
 			auto asset = std::make_unique<Mesh>();
-			asset->Load( *resourceManager, *serializer );
+			asset->Load( *resourceManager, serializer );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -76,7 +75,7 @@ void AssetManager::LoadAsset( const std::string& path )
 		case AssetType::Model:
 		{
 			auto asset = std::make_unique<Model>();
-			asset->Load( *resourceManager, *serializer );
+			asset->Load( *resourceManager, serializer );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -84,7 +83,7 @@ void AssetManager::LoadAsset( const std::string& path )
 		case AssetType::Material:
 		{
 			auto asset = std::make_unique<Material>();
-			asset->Load( *resourceManager, *serializer );
+			asset->Load( *resourceManager, serializer );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -92,7 +91,7 @@ void AssetManager::LoadAsset( const std::string& path )
 		case AssetType::MaterialTemplate:
 		{
 			auto asset = std::make_unique<MaterialTemplate>( *nodeLibrary );
-			asset->Load( *resourceManager, *serializer );
+			asset->Load( *resourceManager, serializer );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}

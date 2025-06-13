@@ -20,7 +20,7 @@ class ImportManager;
 class AssetManager : public System {
 public:
 	AssetManager( SystemManager& systemManager )
-		: serializer( serializer ),
+		: serializer( systemManager.GetSerializer() ),
 		fileManager( systemManager.GetFileManager() ),
 		resourceManager( systemManager.GetResourceManager() ),
 		nodeLibrary( systemManager.GetNodeLibrary() ),
@@ -34,7 +34,7 @@ public:
 	void RegisterAsset( const AssetID& assetId, std::unique_ptr<Asset> asset );
 	void RemoveAsset( const AssetID& id );
 	void SaveAsset( const AssetID& id, const std::string& additionalPath = "" ) const;
-	void LoadAsset( const std::string& name );
+	void LoadAsset( const std::string& path, JsonSerializer& serializer );
 public:
 	void ImportMesh( const std::string& path, const std::string& name );
 	void ImportTexture( const std::string& path, const std::string& name );

@@ -52,6 +52,7 @@ std::string Mesh::Serialize( JsonSerializer& serializer ) const
 			serializer.WriteValue( vertex.tangent.x );
 			serializer.WriteValue( vertex.tangent.y );
 			serializer.WriteValue( vertex.tangent.z );
+			serializer.WriteValue( vertex.tangent.w );
 			serializer.EndArray();
 
 			serializer.EndObject();

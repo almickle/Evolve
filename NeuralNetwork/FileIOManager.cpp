@@ -1,8 +1,9 @@
+#include <atomic>
 #include <future>
 #include <memory>
 #include <mutex>
-#include <string>
 #include <utility>
+#include <vector>
 #include "FileIOManager.h"
 #include "ThreadManager.h"
 
@@ -11,8 +12,8 @@ void FileIOManager::Enqueue( FileTask task )
 	{
 		std::lock_guard<std::mutex> lock( queueMutex );
 		taskQueue.push( std::move( task ) );
+		++outstandingTasks;
 	}
-	// Immediately launch the task on the thread pool
 	threadManager->Launch( [this] {
 		FileTask localTask;
 		{
@@ -23,6 +24,15 @@ void FileIOManager::Enqueue( FileTask task )
 		}
 		if( localTask.taskFunc ) localTask.taskFunc( localTask.path );
 		if( localTask.onComplete ) localTask.onComplete();
+
+		// Decrement outstanding tasks and check for fences
+		if( --outstandingTasks == 0 ) {
+			std::lock_guard<std::mutex> fenceLock( fenceMutex );
+			for( auto& fence : pendingFences ) {
+				fence->set_value();
+			}
+			pendingFences.clear();
+		}
 						   } );
 }
 
@@ -31,13 +41,12 @@ std::future<void> FileIOManager::InsertFence()
 	auto promise = std::make_shared<std::promise<void>>();
 	std::future<void> fut = promise->get_future();
 
-	FileTask fenceTask;
-	fenceTask.taskFunc = [promise]( const std::string& ) {
+	if( outstandingTasks == 0 ) {
 		promise->set_value();
-		};
-	fenceTask.onComplete = nullptr;
-	fenceTask.path = "";
-
-	Enqueue( std::move( fenceTask ) );
+	}
+	else {
+		std::lock_guard<std::mutex> lock( fenceMutex );
+		pendingFences.push_back( promise );
+	}
 	return fut;
 }

@@ -13,7 +13,7 @@ std::string Model::Serialize( JsonSerializer& serializer ) const
 	SerializeBaseAsset( serializer );
 
 	// Mesh reference (by asset ID)
-	serializer.Write( "mesh", meshId );
+	serializer.Write( "meshId", meshId );
 
 	// Material slots (array of asset IDs)
 	serializer.WriteArray( "materialSlots", materialSlots );
@@ -34,7 +34,7 @@ void Model::Deserialize( JsonSerializer& serializer )
 	DeserializeBaseAsset( serializer );
 
 	// Mesh reference
-	meshId = serializer.Read<AssetID>( "mesh" );
+	meshId = serializer.Read<AssetID>( "meshId" );
 
 	// Material slots
 	materialSlots = serializer.ReadArray<AssetID>( "materialSlots" );
