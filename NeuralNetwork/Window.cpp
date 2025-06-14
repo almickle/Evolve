@@ -29,7 +29,10 @@ bool Window::Init( const wchar_t* title, HINSTANCE hInstance, int nCmdShow )
 
 	// COM init
 	HRESULT hr = CoInitializeEx( nullptr, COINIT_MULTITHREADED );
-
+	if( FAILED( hr ) ) {
+		MessageBox( nullptr, L"Failed to initialize COM library", L"Error", MB_OK | MB_ICONERROR );
+		return false;
+	}
 	return hwnd != nullptr;
 }
 

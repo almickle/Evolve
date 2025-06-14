@@ -1,15 +1,15 @@
 #include <d3d12.h>
 #include <memory>
-#include <stdexcept>
 #include <vector>
-#include <Windows.h>
 #include <wrl\client.h>
 #include "GraphPass.h"
-#include "Renderer.h"
+#include "Types.h"
 
-void GraphPass::AddDependency( std::shared_ptr<GraphPass> dependency )
+GraphPass* GraphPass::AddDependency( GraphPass* dependency )
 {
-	dependencies.push_back( dependency.get() );
+	dependencies.push_back( dependency );
+
+	return this;
 }
 
 void GraphPass::RemoveDependency( GraphPass* dependency )

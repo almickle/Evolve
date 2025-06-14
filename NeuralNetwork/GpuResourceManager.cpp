@@ -2,6 +2,7 @@
 #include <combaseapi.h>
 #include <d3d12.h>
 #include <d3dx12_core.h>
+#include <DirectXTex.h>
 #include <memory>
 #include <rpcndr.h>
 #include <string>
@@ -17,7 +18,6 @@
 #include "Renderer.h"
 #include "Texture.h"
 #include "Types.h"
-#include "UploadManager.h"
 #include "VertexBuffer.h"
 
 using ResourceID = std::string;
@@ -80,28 +80,19 @@ std::vector<GpuResource*> GpuResourceManager::GetAllResources() const
 	return allResources;
 }
 
+std::vector<GpuResource*> GpuResourceManager::GetCurrentFrameResources() const
+{
+	std::vector<GpuResource*> allResources;
+	for( auto& pair : perFrameResourceHeap ) {
+		allResources.push_back( pair.second[renderer->GetCurrentFrameIndex()].get() );
+	}
+	return allResources;
+}
+
 void GpuResourceManager::RemoveResource( const ResourceID& id )
 {
 	resourceHeap.erase( id );
 	perFrameResourceHeap.erase( id );
-}
-
-void GpuResourceManager::UploadResource( const ResourceID& id )
-{
-	auto* resource = GetResource( id );
-	if( !resource ) return;
-
-	// Enqueue the upload request
-	uploadManager->Enqueue( {
-		// recordFunc: called on the upload thread, records the copy/upload
-		[resource]( ID3D12GraphicsCommandList* cmdList ) {
-			resource->Upload( cmdList );
-			},
-							// onComplete: set resource as ready
-							[resource]() {
-								resource->SetIsReady( true );
-							}
-							} );
 }
 
 ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name )
@@ -242,12 +233,34 @@ ResourceID GpuResourceManager::CreateConstantBuffer( const std::vector<byte>& da
 	return id;
 }
 
-ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& name )
+ResourceID GpuResourceManager::CreateTexture( std::shared_ptr<DirectX::ScratchImage> image, const std::string& name )
 {
-	auto device = renderer->GetDevice();
-	uint numSubresources = static_cast<uint>(subresourceData.size());
+	// 1. Describe the texture
+	const DirectX::TexMetadata& metadata = image->GetMetadata();
+	D3D12_RESOURCE_DESC texDesc = {};
+	texDesc.Dimension = static_cast<D3D12_RESOURCE_DIMENSION>(metadata.dimension);
+	texDesc.Width = static_cast<UINT>(metadata.width);
+	texDesc.Height = static_cast<UINT>(metadata.height);
+	texDesc.DepthOrArraySize = static_cast<UINT16>(metadata.arraySize);
+	texDesc.MipLevels = static_cast<UINT16>(metadata.mipLevels);
+	texDesc.Format = metadata.format;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 
-	// 1. Create the default heap resource (GPU local)
+	// 2. Prepare subresource data for all subresources
+	size_t numSubresources = image->GetImageCount();
+	std::vector<D3D12_SUBRESOURCE_DATA> subresources( numSubresources );
+	const DirectX::Image* images = image->GetImages();
+	for( size_t i = 0; i < numSubresources; ++i ) {
+		subresources[i].pData = images[i].pixels;
+		subresources[i].RowPitch = images[i].rowPitch;
+		subresources[i].SlicePitch = images[i].slicePitch;
+	}
+
+	auto device = renderer->GetDevice();
+
+	// 3. Create the default heap resource (GPU local)
 	CD3DX12_HEAP_PROPERTIES heapProps( D3D12_HEAP_TYPE_DEFAULT );
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource;
 	HRESULT hr = device->CreateCommittedResource(
@@ -260,10 +273,10 @@ ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURC
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	// 2. Create the upload heap
+	// 4. Create the upload heap
 	UINT64 uploadBufferSize = 0;
 	device->GetCopyableFootprints(
-		&texDesc, 0, numSubresources, 0, nullptr, nullptr, nullptr, &uploadBufferSize );
+		&texDesc, 0, (uint)numSubresources, 0, nullptr, nullptr, nullptr, &uploadBufferSize );
 
 	CD3DX12_HEAP_PROPERTIES uploadHeapProps( D3D12_HEAP_TYPE_UPLOAD );
 	CD3DX12_RESOURCE_DESC uploadBufferDesc = CD3DX12_RESOURCE_DESC::Buffer( uploadBufferSize );
@@ -279,8 +292,8 @@ ResourceID GpuResourceManager::CreateTexture( const std::vector<D3D12_SUBRESOURC
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	// 3. Create the Texture resource object
-	auto tex = std::make_unique<Texture>( subresourceData, name );
+	//5. Create the Texture resource object
+	auto tex = std::make_unique<Texture>( std::move( image ), subresources, name );
 	tex->SetResource( std::move( textureResource ) );
 	tex->SetUploadResource( std::move( uploadResource ) );
 	tex->SetResourceSize( uploadBufferSize );

@@ -16,6 +16,7 @@ class GpuResourceManager;
 class DescriptorHeapManager;
 class ImGuiLayer;
 class Window;
+class InputSystem;
 
 struct AppContext {
 	const wchar_t* title;
@@ -52,6 +53,7 @@ public:
 	ThreadManager* GetThreadManager() { return threadManager.get(); }
 	JsonSerializer* GetSerializer() { return serializer.get(); }
 	FileIOManager* GetFileManager() { return fileManager.get(); }
+	InputSystem* GetInputSystem() { return inputSystem.get(); }
 public:
 	AssetManager* GetAssetManager() { return assetManager.get(); }
 	NodeLibrary* GetNodeLibrary() { return nodeLibrary.get(); }
@@ -74,6 +76,7 @@ private:
 private:
 	std::unique_ptr<ImGuiLayer> uiLayer;
 	std::unique_ptr<Window> window;
+	std::unique_ptr<InputSystem> inputSystem;
 private:
 	std::unique_ptr<ThreadManager> threadManager;
 	std::unique_ptr<JsonSerializer> serializer;

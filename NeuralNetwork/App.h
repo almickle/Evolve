@@ -1,10 +1,6 @@
 #pragma once
 #include <memory>
 #include <Windows.h>
-#include "ExecutionGraph.h"
-#include "ImGuiLayer.h"
-#include "InitializationGraph.h"
-#include "Renderer.h"
 #include "SystemManager.h"
 
 struct InputState {
@@ -18,17 +14,17 @@ struct InputState {
 
 class App {
 public:
-	App() {};
+	App() :
+		systemManager( std::make_unique<SystemManager>() )
+	{
+	};
 	~App();
 public:
 	bool Init( HINSTANCE hInstance, int nCmdShow );
 	void Run();
-	void UpdateInputState();
-	void UpdateCameraFromInput();
+
 public:
-	std::shared_ptr<InitializationGraph> BuildInitializationGraph( Renderer& renderer );
-	std::shared_ptr<ExecutionGraph> BuildSimulationGraph( Renderer& renderer );
-	std::shared_ptr<ExecutionGraph> BuildRenderGraph( Renderer& renderer, ImGuiLayer& imguiLayer );
+	void BuildRenderGraph();
 private:
 	InputState inputState;
 private:

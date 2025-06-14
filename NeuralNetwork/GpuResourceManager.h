@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <d3d12.h>
 #include <d3dx12_core.h>
+#include <DirectXTex.h>
 #include <dxgiformat.h>
 #include <memory>
 #include <rpcndr.h>
@@ -21,14 +22,12 @@
 
 class Renderer;
 class DescriptorHeapManager;
-class UploadManager;
 
 class GpuResourceManager : public System {
 public:
 	GpuResourceManager( SystemManager& systemManager )
 		: renderer( systemManager.GetRenderer() ),
-		srvHeapManager( systemManager.GetSrvHeapManager() ),
-		uploadManager( systemManager.GetUploadManager() )
+		srvHeapManager( systemManager.GetSrvHeapManager() )
 	{
 	}
 	~GpuResourceManager();
@@ -37,7 +36,6 @@ public:
 	bool RegisterPerFrameResource( ResourceID id, std::unique_ptr<GpuResource> resource );
 	void RemoveResource( const ResourceID& id );
 	ResourceID GenerateUniqueResourceId( const std::string& prefix = "Resource" );
-	void UploadResource( const ResourceID& id );
 public:
 	ResourceID CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name = "VertexBuffer" );
 	ResourceID CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& name = "IndexBuffer" );
@@ -46,10 +44,11 @@ public:
 	ResourceID CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& name = "StructuredBuffer" );
 	template<typename T>
 	ResourceID CreateDynamicStructuredBuffer( const std::vector<T>& data, const std::string& name );
-	ResourceID CreateTexture( const std::vector<D3D12_SUBRESOURCE_DATA>& subresourceData, D3D12_RESOURCE_DESC texDesc, const std::string& name = "Texture" );
+	ResourceID CreateTexture( std::shared_ptr<DirectX::ScratchImage> image, const std::string& name = "Texture" );
 public:
 	GpuResource* GetResource( const ResourceID& id ) const;
 	std::vector<GpuResource*> GetAllResources() const;
+	std::vector<GpuResource*> GetCurrentFrameResources() const;
 private:
 	std::unordered_map<ResourceID, std::unique_ptr<GpuResource>> resourceHeap;
 	std::unordered_map<ResourceID, std::vector<std::unique_ptr<GpuResource>>> perFrameResourceHeap;
@@ -57,7 +56,6 @@ private:
 private:
 	Renderer* renderer;
 	DescriptorHeapManager* srvHeapManager;
-	UploadManager* uploadManager;
 };
 
 template<typename T>

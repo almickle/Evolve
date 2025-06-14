@@ -1,16 +1,15 @@
-#include <combaseapi.h>
 #include <memory>
-#include <objbase.h>
 #include <sal.h>
+#include <utility>
 #include <Windows.h>
 #include "App.h"
 #include "BeginFramePass.h"
 #include "EndFramePass.h"
 #include "ExecutionGraph.h"
-#include "ImGuiLayer.h"
-#include "InitializationGraph.h"
 #include "Renderer.h"
 #include "SystemManager.h"
+#include "UploadManager.h"
+#include "UploadPass.h"
 #include "Window.h"
 
 int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow )
@@ -25,151 +24,46 @@ int WINAPI WinMain( _In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, 
 
 App::~App()
 {
-	CoUninitialize();
 }
 
 bool App::Init( HINSTANCE hInstance, int nCmdShow )
 {
-	HRESULT hr = CoInitializeEx( nullptr, COINIT_MULTITHREADED );
-	if( FAILED( hr ) ) {
-		MessageBox( nullptr, L"Failed to initialize COM library", L"Error", MB_OK | MB_ICONERROR );
-		return false;
-	}
-	systemManager = std::make_unique<SystemManager>();
 	systemManager->Init( { L"Hitari Engine", hInstance, nCmdShow } );
 
-	/*auto simGraph = BuildSimulationGraph( renderer );
-	auto renderGraph = BuildRenderGraph( renderer, imgui );
-	auto initGraph = BuildInitializationGraph( renderer );*/
-
-	// Center the mouse in the window
-	RECT rect;
-	GetClientRect( systemManager->GetWindow()->GetHWND(), &rect );
-	POINT center{};
-	center.x = (rect.right - rect.left) / 2;
-	center.y = (rect.bottom - rect.top) / 2;
-	ClientToScreen( systemManager->GetWindow()->GetHWND(), &center );
-	//SetCursorPos( center.x, center.y );
-
-	// Initialize input state
-	inputState.lastMouseX = center.x;
-	inputState.lastMouseY = center.y;
-	inputState.firstMouse = false;
-
-	//initGraph->ExecuteAsync( renderer );
+	BuildRenderGraph();
 
 	return true;
 }
 
 void App::Run()
 {
+	auto uploadPass = std::make_unique<UploadPass>();
+	uploadPass->Init( *systemManager );
 	while( !systemManager->GetWindow()->ShouldClose() ) {
 		systemManager->GetWindow()->PollEvents();
 		//UpdateInputState();
 		//UpdateCameraFromInput();
+		systemManager->GetUploadManager()->WaitForCurrentFrame();
+		systemManager->GetRenderer()->WaitForCurrentFrame();
 
-		/*renderer.GetSimulationGraph()->ExecuteAsync( renderer );
-		renderer.GetRenderGraph()->ExecuteAsync( renderer );
-
-		renderer.Present();*/
+		uploadPass->Execute( *systemManager );
+		systemManager->GetRenderer()->GetRenderGraph()->ExecuteAsync( *systemManager );
+		systemManager->GetRenderer()->Present();
 	}
 }
 
-std::shared_ptr<InitializationGraph> App::BuildInitializationGraph( Renderer& renderer )
+void App::BuildRenderGraph()
 {
-	auto graph = std::make_shared<InitializationGraph>();
+	auto beginPass = std::make_unique<BeginFramePass>();
+	auto endPass = std::make_unique<EndFramePass>();
+	endPass->AddDependency( beginPass.get() );
 
-	for( const auto& pass : renderer.GetSimulationGraph()->GetPasses() ) {
-		graph->AddPass( pass );
+	systemManager->GetRenderer()->GetRenderGraph()
+		->AddPass( std::move( beginPass ) )
+		->AddPass( std::move( endPass ) );
+
+	for( const auto& pass : systemManager->GetRenderer()->GetRenderGraph()->GetPasses() )
+	{
+		pass->Init( *systemManager );
 	}
-	for( const auto& pass : renderer.GetRenderGraph()->GetPasses() ) {
-		graph->AddPass( pass );
-	}
-
-	renderer.SetInitializationGraph( graph );
-	return graph;
-}
-
-std::shared_ptr<ExecutionGraph> App::BuildSimulationGraph( Renderer& renderer )
-{
-	auto graph = std::make_shared<ExecutionGraph>();
-
-	renderer.SetSimulationGraph( graph );
-	return graph;
-}
-
-std::shared_ptr<ExecutionGraph> App::BuildRenderGraph( Renderer& renderer, ImGuiLayer& imguiLayer )
-{
-	auto graph = std::make_shared<ExecutionGraph>();
-
-	auto beginPass = std::make_shared<BeginFramePass>();
-	//auto uiPass = std::make_shared<UIRenderPass>( renderer, &imguiLayer );
-	auto endPass = std::make_shared<EndFramePass>();
-
-	//uiPass->AddDependency( beginPass );
-	endPass->AddDependency( beginPass );
-
-	graph->AddPass( beginPass );
-	//graph->AddPass( uiPass );
-	graph->AddPass( endPass );
-
-	renderer.SetRenderGraph( graph );
-	return graph;
-}
-
-
-void App::UpdateInputState()
-{
-	// Keyboard
-	for( int i = 0; i < 256; ++i ) {
-		inputState.keys[i] = (GetAsyncKeyState( i ) & 0x8000) != 0;
-	}
-
-	// Mouse
-	POINT p;
-	if( GetCursorPos( &p ) ) {
-		ScreenToClient( systemManager->GetWindow()->GetHWND(), &p );
-		if( inputState.firstMouse ) {
-			inputState.lastMouseX = p.x;
-			inputState.lastMouseY = p.y;
-			inputState.firstMouse = false;
-		}
-		inputState.mouseDeltaX = p.x - inputState.lastMouseX;
-		inputState.mouseDeltaY = p.y - inputState.lastMouseY;
-		inputState.lastMouseX = p.x;
-		inputState.lastMouseY = p.y;
-
-		// Only recenter if window is focused
-		if( GetForegroundWindow() == systemManager->GetWindow()->GetHWND() ) {
-			RECT rect;
-			GetClientRect( systemManager->GetWindow()->GetHWND(), &rect );
-			POINT center{};
-			center.x = (rect.right - rect.left) / 2;
-			center.y = (rect.bottom - rect.top) / 2;
-			ClientToScreen( systemManager->GetWindow()->GetHWND(), &center );
-			SetCursorPos( center.x, center.y );
-			inputState.lastMouseX = center.x;
-			inputState.lastMouseY = center.y;
-		}
-	}
-}
-
-void App::UpdateCameraFromInput()
-{
-	//auto camera = scene.GetActiveCamera();
-	//if( !camera ) return;
-
-	//float moveSpeed = 0.1f;
-	//float rotSpeed = 0.005f;
-
-	//if( inputState.keys['W'] ) camera->MoveForward( moveSpeed );
-	//if( inputState.keys['S'] ) camera->MoveForward( -moveSpeed );
-	//if( inputState.keys['A'] ) camera->MoveRight( -moveSpeed );
-	//if( inputState.keys['D'] ) camera->MoveRight( moveSpeed );
-
-	//if( !inputState.firstMouse ) {
-	//	camera->Rotate( inputState.mouseDeltaX * rotSpeed, inputState.mouseDeltaY * rotSpeed );
-	//}
-	//inputState.mouseDeltaX = 0;
-	//inputState.mouseDeltaY = 0;
 }

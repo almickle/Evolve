@@ -5,7 +5,6 @@
 #include <assimp/scene.h>
 #include <cctype>
 #include <cstdint>
-#include <d3d12.h>
 #include <DirectXMath.h>
 #include <DirectXMathConvert.inl>
 #include <DirectXMathVector.inl>
@@ -95,9 +94,9 @@ std::vector<MeshData> ImportManager::LoadMesh( const std::string& path )
 	return meshData;
 }
 
-TextureData ImportManager::LoadTexture( const std::string& path )
+std::shared_ptr<DirectX::ScratchImage> ImportManager::LoadTexture( const std::string& path )
 {
-	DirectX::ScratchImage image;
+	auto image = std::make_shared<DirectX::ScratchImage>();
 	HRESULT hr = S_OK;
 	std::wstring filePath( path.begin(), path.end() );
 
@@ -109,21 +108,21 @@ TextureData ImportManager::LoadTexture( const std::string& path )
 				filePath.c_str(),
 				DirectX::DDS_FLAGS_NONE,
 				nullptr,
-				image
+				*image
 			);
 			break;
 		case ImageType::TGA:
 			hr = DirectX::LoadFromTGAFile(
 				filePath.c_str(),
 				nullptr,
-				image
+				*image
 			);
 			break;
 		case ImageType::HDR:
 			hr = DirectX::LoadFromHDRFile(
 				filePath.c_str(),
 				nullptr,
-				image
+				*image
 			);
 			break;
 		case ImageType::WIC:
@@ -132,33 +131,9 @@ TextureData ImportManager::LoadTexture( const std::string& path )
 				filePath.c_str(),
 				DirectX::WIC_FLAGS_NONE,
 				nullptr,
-				image
+				*image
 			);
 			break;
 	}
-
-	// 2. Describe the texture
-	const DirectX::TexMetadata& metadata = image.GetMetadata();
-	D3D12_RESOURCE_DESC texDesc = {};
-	texDesc.Dimension = static_cast<D3D12_RESOURCE_DIMENSION>(metadata.dimension);
-	texDesc.Width = static_cast<UINT>(metadata.width);
-	texDesc.Height = static_cast<UINT>(metadata.height);
-	texDesc.DepthOrArraySize = static_cast<UINT16>(metadata.arraySize);
-	texDesc.MipLevels = static_cast<UINT16>(metadata.mipLevels);
-	texDesc.Format = metadata.format;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-	texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-	// 3. Prepare subresource data for all subresources
-	size_t numSubresources = image.GetImageCount();
-	std::vector<D3D12_SUBRESOURCE_DATA> subresources( numSubresources );
-	const DirectX::Image* images = image.GetImages();
-	for( size_t i = 0; i < numSubresources; ++i ) {
-		subresources[i].pData = images[i].pixels;
-		subresources[i].RowPitch = images[i].rowPitch;
-		subresources[i].SlicePitch = images[i].slicePitch;
-	}
-
-	return TextureData{ subresources, texDesc };
+	return image;
 }

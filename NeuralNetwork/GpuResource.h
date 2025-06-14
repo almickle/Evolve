@@ -31,6 +31,7 @@ public:
 	virtual const void* GetData() const = 0;
 	virtual size_t GetDataSize() const = 0;
 public:
+	void Transition( ID3D12GraphicsCommandList* commandList, const D3D12_RESOURCE_STATES& requestedState );
 	void TransitionToTargetState( ID3D12GraphicsCommandList* commandList );
 public:
 	ID3D12Resource* GetResource() const { return resource.Get(); }

@@ -19,6 +19,8 @@ void GpuResource::CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& re
 
 void GpuResource::Upload( ID3D12GraphicsCommandList* cmdList )
 {
+	Transition( cmdList, D3D12_RESOURCE_STATE_COPY_DEST );
+
 	void* mapped = nullptr;
 	uploadResource->Map( 0, nullptr, &mapped );
 	memcpy( mapped, GetData(), GetDataSize() );
@@ -29,6 +31,17 @@ void GpuResource::Upload( ID3D12GraphicsCommandList* cmdList )
 		uploadResource.Get(), 0,
 		GetDataSize()
 	);
+}
+
+void GpuResource::Transition( ID3D12GraphicsCommandList* commandList, const D3D12_RESOURCE_STATES& requestedState )
+{
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		resource.Get(),
+		state.current,
+		requestedState
+	);
+	commandList->ResourceBarrier( 1, &barrier );
+	state.current = requestedState;
 }
 
 void GpuResource::TransitionToTargetState( ID3D12GraphicsCommandList* commandList )

@@ -26,7 +26,10 @@ void AssetManager::SaveAsset( const AssetID& id, const std::string& additionalPa
 
 void AssetManager::Init()
 {
-	auto entries = std::filesystem::directory_iterator( assetDirectory );
+	//auto entries = std::filesystem::directory_iterator( assetDirectory );
+
+	namespace fs = std::filesystem;
+	auto entries = fs::recursive_directory_iterator( assetDirectory, fs::directory_options::skip_permission_denied );
 	for( const auto& entry : entries )
 	{
 		if( entry.is_regular_file() && entry.path().extension() == assetFileExtension )
@@ -118,9 +121,9 @@ void AssetManager::ImportMesh( const std::string& path, const std::string& name 
 
 void AssetManager::ImportTexture( const std::string& path, const std::string& name )
 {
-	auto textureData = importManager->LoadTexture( path );
+	auto image = importManager->LoadTexture( path );
 	auto texture = std::make_unique<TextureAsset>( *importManager, name );
-	auto texId = resourceManager->CreateTexture( textureData.subresources, textureData.texDesc, name );
+	auto texId = resourceManager->CreateTexture( std::move( image ), name );
 	texture->AddResource( texId );
 	auto id = RegisterAsset( std::move( texture ) );
 	SaveAsset( id, "textures" );

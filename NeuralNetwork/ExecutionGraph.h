@@ -2,22 +2,22 @@
 #include <d3d12.h>
 #include <memory>
 #include <vector>
+#include "GraphPass.h"
 #include "Types.h"
 
 class SystemManager;
-class GraphPass;
 
 class ExecutionGraph {
 public:
-	ExecutionGraph() = default;
+	ExecutionGraph() {};
 	~ExecutionGraph() = default;
 public:
 	virtual void ExecuteSync( SystemManager& systemManager );
 	virtual void ExecuteAsync( SystemManager& systemManager );
 public:
-	void AddPass( std::shared_ptr<GraphPass> pass );
+	ExecutionGraph* AddPass( std::unique_ptr<GraphPass> pass );
 	std::vector<ID3D12CommandList*> GetAllCommandLists( uint frameIndex ) const;
-	std::vector<std::shared_ptr<GraphPass>> GetPasses() const { return passes; }
+	const std::vector<std::unique_ptr<GraphPass>>& GetPasses() const { return passes; }
 protected:
-	std::vector<std::shared_ptr<GraphPass>> passes;
+	std::vector<std::unique_ptr<GraphPass>> passes;
 };

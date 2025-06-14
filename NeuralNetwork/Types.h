@@ -12,10 +12,10 @@ enum class AssetType {
 	Mesh,
 	Model,
 	Material,
-	MaterialTemplate
+	MaterialTemplate,
+	Scene
 };
 
 enum class SubAssetType {
-	Unknown,
-	SubMesh,
+	SubMesh
 };

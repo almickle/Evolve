@@ -1,4 +1,5 @@
 #pragma once
+#include <combaseapi.h>
 #include <imgui.h>
 #include <Windows.h>
 #include "System.h"
@@ -10,6 +11,7 @@ public:
 	Window() = default;
 	~Window()
 	{
+		CoUninitialize();
 		::DestroyWindow( hwnd );
 		hwnd = nullptr;
 		::UnregisterClassW( wc.lpszClassName, wc.hInstance );

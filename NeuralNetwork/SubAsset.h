@@ -5,7 +5,7 @@
 
 class SubAsset {
 public:
-	SubAsset( SubAssetType subType = SubAssetType::Unknown, const std::string& name = "SubAsset" )
+	SubAsset( SubAssetType subType, const std::string& name = "SubAsset" )
 		: subType( subType ), name( name )
 	{
 	}

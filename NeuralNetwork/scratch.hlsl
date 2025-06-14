@@ -1,27 +1,4 @@
-Texture2D<float4> textures[];
-SamplerState samp;
-struct VSOutput
-{
-    float4 pixelPos : SV_POSITION;
-    float3 worldPos : TEXCOORD0;
-    float3 normal : NORMAL;
-    float2 uv : UV;
-    float4 tangent : TANGENT;
-};
-cbuffer MaterialTextureSlots : register(b1)
-{
-    uint textureSlots[128];
-}
-
-cbuffer MaterialVectorSlots : register(b3)
-{
-    float4 vectorSlots[128];
-};
-
-cbuffer MaterialScalarSlots : register(b2)
-{
-    float scalarSlots[128];
-}
+#include "Common.hlsli"
 
 // Generated code for the material graph
 struct MaterialOutputNodeInput
@@ -77,14 +54,4 @@ float4 main(VSOutput vertexData) : SV_TARGET
     MaterialOutputNodeInputData0.baseColor = TextureSamplerNodeOutputData1.color;
     MaterialOutputNodeOutput MaterialOutputNodeOutputData0 = MaterialOutputNode(MaterialOutputNodeInputData0, MaterialOutputNodeParameterData0);
     return MaterialOutputNodeOutputData0.color;
-};
-
-struct Vector
-{
-    float3 value;
-};
-
-float3 vectorScale(Vector input)
-{
-    return input.value.x;
 }

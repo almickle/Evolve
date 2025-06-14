@@ -7,16 +7,18 @@
 #include <Windows.h>
 #include <wrl/client.h>
 #include "d3d12.h"
+#include "Renderer.h"
 #include "System.h"
 #include "SystemManager.h"
 
 class ThreadManager;
-class Renderer;
 
 struct UploadRequest {
 	std::function<void( ID3D12GraphicsCommandList* )> recordFunc;
 	std::function<void()> onComplete; // Optional callback
 };
+
+using Microsoft::WRL::ComPtr;
 
 class UploadManager : public System {
 public:
@@ -30,16 +32,27 @@ public:
 	void Init();
 	void Enqueue( UploadRequest req );
 	void Flush();
+	void FlushCurrentFrame();
+	void WaitForCurrentFrame();
+private:
+	void WaitForInitialUpload();
 private:
 	std::mutex queueMutex;
+	ComPtr<ID3D12CommandQueue> uploadCommandQueue;
 	std::queue<UploadRequest> uploadQueue;
 	std::atomic<bool> batchInProgress{ false };
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> uploadAllocator;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> uploadCmdList;
-	Microsoft::WRL::ComPtr<ID3D12CommandQueue> uploadCommandQueue;
-	Microsoft::WRL::ComPtr<ID3D12Fence> uploadFence;
+private:
+	ComPtr<ID3D12CommandAllocator> uploadAllocator;
+	ComPtr<ID3D12GraphicsCommandList> uploadCmdList;
+	ComPtr<ID3D12Fence> uploadFence;
 	uint64_t uploadFenceValue = 0;
 	HANDLE uploadFenceEvent = nullptr;
+private:
+	ComPtr<ID3D12CommandAllocator> frameAllocators[Renderer::BackBufferCount];
+	ComPtr<ID3D12GraphicsCommandList> frameCmdLists[Renderer::BackBufferCount];
+	ComPtr<ID3D12Fence> frameFences[Renderer::BackBufferCount];
+	uint64_t frameFenceValues[Renderer::BackBufferCount]{ 0 };
+	HANDLE frameFenceEvents[Renderer::BackBufferCount]{ nullptr };
 private:
 	ThreadManager* threadManager;
 	Renderer* renderer;

@@ -6,6 +6,7 @@
 #include <mutex>
 #include <queue>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include "ExecutionGraph.h"
 #include "GraphPass.h"
@@ -13,9 +14,11 @@
 #include "ThreadManager.h"
 #include "Types.h"
 
-void ExecutionGraph::AddPass( std::shared_ptr<GraphPass> pass )
+ExecutionGraph* ExecutionGraph::AddPass( std::unique_ptr<GraphPass> pass )
 {
-	passes.push_back( pass );
+	passes.push_back( std::move( pass ) );
+
+	return this;
 }
 
 void ExecutionGraph::ExecuteSync( SystemManager& systemManager )

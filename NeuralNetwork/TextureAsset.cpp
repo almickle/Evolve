@@ -1,4 +1,5 @@
 #include <string>
+#include <utility>
 #include "GpuResourceManager.h"
 #include "JsonSerializer.h"
 #include "TextureAsset.h"
@@ -23,7 +24,7 @@ void TextureAsset::Load( GpuResourceManager& resourceManager, JsonSerializer& se
 {
 	Deserialize( serializer );
 	auto data = importManager.LoadTexture( texturePath );
-	auto resourceId = resourceManager.CreateTexture( data.subresources, data.texDesc, name );
+	auto resourceId = resourceManager.CreateTexture( std::move( data ), name );
 	AddResource( resourceId );
 }
 

@@ -30,6 +30,7 @@ public:
 	~AssetManager() = default;
 public:
 	void Init();
+public:
 	AssetID RegisterAsset( std::unique_ptr<Asset> asset );
 	void RegisterAsset( const AssetID& assetId, std::unique_ptr<Asset> asset );
 	void RemoveAsset( const AssetID& id );

@@ -1,5 +1,7 @@
 #pragma once
 #include <d3d12.h>
+#include <DirectXTex.h>
+#include <memory>
 #include <string>
 #include <vector>
 #include "Mesh.h"
@@ -24,6 +26,6 @@ public:
 	~ImportManager() = default;
 public:
 	std::vector<MeshData> LoadMesh( const std::string& path );
-	TextureData LoadTexture( const std::string& path );
+	std::shared_ptr<DirectX::ScratchImage> LoadTexture( const std::string& path );
 };
 

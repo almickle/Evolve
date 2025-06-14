@@ -30,8 +30,11 @@ void BeginFramePass::Init( SystemManager& systemManager )
 
 void BeginFramePass::Execute( SystemManager& systemManager )
 {
-	systemManager.GetRenderer()->UpdateCurrentFrameIndex();
-	uint frameIndex = systemManager.GetRenderer()->GetCurrentFrameIndex();
+	auto* renderer = systemManager.GetRenderer();
+	auto* srvHeapManager = systemManager.GetSrvHeapManager();
+
+	renderer->UpdateCurrentFrameIndex();
+	uint frameIndex = renderer->GetCurrentFrameIndex();
 
 	auto allocator = commandAllocators[frameIndex].Get();
 	auto commandList = commandLists[frameIndex].Get();
@@ -42,14 +45,14 @@ void BeginFramePass::Execute( SystemManager& systemManager )
 	D3D12_RESOURCE_BARRIER barrier = {};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	barrier.Transition.pResource = systemManager.GetRenderer()->GetCurrentBackBuffer();
+	barrier.Transition.pResource = renderer->GetCurrentBackBuffer();
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	commandList->ResourceBarrier( 1, &barrier );
 
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = systemManager.GetRenderer()->GetCurrentRtvHandle();
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = systemManager.GetRenderer()->GetCurrentDsvHandle();
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderer->GetCurrentRtvHandle();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = renderer->GetCurrentDsvHandle();
 	commandList->OMSetRenderTargets( 1, &rtvHandle, FALSE, &dsvHandle );
 
 	const float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -58,6 +61,9 @@ void BeginFramePass::Execute( SystemManager& systemManager )
 
 	ID3D12DescriptorHeap* heaps[] = { systemManager.GetSrvHeapManager()->GetHeap() };
 	commandList->SetDescriptorHeaps( 1, heaps );
+	commandList->IASetPrimitiveTopology( renderer->GetTopology() );
+	commandList->SetGraphicsRootSignature( renderer->GetRootSignature() );
+	commandList->SetGraphicsRootDescriptorTable( 5, srvHeapManager->GetHeap()->GetGPUDescriptorHandleForHeapStart() );
 
 	commandList->Close();
 }

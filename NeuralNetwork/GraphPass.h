@@ -1,6 +1,5 @@
 #pragma once
 #include <d3d12.h>
-#include <memory>
 #include <string>
 #include <vector>
 #include <wrl/client.h>
@@ -16,10 +15,11 @@ class GraphPass {
 		bool finished;
 	};
 public:
-	GraphPass( const std::string& name )
+	GraphPass( const std::string& name = "GraphPass" )
 		: name( name )
 	{
 	}
+	GraphPass() = default;
 	virtual ~GraphPass() = default;
 public:
 	virtual void Init( SystemManager& systemManager ) = 0;
@@ -33,7 +33,7 @@ public:
 	const std::vector<GraphPass*>& GetDependencies() const { return dependencies; }
 	ID3D12CommandList* GetCurrentCommandList( uint& frameIndex ) const;
 public:
-	void AddDependency( std::shared_ptr<GraphPass> dependency );
+	GraphPass* AddDependency( GraphPass* dependency );
 	void RemoveDependency( GraphPass* dependency );
 protected:
 	PassState state = { true, false, false };

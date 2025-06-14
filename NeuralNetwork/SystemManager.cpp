@@ -6,6 +6,7 @@
 #include "GpuResourceManager.h"
 #include "ImGuiLayer.h"
 #include "ImportManager.h"
+#include "InputSystem.h"
 #include "JsonSerializer.h"
 #include "NodeLibrary.h"
 #include "Renderer.h"
@@ -29,10 +30,9 @@ void SystemManager::Init( const AppContext& appContext )
 	window->Init( appContext.title, appContext.hInstance, appContext.nCmdShow );
 	renderer = std::make_unique<Renderer>( *this );
 	renderer->Init();
+	inputSystem = std::make_unique<InputSystem>( *this );
 	threadManager = std::make_unique<ThreadManager>();
 	threadManager->Init();
-	uploadManager = std::make_unique<UploadManager>( *this );
-	uploadManager->Init();
 	srvHeapManager = std::make_unique<DescriptorHeapManager>( *this );
 	srvHeapManager->Init( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024, true );
 	uiLayer = std::make_unique<ImGuiLayer>( *this );
@@ -44,4 +44,6 @@ void SystemManager::Init( const AppContext& appContext )
 	importManager = std::make_unique<ImportManager>( *this );
 	assetManager = std::make_unique<AssetManager>( *this );
 	assetManager->Init();
+	uploadManager = std::make_unique<UploadManager>( *this );
+	uploadManager->Init();
 }
