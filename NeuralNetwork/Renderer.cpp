@@ -484,7 +484,7 @@ void Renderer::RenderActorInstances( ID3D12GraphicsCommandList* cmdList,
 									 const uint& instanceBufferStart,
 									 const bool& isStatic )
 {
-	byte constants[2] = { instanceBufferStart, isStatic };
+	uint constants[2] = { instanceBufferStart, isStatic };
 	BindRootConstants( cmdList, &constants );
 
 	auto numMeshes = (uint)vbViews.size();

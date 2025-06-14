@@ -2,7 +2,6 @@
 #include <memory>
 #include "AssetManager.h"
 #include "DescriptorHeapManager.h"
-#include "FileIOManager.h"
 #include "GpuResourceManager.h"
 #include "ImGuiLayer.h"
 #include "ImportManager.h"
@@ -11,6 +10,7 @@
 #include "NodeLibrary.h"
 #include "Renderer.h"
 #include "SystemManager.h"
+#include "TaskManager.h"
 #include "ThreadManager.h"
 #include "UploadManager.h"
 #include "Window.h"
@@ -38,7 +38,7 @@ void SystemManager::Init( const AppContext& appContext )
 	uiLayer = std::make_unique<ImGuiLayer>( *this );
 	uiLayer->Init();
 	serializer = std::make_unique<JsonSerializer>();
-	fileManager = std::make_unique<FileIOManager>( *this );
+	taskManager = std::make_unique<TaskManager>( *this );
 	nodeLibrary = std::make_unique<NodeLibrary>();
 	resourceManager = std::make_unique<GpuResourceManager>( *this );
 	importManager = std::make_unique<ImportManager>( *this );

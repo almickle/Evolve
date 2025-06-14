@@ -171,7 +171,7 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClCompile Include="ModifierTemplate.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="SystemManager.cpp" />
-    <ClCompile Include="FileIOManager.cpp" />
+    <ClCompile Include="TaskManager.cpp" />
     <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="ExecutionGraph.cpp" />
@@ -232,7 +232,7 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClInclude Include="ShaderBindings.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="SystemManager.h" />
-    <ClInclude Include="FileIOManager.h" />
+    <ClInclude Include="TaskManager.h" />
     <ClInclude Include="FPCamera.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="GpuResourceManager.h" />

@@ -12,7 +12,7 @@
 #include "Types.h"
 
 class JsonSerializer;
-class FileIOManager;
+class TaskManager;
 class GpuResourceManager;
 class NodeLibrary;
 class ImportManager;
@@ -21,7 +21,7 @@ class AssetManager : public System {
 public:
 	AssetManager( SystemManager& systemManager )
 		: serializer( systemManager.GetSerializer() ),
-		fileManager( systemManager.GetFileManager() ),
+		taskManager( systemManager.GetTaskManager() ),
 		resourceManager( systemManager.GetResourceManager() ),
 		nodeLibrary( systemManager.GetNodeLibrary() ),
 		importManager( systemManager.GetImportManager() )
@@ -53,7 +53,7 @@ private:
 	std::string assetFileExtension = ".json";
 private:
 	JsonSerializer* serializer;
-	FileIOManager* fileManager;
+	TaskManager* taskManager;
 	GpuResourceManager* resourceManager;
 	NodeLibrary* nodeLibrary;
 	ImportManager* importManager;

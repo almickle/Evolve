@@ -7,13 +7,13 @@
 #include <vector>
 #include "Asset.h"
 #include "AssetManager.h"
-#include "FileIOManager.h"
 #include "JsonSerializer.h"
 #include "Material.h"
 #include "MaterialTemplate.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "SubMesh.h"
+#include "TaskManager.h"
 #include "TextureAsset.h"
 #include "Types.h"
 
@@ -35,7 +35,7 @@ void AssetManager::Init()
 		if( entry.is_regular_file() && entry.path().extension() == assetFileExtension )
 		{
 			std::string path = std::filesystem::absolute( entry.path() ).string();
-			FileTask task;
+			Task task;
 			task.path = path;
 			task.taskFunc = [this]( const std::string& filePath ) {
 				JsonSerializer localSerializer;
@@ -43,10 +43,10 @@ void AssetManager::Init()
 				};
 			// Optionally, set onComplete if you want a callback after loading
 			task.onComplete = nullptr;
-			fileManager->Enqueue( std::move( task ) );
+			taskManager->Enqueue( std::move( task ) );
 		}
 	}
-	auto fence = fileManager->InsertFence();
+	auto fence = taskManager->InsertFence();
 	fence.wait();
 }
 

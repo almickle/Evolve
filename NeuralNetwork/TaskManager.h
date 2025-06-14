@@ -13,24 +13,24 @@
 
 class ThreadManager;
 
-struct FileTask {
+struct Task {
 	std::function<void( const std::string& )> taskFunc;
 	std::function<void()> onComplete;
 	std::string path;
 };
 
-class FileIOManager : public System {
+class TaskManager : public System {
 public:
-	FileIOManager( SystemManager& systemManager )
+	TaskManager( SystemManager& systemManager )
 		: threadManager( systemManager.GetThreadManager() )
 	{
 	}
-	~FileIOManager() = default;
+	~TaskManager() = default;
 public:
-	void Enqueue( FileTask task );
+	void Enqueue( Task task );
 	std::future<void> InsertFence();
 private:
-	std::queue<FileTask> taskQueue;
+	std::queue<Task> taskQueue;
 	std::atomic<uint> outstandingTasks{ 0 };
 	std::vector<std::shared_ptr<std::promise<void>>> pendingFences;
 	std::mutex fenceMutex;

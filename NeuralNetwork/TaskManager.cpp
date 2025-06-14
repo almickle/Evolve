@@ -4,10 +4,10 @@
 #include <mutex>
 #include <utility>
 #include <vector>
-#include "FileIOManager.h"
+#include "TaskManager.h"
 #include "ThreadManager.h"
 
-void FileIOManager::Enqueue( FileTask task )
+void TaskManager::Enqueue( Task task )
 {
 	{
 		std::lock_guard<std::mutex> lock( queueMutex );
@@ -15,7 +15,7 @@ void FileIOManager::Enqueue( FileTask task )
 		++outstandingTasks;
 	}
 	threadManager->Launch( [this] {
-		FileTask localTask;
+		Task localTask;
 		{
 			std::lock_guard<std::mutex> lock( queueMutex );
 			if( taskQueue.empty() ) return;
@@ -36,7 +36,7 @@ void FileIOManager::Enqueue( FileTask task )
 						   } );
 }
 
-std::future<void> FileIOManager::InsertFence()
+std::future<void> TaskManager::InsertFence()
 {
 	auto promise = std::make_shared<std::promise<void>>();
 	std::future<void> fut = promise->get_future();

@@ -201,7 +201,7 @@
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>Source Files\Assets\Resources</Filter>
     </ClCompile>
-    <ClCompile Include="FileIOManager.cpp">
+    <ClCompile Include="TaskManager.cpp">
       <Filter>Source Files\Systems\Managers</Filter>
     </ClCompile>
     <ClCompile Include="AssetManager.cpp">
@@ -392,7 +392,7 @@
     <ClInclude Include="AssetManager.h">
       <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="FileIOManager.h">
+    <ClInclude Include="TaskManager.h">
       <Filter>Header Files\Systems\Managers</Filter>
     </ClInclude>
     <ClInclude Include="Landscape.h">

@@ -6,7 +6,7 @@
 
 class ThreadManager;
 class JsonSerializer;
-class FileIOManager;
+class TaskManager;
 class AssetManager;
 class NodeLibrary;
 class ImportManager;
@@ -27,7 +27,7 @@ struct AppContext {
 enum class SystemID {
 	ThreadManager,
 	JsonSerializer,
-	FileIOManager,
+	TaskManager,
 	AssetManager,
 	NodeLibrary,
 	ImportManager,
@@ -52,7 +52,7 @@ public:
 public:
 	ThreadManager* GetThreadManager() { return threadManager.get(); }
 	JsonSerializer* GetSerializer() { return serializer.get(); }
-	FileIOManager* GetFileManager() { return fileManager.get(); }
+	TaskManager* GetTaskManager() { return taskManager.get(); }
 	InputSystem* GetInputSystem() { return inputSystem.get(); }
 public:
 	AssetManager* GetAssetManager() { return assetManager.get(); }
@@ -80,7 +80,7 @@ private:
 private:
 	std::unique_ptr<ThreadManager> threadManager;
 	std::unique_ptr<JsonSerializer> serializer;
-	std::unique_ptr<FileIOManager> fileManager;
+	std::unique_ptr<TaskManager> taskManager;
 private:
 	std::unique_ptr<AssetManager> assetManager;
 	std::unique_ptr<ImportManager> importManager;
