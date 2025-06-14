@@ -29,8 +29,6 @@ struct SceneData {
 };
 
 struct SceneConstants {
-	unsigned int instanceIndex;
+	unsigned int instanceBufferStart;
 	bool isStaticInstance;
 };
-
-// commandList->SetDescriptorHeaps(1, &globalHeap);

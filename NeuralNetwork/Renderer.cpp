@@ -1,3 +1,4 @@
+#include <array>
 #include <climits>
 #include <combaseapi.h>
 #include <cstdint>
@@ -19,6 +20,7 @@
 #include <fstream>
 #include <handleapi.h>
 #include <memory>
+#include <rpcndr.h>
 #include <synchapi.h>
 #include <vector>
 #include <Windows.h>
@@ -174,11 +176,9 @@ bool Renderer::Init()
 	// Resize swap chain buffers to match the new mode
 	swapChain->ResizeBuffers( BackBufferCount, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0 );
 
-	// Recreate render targets for the new buffers
 	CreateRenderTargets();
-
-	// Create depth stencil buffer
 	CreateDepthStencils( width, height );
+	ConfigureRootSignature();
 
 	return true;
 }
@@ -312,9 +312,9 @@ bool Renderer::ConfigureRootSignature()
 	CD3DX12_ROOT_PARAMETER1 rootParameters[6]{};
 	rootParameters[0].InitAsConstants( 8, 0 );
 	rootParameters[1].InitAsConstantBufferView( 1 ); // Light and camera data
-	rootParameters[2].InitAsConstantBufferView( 2 ); // Material texture slots
-	rootParameters[3].InitAsConstantBufferView( 3 ); // Material vector slots
-	rootParameters[4].InitAsConstantBufferView( 4 ); // Material scalar slots
+	rootParameters[2].InitAsConstantBufferView( 2 ); // Shader texture slots
+	rootParameters[3].InitAsConstantBufferView( 3 ); // Shader vector slots
+	rootParameters[4].InitAsConstantBufferView( 4 ); // Shader scalar slots
 	rootParameters[5].InitAsDescriptorTable( 2, ranges, D3D12_SHADER_VISIBILITY_ALL );
 
 	D3D12_STATIC_SAMPLER_DESC sampler = {};
@@ -358,12 +358,26 @@ bool Renderer::ConfigureRootSignature()
 		IID_PPV_ARGS( &rootSignature )
 	);
 	if( FAILED( hr ) ) return false;
-	// ... rest of your Init() code ...
+
 	return true;
 }
 
-uint Renderer::CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob* dsBlob, ID3DBlob* hsBlob )
+PipelineStateKey Renderer::CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob* dsBlob, ID3DBlob* hsBlob )
 {
+	PipelineStateKey key{
+		vsBlob ? HashBlob( vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() ) : 0,
+		psBlob ? HashBlob( psBlob->GetBufferPointer(), psBlob->GetBufferSize() ) : 0,
+		dsBlob ? HashBlob( dsBlob->GetBufferPointer(), dsBlob->GetBufferSize() ) : 0,
+		hsBlob ? HashBlob( hsBlob->GetBufferPointer(), hsBlob->GetBufferSize() ) : 0
+	};
+
+	// Return handle if cache hit
+	auto it = pipelineStateCache.find( key );
+	if( it != pipelineStateCache.end() ) {
+		return it->first;
+	}
+
+	// Create new pso if cache miss
 	D3D12_INPUT_ELEMENT_DESC inputLayout[4] = {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
@@ -390,32 +404,60 @@ uint Renderer::CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob
 
 	ComPtr<ID3D12PipelineState> pso;
 	device->CreateGraphicsPipelineState( &psoDesc, IID_PPV_ARGS( &pso ) );
-	pipelineStates.push_back( pso );
+	pipelineStateCache[key] = pso;
 
-	return (uint)pipelineStates.size() - 1;
+	return key;
+}
+
+uint64_t Renderer::HashBlob( const void* data, size_t size )
+{
+	const uint8_t* bytes = static_cast<const uint8_t*>(data);
+	uint64_t hash = 14695981039346656037ull;
+	for( size_t i = 0; i < size; ++i ) {
+		hash ^= bytes[i];
+		hash *= 1099511628211ull;
+	}
+	return hash;
+}
+
+void Renderer::SetPipelineState( ID3D12GraphicsCommandList* cmdList, const PipelineStateKey& psoKey )
+{
+	if( psoKey == currentPipelineState ) return;
+
+	cmdList->SetPipelineState( pipelineStateCache[psoKey].Get() );
+}
+
+void Renderer::BindConstantBuffer( ID3D12GraphicsCommandList* cmdList, const uint& slot, D3D12_GPU_VIRTUAL_ADDRESS buffer )
+{
+	cmdList->SetGraphicsRootConstantBufferView( slot, buffer );
+}
+
+void Renderer::BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* constants )
+{
+	cmdList->SetGraphicsRoot32BitConstants( 0, 2, &constants, 0 );
+
 }
 
 void Renderer::BindSceneData( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer )
 {
-	cmdList->SetGraphicsRootConstantBufferView( 1, sceneBuffer );
+	BindConstantBuffer( cmdList, 0, sceneBuffer );
 }
 
-void Renderer::SetPipelineState( ID3D12GraphicsCommandList* cmdList, const uint& index )
+void Renderer::BindShaderSlots( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS textureSlots, D3D12_GPU_VIRTUAL_ADDRESS vectorSlots, D3D12_GPU_VIRTUAL_ADDRESS scalarSlots )
 {
-	cmdList->SetPipelineState( pipelineStates[index].Get() );
+	BindConstantBuffer( cmdList, 2, textureSlots );
+	BindConstantBuffer( cmdList, 3, vectorSlots );
+	BindConstantBuffer( cmdList, 4, scalarSlots );
 }
 
-void Renderer::BindMaterial( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS textureSlots, D3D12_GPU_VIRTUAL_ADDRESS vectorSlots, D3D12_GPU_VIRTUAL_ADDRESS scalarSlots )
+void Renderer::RenderMeshInstances( ID3D12GraphicsCommandList* cmdList,
+									D3D12_VERTEX_BUFFER_VIEW* vbView,
+									D3D12_INDEX_BUFFER_VIEW* ibView,
+									const std::array<D3D12_GPU_VIRTUAL_ADDRESS, 3>& shaderSlots,
+									const uint& instanceCount
+)
 {
-	cmdList->SetGraphicsRootConstantBufferView( 2, textureSlots );
-	cmdList->SetGraphicsRootConstantBufferView( 3, vectorSlots );
-	cmdList->SetGraphicsRootConstantBufferView( 4, scalarSlots );
-}
-
-void Renderer::RenderMeshInstances( ID3D12GraphicsCommandList* cmdList, D3D12_VERTEX_BUFFER_VIEW* vbView, D3D12_INDEX_BUFFER_VIEW* ibView, const uint& instanceCount, const uint& instanceIndex )
-{
-	// Set by mesh instance
-	cmdList->SetGraphicsRoot32BitConstants( 0, 2, &instanceIndex, 0 );
+	BindShaderSlots( cmdList, shaderSlots[0], shaderSlots[1], shaderSlots[2] );
 	cmdList->IASetVertexBuffers( 0, 1, vbView );
 	cmdList->IASetIndexBuffer( ibView );
 
@@ -431,4 +473,29 @@ void Renderer::RenderMeshInstances( ID3D12GraphicsCommandList* cmdList, D3D12_VE
 	}
 
 	cmdList->DrawIndexedInstanced( indexCount, instanceCount, 0, 0, 0 );
+}
+
+void Renderer::RenderActorInstances( ID3D12GraphicsCommandList* cmdList,
+									 const std::vector <PipelineStateKey>& pipelineStates,
+									 const std::vector<D3D12_VERTEX_BUFFER_VIEW*>& vbViews,
+									 const std::vector<D3D12_INDEX_BUFFER_VIEW*>& ibViews,
+									 const std::vector<std::array<D3D12_GPU_VIRTUAL_ADDRESS, 3>>& shaderSlots,
+									 const uint& instanceCount,
+									 const uint& instanceBufferStart,
+									 const bool& isStatic )
+{
+	byte constants[2] = { instanceBufferStart, isStatic };
+	BindRootConstants( cmdList, &constants );
+
+	auto numMeshes = (uint)vbViews.size();
+	for( uint i = 0; i < numMeshes; i++ )
+	{
+		auto* vbView = vbViews[i];
+		auto* ibView = ibViews[i];
+		auto& pso = pipelineStates[i];
+		auto& slots = shaderSlots[i];
+
+		SetPipelineState( cmdList, pso );
+		RenderMeshInstances( cmdList, vbView, ibView, slots, instanceCount );
+	}
 }

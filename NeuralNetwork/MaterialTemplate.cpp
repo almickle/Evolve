@@ -189,17 +189,18 @@ std::vector<uint> MaterialTemplate::TopologicalSort() const
 	return sorted;
 }
 
-std::string MaterialTemplate::GetShaderCode( NodeLibrary& nodeLibrary )
+void MaterialTemplate::GenerateShaderCode( NodeLibrary& nodeLibrary )
 {
 	std::ostringstream oss;
 
+	auto includes = "#include \"Common.hlsli\"";
 	auto inputStructs = GetInputStructs( nodeLibrary );
 	auto outputStructs = GetOutputStructs( nodeLibrary );
 	auto parameterStructs = GetParameterStructs( nodeLibrary );
 	auto shaderFunctions = GetShaderFunctions( nodeLibrary );
 	std::string signature = "float4 main(VSOutput input) : SV_TARGET";
 
-	oss << inputStructs << outputStructs << parameterStructs << shaderFunctions << signature << "\n" << "{";
+	oss << includes << inputStructs << outputStructs << parameterStructs << shaderFunctions << signature << "\n" << "{";
 
 	std::vector<uint> sorted = TopologicalSort();
 	std::vector<std::string> shaderChunks;
@@ -253,7 +254,7 @@ std::string MaterialTemplate::GetShaderCode( NodeLibrary& nodeLibrary )
 
 	oss << outputStatement << "\n};";
 
-	return oss.str();
+	shaderCode = oss.str();
 }
 
 std::vector<MaterialEdge> MaterialTemplate::GetIncomingEdges( uint nodeIndex ) const

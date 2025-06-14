@@ -15,7 +15,7 @@ Texture2D<float4> textures[] : register(t0, space1);
 
 cbuffer constants : register(b0)
 {
-    uint instanceIndex;
+    uint instanceBufferStart;
     bool isStaticInstance;
 }
 cbuffer sceneData : register(b1)
@@ -43,17 +43,18 @@ cbuffer MaterialScalarSlots : register(b4)
 
 struct VSInput
 {
-    float3 position : POSITION;
-    float3 normal : NORMAL;
-    float2 uv : UV;
-    float4 tangent : TANGENT;
+    float3 position   : POSITION;
+    float3 normal     : NORMAL;
+    float2 uv         : UV;
+    float4 tangent    : TANGENT;
+    uint   instanceId : SV_InstanceID;
 };
 
 struct VSOutput
 {
-    float4 position : SV_POSITION;
-    float3 worldPos : TEXCOORD0;
-    float3 normal : NORMAL;
-    float2 uv : UV;
-    float4 tangent : TANGENT;
-};
+    float4 position   : SV_POSITION;
+    float3 worldPos   : TEXCOORD0;
+    float3 normal     : NORMAL;
+    float2 uv         : UV;
+    float4 tangent    : TANGENT;
+};  

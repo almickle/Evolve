@@ -1,32 +1,15 @@
 #pragma once
-#include <DirectXMath.h>
 #include <string>
 #include <vector>
 #include "Asset.h"
 #include "JsonSerializer.h"
+#include "ShaderBindings.h"
 #include "Types.h"
 
 class GpuResourceManager;
 
-struct TextureBinding
-{
-	uint slot;
-	AssetID data;
-};
-
-struct VectorBinding
-{
-	uint slot;
-	DirectX::XMFLOAT3 data;
-};
-
-struct ScalarBinding
-{
-	uint slot;
-	float data;
-};
-
-class Material : public Asset {
+class Material :
+	public Asset {
 public:
 	Material( const std::string& name = "Material" )
 		: Asset( AssetType::Material, name )

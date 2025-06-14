@@ -2,26 +2,27 @@
 #include <string>
 #include <vector>
 #include "Asset.h"
-#include "GpuResourceManager.h"
 #include "JsonSerializer.h"
-#include "Renderer.h"
+#include "ShaderBindings.h"
 #include "Types.h"
 
-class Model : public Asset {
+class Modifier :
+	public Asset
+{
 public:
-	Model( const std::string& name = "Model" )
-		: Asset( AssetType::Model, name )
+	Modifier( const std::string& name = "Modifier" )
+		: Asset( AssetType::Modifier, name )
 	{
 	}
-	~Model() = default;
+	~Modifier() = default;
 public:
 	void Load( GpuResourceManager& resourceManager, JsonSerializer& serializer ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
 private:
-	AssetID meshId;
-	std::vector<AssetID> materialSlots;
-	std::vector<AssetID> modifierSlots;
-	std::vector<PipelineStateKey> psoKeys;
+	AssetID modifierTemplate;
+	std::vector<TextureBinding> textureBindings;
+	std::vector<VectorBinding> vectorBindings;
+	std::vector<ScalarBinding> scalarBindings;
 };
 

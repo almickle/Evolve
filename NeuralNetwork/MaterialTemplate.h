@@ -22,7 +22,8 @@ struct ParameterBinding {
 	uint cbufferSlot;
 };
 
-class MaterialTemplate : public Asset {
+class MaterialTemplate :
+	public Asset {
 public:
 	MaterialTemplate( NodeLibrary& nodeLibrary, const std::string& name = "MaterialTemplate" )
 		: Asset( AssetType::MaterialTemplate, name ),
@@ -48,16 +49,18 @@ public:
 		parameterBindings.clear();
 	}
 public:
-	std::string GetShaderCode( NodeLibrary& nodeLibrary );
+	void GenerateShaderCode( NodeLibrary& nodeLibrary );
 	void Load( GpuResourceManager& resourceManager, JsonSerializer& serializer ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
 public:
 	void AddNode( const NodeTypes& node ) { nodes.push_back( node ); }
 	void AddEdge( const MaterialEdge& edge ) { edges.push_back( edge ); }
+	void BuildParameterBindings( NodeLibrary& nodeLibrary );
+public:
+	const std::string& GetShaderCode() const { return shaderCode; }
 	const std::vector<NodeTypes>& GetNodes() const { return nodes; }
 	const std::vector<MaterialEdge>& GetEdges() const { return edges; }
-	void BuildParameterBindings( NodeLibrary& nodeLibrary );
 	const ParameterBinding* GetParameterBinding( uint nodeIndex, uint parameterIndex, NodeParameter parameter ) const;
 	std::string GetParameterValue( uint nodeIndex, uint parameterIndex, NodeParameter parameter ) const;
 private:
@@ -68,6 +71,7 @@ private:
 	std::string GetParameterStructs( NodeLibrary& nodeLibrary );
 	std::string GetShaderFunctions( NodeLibrary& nodeLibrary );
 private:
+	std::string shaderCode;
 	std::vector<NodeTypes> nodes;
 	std::vector<MaterialEdge> edges;
 	std::vector<ParameterBinding> parameterBindings;

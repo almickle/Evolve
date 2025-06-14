@@ -13,6 +13,8 @@ enum class AssetType {
 	Model,
 	Material,
 	MaterialTemplate,
+	Modifier,
+	ModifierTemplate,
 	Scene
 };
 

@@ -167,6 +167,8 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClCompile Include="DescriptorHeapManager.cpp" />
     <ClCompile Include="EndFramePass.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="Modifier.cpp" />
+    <ClCompile Include="ModifierTemplate.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="FileIOManager.cpp" />
@@ -224,7 +226,10 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClInclude Include="DescriptorHeapManager.h" />
     <ClInclude Include="EndFramePass.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Modifier.h" />
+    <ClInclude Include="ModifierTemplate.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="ShaderBindings.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="SystemManager.h" />
     <ClInclude Include="FileIOManager.h" />

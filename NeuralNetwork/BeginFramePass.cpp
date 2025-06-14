@@ -59,6 +59,7 @@ void BeginFramePass::Execute( SystemManager& systemManager )
 	commandList->ClearRenderTargetView( rtvHandle, clearColor, 0, nullptr );
 	commandList->ClearDepthStencilView( dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr );
 
+	// Might have to set for each pass
 	ID3D12DescriptorHeap* heaps[] = { systemManager.GetSrvHeapManager()->GetHeap() };
 	commandList->SetDescriptorHeaps( 1, heaps );
 	commandList->IASetPrimitiveTopology( renderer->GetTopology() );

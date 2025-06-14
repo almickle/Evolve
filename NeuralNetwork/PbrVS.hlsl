@@ -3,7 +3,7 @@
 VSOutput main(VSInput input)
 {
     VSOutput output;
-    float4x4 world = instanceBuffers[isStaticInstance][instanceIndex];
+    float4x4 world = instanceBuffers[isStaticInstance][instanceBufferStart + input.instanceId];
     float4 worldPos = mul(float4(input.position, 1.0f), world);
     output.worldPos = worldPos.xyz;
     output.normal = mul((float3x3)world, input.normal);

@@ -1,9 +1,11 @@
 #pragma once
+#include <array>
 #include <cstdint>
 #include <d3d12.h>
 #include <d3dcommon.h>
 #include <dxgi1_4.h>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 #include <Windows.h>
 #include <wrl\client.h>
@@ -19,6 +21,33 @@ class DescriptorHeapManager;
 class ThreadManager;
 class UploadManager;
 class Window;
+
+struct PipelineStateKey {
+	uint64_t vsHash, psHash, dsHash, hsHash;
+
+	bool operator==( const PipelineStateKey& other ) const
+	{
+		return vsHash == other.vsHash &&
+			psHash == other.psHash &&
+			dsHash == other.dsHash &&
+			hsHash == other.hsHash;
+	}
+};
+
+namespace std {
+	template <>
+	struct hash<PipelineStateKey> {
+		size_t operator()( const PipelineStateKey& k ) const
+		{
+			// Combine hashes (boost::hash_combine style)
+			size_t h = k.vsHash;
+			h ^= k.psHash + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= k.dsHash + 0x9e3779b9 + (h << 6) + (h >> 2);
+			h ^= k.hsHash + 0x9e3779b9 + (h << 6) + (h >> 2);
+			return h;
+		}
+	};
+}
 
 class Renderer : public System {
 public:
@@ -46,16 +75,33 @@ public:
 	ID3D12RootSignature* GetRootSignature() const { return rootSignature.Get(); }
 	D3D12_PRIMITIVE_TOPOLOGY GetTopology() const { return topology; }
 public:
-	void RenderMeshInstances( ID3D12GraphicsCommandList* cmdList, D3D12_VERTEX_BUFFER_VIEW* vbView, D3D12_INDEX_BUFFER_VIEW* ibView, const uint& instanceCount, const uint& instanceIndex );
-	void BindMaterial( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS textureSlots, D3D12_GPU_VIRTUAL_ADDRESS vectorSlots, D3D12_GPU_VIRTUAL_ADDRESS scalarSlots );
-	void SetPipelineState( ID3D12GraphicsCommandList* cmdList, const uint& index );
+	void RenderMeshInstances( ID3D12GraphicsCommandList* cmdList,
+							  D3D12_VERTEX_BUFFER_VIEW* vbView,
+							  D3D12_INDEX_BUFFER_VIEW* ibView,
+							  const std::array<D3D12_GPU_VIRTUAL_ADDRESS, 3>& shaderSlots,
+							  const uint& instanceCount );
+	void RenderActorInstances( ID3D12GraphicsCommandList* cmdList,
+							   const std::vector <PipelineStateKey>& pipelineStates,
+							   const std::vector<D3D12_VERTEX_BUFFER_VIEW*>& vbViews,
+							   const std::vector<D3D12_INDEX_BUFFER_VIEW*>& ibViews,
+							   const std::vector<std::array<D3D12_GPU_VIRTUAL_ADDRESS, 3>>& shaderSlots,
+							   const uint& instanceCount,
+							   const uint& instanceBufferStart,
+							   const bool& isStatic );
+	void SetPipelineState( ID3D12GraphicsCommandList* cmdList, const PipelineStateKey& psoKey );
+	void BindShaderSlots( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS textureSlots, D3D12_GPU_VIRTUAL_ADDRESS vectorSlots, D3D12_GPU_VIRTUAL_ADDRESS scalarSlots );
 	void BindSceneData( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer );
 	ComPtr<ID3DBlob> LoadShaderBlob( const wchar_t* filename );
+	PipelineStateKey CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob* dsBlob = nullptr, ID3DBlob* hsBlob = nullptr );
+private:
 	void CreateRenderTargets();
 	void CreateDepthStencils( uint width, uint height );
 	bool ConfigureRootSignature();
-	uint CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob* dsBlob = nullptr, ID3DBlob* hsBlob = nullptr );
+	void BindConstantBuffer( ID3D12GraphicsCommandList* cmdList, const uint& slot, D3D12_GPU_VIRTUAL_ADDRESS buffer );
+	void BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* constants );
 	void CleanupRenderTargets();
+	uint64_t HashBlob( const void* data, size_t size );
+
 private:
 	ComPtr<ID3D12Device> device;
 	ComPtr<ID3D12CommandQueue> commandQueue;
@@ -63,7 +109,8 @@ private:
 	ComPtr<ID3D12DescriptorHeap> dsvHeap;
 	ComPtr<IDXGISwapChain3> swapChain;
 	ComPtr<ID3D12RootSignature> rootSignature;
-	std::vector<ComPtr<ID3D12PipelineState>> pipelineStates{ 16 };
+	std::unordered_map<PipelineStateKey, ComPtr<ID3D12PipelineState>> pipelineStateCache;
+	PipelineStateKey currentPipelineState;
 	D3D12_PRIMITIVE_TOPOLOGY topology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 private:
 	ComPtr<ID3D12Resource> backBuffers[BackBufferCount];

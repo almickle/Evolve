@@ -297,6 +297,12 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\Assets\Assets</Filter>
     </ClCompile>
+    <ClCompile Include="ModifierTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Modifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -489,6 +495,15 @@
       <Filter>Header Files\Assets\Assets</Filter>
     </ClInclude>
     <ClInclude Include="SceneData.h">
+      <Filter>Header Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="ModifierTemplate.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Modifier.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderBindings.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
   </ItemGroup>
