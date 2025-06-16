@@ -6,32 +6,49 @@
 #include "Actor.h"
 #include "Asset.h"
 #include "Camera.h"
+#include "InstanceManager.h"
+#include "JsonSerializer.h"
 #include "Light.h"
 #include "Types.h"
 
 class Scene :
 	public Asset {
 public:
-	Scene( const std::string& name = "Mesh" )
-		: Asset( AssetType::Mesh, name )
+	Scene( const std::string& name = "Scene" )
+		: Asset( AssetType::Scene, name ),
+		dynamicInstanceManager( std::make_unique<InstanceManager>() ),
+		staticInstanceManager( std::make_unique<InstanceManager>() )
 	{
 	}
 	~Scene() = default;
 public:
-	void AddLight( std::unique_ptr<Light> light ) { lights.push_back( std::move( light ) ); };
-	void AddCamera( std::unique_ptr<Camera> camera ) { cameras.push_back( std::move( camera ) ); };
+	void Load( SystemManager* systemManager ) override;
+	std::string Serialize( JsonSerializer& serializer ) const override;
+	void Deserialize( JsonSerializer& serializer ) override;
 public:
-	const std::vector<std::unique_ptr<Light>>& GetLights() const { return lights; };
-	const std::vector<std::unique_ptr<Camera>>& GetCameras() const { return cameras; };
-	const std::vector<std::unique_ptr<Actor>>& GetDynamicActors() const { return dynamicActors; };
-	const std::vector<std::unique_ptr<Actor>>& GetStaticActors() const { return staticActors; };
+	void AddLight( std::unique_ptr<Light> light ) { lights.push_back( std::move( light ) ); }
+	void AddCamera( std::unique_ptr<Camera> camera ) { cameras.push_back( std::move( camera ) ); }
 public:
-	Camera* GetActiveCamera() const { return activeCamera; };
+	const std::vector<std::unique_ptr<Light>>& GetLights() const { return lights; }
+	const std::vector<std::unique_ptr<Camera>>& GetCameras() const { return cameras; }
+	const std::vector<std::unique_ptr<Actor>>& GetStaticActors() const { return staticActors; }
+	const std::vector<std::unique_ptr<Actor>>& GetDynamicActors() const { return dynamicActors; }
+	InstanceManager* GetStaticInstanceManager() const { return staticInstanceManager.get(); }
+	InstanceManager* GetDynamicInstanceManager() const { return dynamicInstanceManager.get(); }
+	const ResourceID GetSceneBuffer() const { return sceneBuffer; }
+public:
+	Camera* GetActiveCamera() const { return activeCamera; }
 	void SetActiveCamera( const uint& index ) { activeCamera = cameras[index].get(); }
 private:
 	Camera* activeCamera = nullptr;
 	std::vector<std::unique_ptr<Light>> lights{};
 	std::vector<std::unique_ptr<Camera>> cameras{};
-	std::vector<std::unique_ptr<Actor>> dynamicActors{ 1024 };
 	std::vector<std::unique_ptr<Actor>> staticActors{ 1024 };
+	std::vector<std::unique_ptr<Actor>> dynamicActors{ 1024 };
+	std::unique_ptr<InstanceManager> staticInstanceManager;
+	std::unique_ptr<InstanceManager> dynamicInstanceManager;
+private:
+	std::vector<AssetID> staticModels;
+	std::vector<AssetID> dynamicModels;
+	ResourceID sceneBuffer;
 };

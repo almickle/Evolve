@@ -1,7 +1,7 @@
 #include <string>
-#include "GpuResourceManager.h"
 #include "JsonSerializer.h"
 #include "Model.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 std::string Model::Serialize( JsonSerializer& serializer ) const
@@ -17,6 +17,7 @@ std::string Model::Serialize( JsonSerializer& serializer ) const
 
 	// Material slots (array of asset IDs)
 	serializer.WriteArray( "materialSlots", materialSlots );
+	serializer.WriteArray( "modifierSlots", modifierSlots );
 
 	serializer.EndObject();
 	serializer.EndDocument();
@@ -24,9 +25,9 @@ std::string Model::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void Model::Load( GpuResourceManager& resourceManager, JsonSerializer& serializer )
+void Model::Load( SystemManager* systemManager )
 {
-	Deserialize( serializer );
+	Deserialize( *systemManager->GetSerializer() );
 }
 
 void Model::Deserialize( JsonSerializer& serializer )
@@ -38,4 +39,5 @@ void Model::Deserialize( JsonSerializer& serializer )
 
 	// Material slots
 	materialSlots = serializer.ReadArray<AssetID>( "materialSlots" );
+	modifierSlots = serializer.ReadArray<AssetID>( "modifierSlots" );
 }

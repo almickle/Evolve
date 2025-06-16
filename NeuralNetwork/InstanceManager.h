@@ -1,40 +1,74 @@
-//#pragma once
-//#include <unordered_map>
-//#include <map>
-//#include <vector>
-//#include <memory>
-//#include "Model.h"
-//#include <DirectXMath.h>
-//
-//using ModelID = size_t;
-//using InstanceID = size_t;
-//
-//struct InstanceData {
-//    DirectX::XMMATRIX transform;
-//    // Add more per-instance data as needed
-//};
-//
-//class Scene;
-//
-//class InstanceManager {
-//public:
-//    ModelID RegisterModel(std::shared_ptr<Model> model);
-//    InstanceID AddInstance(ModelID modelId, const InstanceData& data);
-//    void RemoveInstance(ModelID modelId, InstanceID instanceId);
-//
-//    std::shared_ptr<Model> GetModel(ModelID modelId) const;
-//    const InstanceData& GetInstanceData(ModelID modelId, InstanceID instanceId) const;
-//    const std::vector<InstanceData> GetAllInstanceData(ModelID modelId) const;
-//
-//    void UpdateInstanceData(const Scene& scene);
-//
-//    // Returns a const reference to the internal models map
-//    const std::unordered_map<ModelID, std::shared_ptr<Model>>& GetModels() const;
-//
-//private:
-//    std::unordered_map<ModelID, std::shared_ptr<Model>> models;
-//    std::unordered_map<ModelID, std::map<InstanceID, InstanceData>> instanceData;
-//    std::unordered_map<ModelID, std::vector<InstanceID>> freeInstanceIds;
-//    std::unordered_map<ModelID, InstanceID> nextInstanceId;
-//    ModelID nextModelId = 0;
-//};
+#pragma once
+#include <algorithm>
+#include <unordered_map>
+#include <vector>
+#include "Actor.h"
+#include "SceneData.h"
+#include "Types.h"
+
+class InstanceManager {
+public:
+	InstanceManager() = default;
+	~InstanceManager() = default;
+public:
+	std::vector<Actor*> GetInstances( AssetID assetID )
+	{
+		auto it = instanceHeap.find( assetID );
+		if( it != instanceHeap.end() ) {
+			return it->second;
+		}
+		return {};
+	}
+	uint GetInstanceCount( AssetID assetID )
+	{
+		auto it = instanceHeap.find( assetID );
+		if( it != instanceHeap.end() ) {
+			return static_cast<uint>(it->second.size());
+		}
+		return 0;
+	}
+	std::vector<ActorTransformData> GetInstanceData( AssetID assetID )
+	{
+		auto it = instanceHeap.find( assetID );
+		if( it != instanceHeap.end() ) {
+			std::vector<ActorTransformData> instanceData;
+			instanceData.reserve( it->second.size() );
+			for( Actor* actor : it->second ) {
+				instanceData.push_back( { actor->GetTransform() } );
+			}
+			return instanceData;
+		}
+		return {};
+	}
+	void AddInstance( AssetID assetID, Actor* actor )
+	{
+		instanceHeap[assetID].push_back( actor );
+		if( std::find( uniqueAssets.begin(), uniqueAssets.end(), assetID ) == uniqueAssets.end() ) {
+			uniqueAssets.push_back( assetID );
+		}
+	}
+	void AddInstances( AssetID assetID, std::vector<Actor*> actors )
+	{
+		instanceHeap[assetID].insert( instanceHeap[assetID].end(), actors.begin(), actors.end() );
+		for( Actor* actor : actors ) {
+			if( std::find( uniqueAssets.begin(), uniqueAssets.end(), assetID ) == uniqueAssets.end() ) {
+				uniqueAssets.push_back( assetID );
+			}
+		}
+	}
+	std::vector<AssetID>& GetUniqueAssets() { return uniqueAssets; }
+	uint GetHeapOffset( const AssetID& id )
+	{
+		uint offset = 0;
+		for( const auto& asset : uniqueAssets )
+		{
+			if( asset == id )
+				break;
+			offset += static_cast<uint>(instanceHeap[asset].size());
+		}
+		return offset;
+	}
+private:
+	std::unordered_map<AssetID, std::vector<Actor*>> instanceHeap;
+	std::vector<AssetID> uniqueAssets;
+};

@@ -21,3 +21,11 @@ enum class AssetType {
 enum class SubAssetType {
 	SubMesh
 };
+
+enum class ShaderType {
+	Pixel,
+	Vertex,
+	Domain,
+	Hull,
+	Compute
+};

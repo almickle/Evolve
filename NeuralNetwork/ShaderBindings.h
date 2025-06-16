@@ -11,7 +11,7 @@ struct TextureBinding
 struct VectorBinding
 {
 	uint slot;
-	DirectX::XMFLOAT3 data;
+	DirectX::XMFLOAT4 data;
 };
 
 struct ScalarBinding

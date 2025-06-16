@@ -9,7 +9,7 @@
 #include "SubAsset.h"
 #include "Types.h"
 
-class GpuResourceManager;
+class SystemManager;
 
 class Asset {
 public:
@@ -19,13 +19,14 @@ public:
 	}
 	virtual ~Asset() = default;
 public:
-	virtual void Load( GpuResourceManager& resourceManager, JsonSerializer& serializer ) = 0;
+	virtual void Load( SystemManager* systemManager ) = 0;
 	virtual std::string Serialize( JsonSerializer& serializer ) const = 0;
 	virtual void Deserialize( JsonSerializer& serializer ) = 0;
 	void Save( const std::filesystem::path& dirPath, const std::string& content ) const;
-	AssetType GetType() const { return assetType; }
 public:
 	AssetID GetAssetID() const { return id; }
+	AssetType GetType() const { return assetType; }
+	std::string GetName() const { return name; }
 	std::vector<AssetID> GetAllAssetIDs() const { return assetIds; }
 	std::vector<ResourceID> GetAllResourceIDs() const;
 	bool IsReady() const { return ready.load( std::memory_order_acquire ); }

@@ -22,8 +22,8 @@ public:
 	GraphPass() = default;
 	virtual ~GraphPass() = default;
 public:
-	virtual void Init( SystemManager& systemManager ) = 0;
-	virtual void Execute( SystemManager& systemManager ) = 0;
+	virtual void Init( SystemManager& systemManager );
+	virtual void Execute( SystemManager& systemManager, const AssetID& sceneID ) = 0;
 public:
 	bool IsReady() const;
 	bool IsFinished() const { return state.finished; }

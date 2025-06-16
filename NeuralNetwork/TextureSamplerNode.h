@@ -11,8 +11,8 @@ public:
 	TextureSamplerNode( const std::string& name = "TextureSamplerNode" )
 		: MaterialNode( 1, 1, 1, name )
 	{
-		AddInput( uvInputSlotIndex, NodeSlot{ "uv", DirectX::XMFLOAT2{ 0.0f, 0.0f } } );
-		AddOutput( colorOutputSlotIndex, NodeSlot{ "color", DirectX::XMFLOAT3{ 1.0f, 1.0f, 1.0f } } );
+		AddInput( uvInputSlotIndex, NodeSlot{ "uv",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
+		AddOutput( colorOutputSlotIndex, NodeSlot{ "color", DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f } } );
 		AddParameter( textureParameter, NodeParameter( NodeParameterTypes::Texture, "textureIndex" ) );
 	}
 public:
@@ -22,7 +22,7 @@ public:
 		auto returnObject = GetReturnObject();
 		auto returnStatement = GetReturnStatement();
 
-		std::string functionBody = std::format( "output.{} = textures[parameters.{}].Sample(samp, input.{});\n", GetColorOutputSlot().name, GetTextureParameter().name, GetUVSlot().name );
+		std::string functionBody = std::format( "output.{} = textures[parameters.{}].Sample(samp, input.{}.xy);\n", GetColorOutputSlot().name, GetTextureParameter().name, GetUVSlot().name );
 
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );
 

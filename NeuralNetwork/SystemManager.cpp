@@ -43,7 +43,7 @@ void SystemManager::Init( const AppContext& appContext )
 	resourceManager = std::make_unique<GpuResourceManager>( *this );
 	importManager = std::make_unique<ImportManager>( *this );
 	assetManager = std::make_unique<AssetManager>( *this );
-	assetManager->Init();
+	assetManager->Init( this );
 	uploadManager = std::make_unique<UploadManager>( *this );
 	uploadManager->Init();
 }

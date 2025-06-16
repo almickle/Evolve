@@ -4,32 +4,31 @@
 #include "NodeTypes.h"
 #include "Types.h"
 
-std::string MaterialNode::GetInputStatement( uint& nodeIndex ) const
+std::string MaterialNode::GetInputStatement( const uint& nodeIndex ) const
 {
 	return GetInputStructName() + " " + GetInputDataName( nodeIndex ) + ";";
 }
 
-std::string MaterialNode::GetOutputStatement( uint& nodeIndex ) const
+std::string MaterialNode::GetOutputStatement( const uint& nodeIndex ) const
 {
-	return GetOutputStructName() + " " + GetOutputDataName( nodeIndex ) + " = " + GetFunctionName() + "(" + GetInputDataName( nodeIndex ) + ", " + GetParameterDataName( nodeIndex ) + ");";
+	return GetOutputStructName() + " " + GetOutputDataName( nodeIndex ) + " = " + GetFunctionName() + "(" + GetInputDataName( nodeIndex ) + ", " + GetParameterDataName( nodeIndex ) + ", " + "vertexData" + ");";
 }
-std::string MaterialNode::GetParameterStatement( uint& nodeIndex ) const
+std::string MaterialNode::GetParameterStatement( const uint& nodeIndex ) const
 {
 	return GetParameterStructName() + " " + GetParameterDataName( nodeIndex ) + ";";
-
 }
 
-std::string MaterialNode::GetInputSlotName( uint slot ) const
+std::string MaterialNode::GetInputSlotName( const uint& slot ) const
 {
 	return inputs[slot].name;
 }
 
-std::string MaterialNode::GetOutputSlotName( uint slot ) const
+std::string MaterialNode::GetOutputSlotName( const uint& slot ) const
 {
 	return outputs[slot].name;
 }
 
-std::string MaterialNode::GetParameterSlotName( uint slot ) const
+std::string MaterialNode::GetParameterSlotName( const uint& slot ) const
 {
 	return parameters[slot].name;
 }
@@ -112,7 +111,7 @@ std::string MaterialNode::GetReturnObject() const
 
 std::string MaterialNode::GetFunctionSignature() const
 {
-	return GetOutputStructName() + " " + GetFunctionName() + "(" + GetInputStructName() + " input" + ", " + GetParameterStructName() + " parameters" + ")";
+	return GetOutputStructName() + " " + GetFunctionName() + "(" + GetInputStructName() + " input" + ", " + GetParameterStructName() + " parameters" + ", " + "VSOutput vertexData" + ")";
 }
 
 std::string MaterialNode::GetReturnStatement() const

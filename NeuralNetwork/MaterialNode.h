@@ -19,18 +19,19 @@ public:
 	std::string GetInputStruct() const;
 	std::string GetOutputStruct() const;
 	std::string GetParameterStruct() const;
-	std::string GetInputStatement( uint& nodeIndex ) const;
-	std::string GetOutputStatement( uint& nodeIndex ) const;
-	std::string GetParameterStatement( uint& nodeIndex ) const;
+	std::string GetInputStatement( const uint& nodeIndex ) const;
+	std::string GetOutputStatement( const uint& nodeIndex ) const;
+	std::string GetParameterStatement( const uint& nodeIndex ) const;
 	std::string GetInputDataName( const uint& nodeIndex ) const;
 	std::string GetOutputDataName( const uint& nodeIndex ) const;
 	std::string GetParameterDataName( const uint& nodeIndex ) const;
-	std::string GetInputSlotName( uint slot ) const;
-	std::string GetOutputSlotName( uint slot ) const;
-	std::string GetParameterSlotName( uint slot ) const;
+	std::string GetInputSlotName( const uint& slot ) const;
+	std::string GetOutputSlotName( const uint& slot ) const;
+	std::string GetParameterSlotName( const uint& slot ) const;
 	uint GetParameterCount() const { return (uint)parameters.size(); };
 public:
 	const std::vector<NodeSlot>& GetInputs() const { return inputs; }
+	const uint GetInputCount() const { return (uint)inputs.size(); }
 	const std::vector<NodeSlot>& GetOutputs() const { return outputs; }
 	const std::vector<NodeParameter>& GetParameters() const { return parameters; }
 	const NodeSlot& GetInput( const uint& slot ) const { return inputs[slot]; }

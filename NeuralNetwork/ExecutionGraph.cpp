@@ -21,7 +21,7 @@ ExecutionGraph* ExecutionGraph::AddPass( std::unique_ptr<GraphPass> pass )
 	return this;
 }
 
-void ExecutionGraph::ExecuteSync( SystemManager& systemManager )
+void ExecutionGraph::ExecuteSync( SystemManager& systemManager, const AssetID& sceneID )
 {
 	std::unordered_map<GraphPass*, int> indegree;
 	std::unordered_map<GraphPass*, std::vector<GraphPass*>> adj;
@@ -44,7 +44,7 @@ void ExecutionGraph::ExecuteSync( SystemManager& systemManager )
 		ready.pop();
 
 		if( pass->IsReady() ) {
-			pass->Execute( systemManager );
+			pass->Execute( systemManager, sceneID );
 			executed[pass] = true;
 
 			for( GraphPass* neighbor : adj[pass] ) {
@@ -60,13 +60,13 @@ void ExecutionGraph::ExecuteSync( SystemManager& systemManager )
 	}
 }
 
-void ExecutionGraph::ExecuteAsync( SystemManager& systemManager )
+void ExecutionGraph::ExecuteAsync( SystemManager& systemManager, const AssetID& sceneID )
 {
-	//ThreadManager& threadManager = systemManager.GetThreadManager();
-	//if( !threadManager ) {
-	//	ExecuteSync( renderer );
-	//	return;
-	//}
+	ThreadManager* threadManager = systemManager.GetThreadManager();
+	if( !threadManager ) {
+		ExecuteSync( systemManager, sceneID );
+		return;
+	}
 
 	// Build dependency graph
 	std::unordered_map<GraphPass*, int> refCount;
@@ -106,7 +106,7 @@ void ExecutionGraph::ExecuteAsync( SystemManager& systemManager )
 				pass = workQueue.front();
 				workQueue.pop();
 			}
-			pass->Execute( systemManager );
+			pass->Execute( systemManager, sceneID );
 			finishedCount++;
 
 			if( finishedCount == totalPasses ) {

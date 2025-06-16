@@ -23,7 +23,6 @@ public:
 	}
 public:
 	void Upload( ID3D12GraphicsCommandList* cmdList ) override;
-	const void* GetData() const override { return subresourceData.data(); }
 	size_t GetDataSize() const override;
 private:
 	std::shared_ptr<DirectX::ScratchImage> image;

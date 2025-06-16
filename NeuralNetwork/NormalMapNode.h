@@ -13,8 +13,8 @@ public:
 	NormalMapNode( const std::string& name = "NormalMapNode" )
 		: MaterialNode( 1, 1, 0, name )
 	{
-		AddInput( normalInputSlot, NodeSlot{ "color", DirectX::XMFLOAT3{ 0.0f, 0.0f, 0.0f } } );
-		AddOutput( normalOutputSlot, NodeSlot{ "normal", DirectX::XMFLOAT3{ 0.0f, 0.0f, 0.0f } } );
+		AddInput( normalInputSlot, NodeSlot{ "color",  DirectX::XMFLOAT4{ 0, 0, 0, 0} } );
+		AddOutput( normalOutputSlot, NodeSlot{ "normal",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 	}
 	~NormalMapNode() {}
 public:
@@ -26,10 +26,10 @@ public:
 
 		std::string functionBody =
 			"float3 T = normalize( vertexData.tangent.xyz );\n"
-			"float3 N = normalize( vertexData.normal );\n"
+			"float3 N = normalize( vertexData.normal.xyz );\n"
 			"float3 B = normalize( cross( N, T ) * vertexData.tangent.w );\n"
 			"float3x3 TBN = float3x3( T, B, N );\n" +
-			std::format( "output.{} = mul(TBN, input.{})\n", GetOutput( normalOutputSlot ).name, GetInput( normalInputSlot ).name );
+			std::format( "output.{} = float4(mul(TBN, input.{}.rgb), 0.0f);\n", GetOutput( normalOutputSlot ).name, GetInput( normalInputSlot ).name );
 
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );
 

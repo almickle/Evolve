@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.props" Condition="Exists('..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -121,8 +122,9 @@
       <ShaderModel>6.7</ShaderModel>
     </FxCompile>
     <PostBuildEvent>
-      <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)\Shaders"
-xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
+      <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)Shaders"
+xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,8 +154,9 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
       <ShaderModel>6.7</ShaderModel>
     </FxCompile>
     <PostBuildEvent>
-      <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)\Shaders"
-xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
+      <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)Shaders"
+xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -169,6 +172,7 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="Modifier.cpp" />
     <ClCompile Include="ModifierTemplate.cpp" />
+    <ClCompile Include="ScenePass.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="TaskManager.cpp" />
@@ -179,7 +183,6 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClCompile Include="ImGuiLayer.cpp" />
     <ClCompile Include="ImportManager.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
-    <ClCompile Include="InitializationGraph.cpp" />
     <ClCompile Include="InstanceManager.cpp" />
     <ClCompile Include="JsonSerializer.cpp" />
     <ClCompile Include="Landscape.cpp" />
@@ -229,6 +232,7 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClInclude Include="Modifier.h" />
     <ClInclude Include="ModifierTemplate.h" />
     <ClInclude Include="SceneData.h" />
+    <ClInclude Include="ScenePass.h" />
     <ClInclude Include="ShaderBindings.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="SystemManager.h" />
@@ -239,7 +243,6 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClInclude Include="ImGuiLayer.h" />
     <ClInclude Include="ImportManager.h" />
     <ClInclude Include="IndexBuffer.h" />
-    <ClInclude Include="InitializationGraph.h" />
     <ClInclude Include="InstanceManager.h" />
     <ClInclude Include="JsonSerializer.h" />
     <ClInclude Include="Landscape.h" />
@@ -279,6 +282,7 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
     <ClInclude Include="UploadPass.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VectorBreakNode.h" />
+    <ClInclude Include="VectorMakeNode.h" />
     <ClInclude Include="VectorScaleNode.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexDataNode.h" />
@@ -324,7 +328,17 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)\Assets"</Command>
   </ItemGroup>
   <ItemGroup>
     <None Include="Common.hlsli" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.targets" Condition="Exists('..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.DXC.1.8.2505.28\build\native\Microsoft.Direct3D.DXC.targets'))" />
+  </Target>
 </Project>

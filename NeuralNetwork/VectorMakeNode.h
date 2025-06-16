@@ -6,18 +6,19 @@
 #include "NodeTypes.h"
 #include "Types.h"
 
-class VectorScaleNode :
+class VectorMakeNode :
 	public MaterialNode
 {
 public:
-	VectorScaleNode( const std::string& name = "VectorScaleNode" )
-		: MaterialNode( 2, 1, 0, name )
+	VectorMakeNode( const std::string& name = "VectorMakeNode" )
+		: MaterialNode( 3, 1, 0, name )
 	{
-		AddInput( vectorInputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
-		AddInput( scaleInputSlot, NodeSlot{ "scale", 1.0f } );
+		AddInput( xInputSlot, NodeSlot{ "x", 0.0f } );
+		AddInput( yInputSlot, NodeSlot{ "y", 0.0f } );
+		AddInput( zInputSlot, NodeSlot{ "z", 0.0f } );
 		AddOutput( vectorOutputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 	}
-	~VectorScaleNode() {}
+	~VectorMakeNode() {}
 public:
 	std::string GetShaderFunction() override
 	{
@@ -25,14 +26,17 @@ public:
 		auto returnObject = GetReturnObject();
 		auto returnStatement = GetReturnStatement();
 
-		std::string functionBody = std::format( " output.{} = float4(input.{}.xyz * input.{}, 0.0f);\n", GetOutput( vectorOutputSlot ).name, GetInput( vectorInputSlot ).name, GetInput( scaleInputSlot ).name );
+		std::string functionBody =
+			std::format( " output.{} = float4(input.{}, input.{}, input.{}, 0.0f);\n", GetOutput( vectorOutputSlot ).name, GetInput( xInputSlot ).name, GetInput( yInputSlot ).name, GetInput( zInputSlot ).name );
+
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );
 
 		return shaderFunction;
 	}
 private:
-	uint vectorInputSlot = 0;
-	uint scaleInputSlot = 1;
+	uint xInputSlot = 0;
+	uint yInputSlot = 1;
+	uint zInputSlot = 2;
 private:
 	uint vectorOutputSlot = 0;
 };

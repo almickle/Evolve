@@ -28,7 +28,7 @@ public:
 	virtual std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const { return nullptr; };
 	virtual void Update( const void* data, size_t size ) {};
 	virtual void Upload( ID3D12GraphicsCommandList* cmdList );
-	virtual const void* GetData() const = 0;
+	virtual void* GetData() const { return nullptr; }
 	virtual size_t GetDataSize() const = 0;
 public:
 	void Transition( ID3D12GraphicsCommandList* commandList, const D3D12_RESOURCE_STATES& requestedState );

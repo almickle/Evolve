@@ -8,7 +8,6 @@
 #include "ExecutionGraph.h"
 #include "Renderer.h"
 #include "SystemManager.h"
-#include "UploadManager.h"
 #include "UploadPass.h"
 #include "Window.h"
 
@@ -43,11 +42,10 @@ void App::Run()
 		systemManager->GetWindow()->PollEvents();
 		//UpdateInputState();
 		//UpdateCameraFromInput();
-		systemManager->GetUploadManager()->WaitForCurrentFrame();
 		systemManager->GetRenderer()->WaitForCurrentFrame();
 
-		uploadPass->Execute( *systemManager );
-		systemManager->GetRenderer()->GetRenderGraph()->ExecuteAsync( *systemManager );
+		uploadPass->Execute( *systemManager, sceneID );
+		systemManager->GetRenderer()->GetRenderGraph()->ExecuteAsync( *systemManager, sceneID );
 		systemManager->GetRenderer()->Present();
 	}
 }

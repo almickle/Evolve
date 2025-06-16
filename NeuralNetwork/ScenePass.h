@@ -1,16 +1,17 @@
 #pragma once
 #include "GraphPass.h"
+#include "SystemManager.h"
 #include "Types.h"
 
-class SystemManager;
-
-class BeginFramePass :
-	public GraphPass {
+class ScenePass :
+	public GraphPass
+{
 public:
-	BeginFramePass()
-		: GraphPass( "BeginFrame" )
+	ScenePass()
+		: GraphPass( "ScenePass" )
 	{
 	}
 public:
 	void Execute( SystemManager& systemManager, const AssetID& sceneID ) override;
 };
+

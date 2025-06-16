@@ -1,8 +1,14 @@
+#include <DirectXMath.h>
 #include <string>
 #include <vector>
 #include "Asset.h"
+#include "AssetManager.h"
 #include "JsonSerializer.h"
 #include "Material.h"
+#include "ShaderBindings.h"
+#include "SystemManager.h"
+#include "TextureAsset.h"
+#include "Types.h"
 
 std::string Material::Serialize( JsonSerializer& serializer ) const
 {
@@ -13,7 +19,7 @@ std::string Material::Serialize( JsonSerializer& serializer ) const
 	SerializeBaseAsset( serializer );
 
 	// Material template ID
-	serializer.Write( "materialTemplateId", materialTemplate );
+	serializer.Write( "materialTemplate", materialTemplate );
 
 	// Texture bindings
 	serializer.BeginArray( "textureBindings" );
@@ -30,7 +36,7 @@ std::string Material::Serialize( JsonSerializer& serializer ) const
 	for( const auto& v : vectorBindings ) {
 		serializer.BeginObject();
 		serializer.Write( "slot", v.slot );
-		std::vector<float> vec = { v.data.x, v.data.y, v.data.z };
+		std::vector<float> vec = { v.data.x, v.data.y, v.data.z, v.data.w };
 		serializer.WriteArray( "data", vec );
 		serializer.EndObject();
 	}
@@ -52,9 +58,33 @@ std::string Material::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void Material::Load( GpuResourceManager& resourceManager, JsonSerializer& serializer )
+void Material::Load( SystemManager* systemManager )
 {
-	Deserialize( serializer );
+	auto* assetManager = systemManager->GetAssetManager();
+	auto* resourceManager = systemManager->GetResourceManager();
+	auto* serializer = systemManager->GetSerializer();
+
+	Deserialize( *serializer );
+	std::vector<uint> texSrvIndices;
+	for( const auto& binding : textureBindings )
+	{
+		auto* tex = static_cast<TextureAsset*>(assetManager->GetAsset( binding.data ));
+		auto srvHeapIndex = tex->GetSrvHeapIndex( *resourceManager );
+		texSrvIndices.push_back( srvHeapIndex );
+	}
+	std::vector<DirectX::XMFLOAT4> vectorData;
+	for( const auto& binding : vectorBindings )
+	{
+		vectorData.push_back( binding.data );
+	}
+	std::vector<float> scalarData;
+	for( const auto& binding : scalarBindings )
+	{
+		scalarData.push_back( binding.data );
+	}
+	constantBuffers[0] = resourceManager->CreateConstantBuffer( texSrvIndices.data() );
+	constantBuffers[1] = resourceManager->CreateConstantBuffer( vectorData.data() );
+	constantBuffers[2] = resourceManager->CreateConstantBuffer( scalarData.data() );
 }
 
 void Material::Deserialize( JsonSerializer& serializer )
@@ -63,7 +93,7 @@ void Material::Deserialize( JsonSerializer& serializer )
 	DeserializeBaseAsset( serializer );
 
 	// Material template ID
-	materialTemplate = serializer.Read<decltype(materialTemplate)>( "materialTemplateId" );
+	materialTemplate = serializer.Read<decltype(materialTemplate)>( "materialTemplate" );
 
 	// Texture bindings
 	textureBindings.clear();

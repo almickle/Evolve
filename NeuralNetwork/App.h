@@ -2,6 +2,7 @@
 #include <memory>
 #include <Windows.h>
 #include "SystemManager.h"
+#include "Types.h"
 
 struct InputState {
 	bool keys[256] = {};
@@ -29,4 +30,5 @@ private:
 	InputState inputState;
 private:
 	std::unique_ptr<SystemManager> systemManager;
+	AssetID sceneID;
 };

@@ -5,6 +5,7 @@
 #include <d3dcommon.h>
 #include <dxgi1_4.h>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <vector>
 #include <Windows.h>
@@ -75,11 +76,6 @@ public:
 	ID3D12RootSignature* GetRootSignature() const { return rootSignature.Get(); }
 	D3D12_PRIMITIVE_TOPOLOGY GetTopology() const { return topology; }
 public:
-	void RenderMeshInstances( ID3D12GraphicsCommandList* cmdList,
-							  D3D12_VERTEX_BUFFER_VIEW* vbView,
-							  D3D12_INDEX_BUFFER_VIEW* ibView,
-							  const std::array<D3D12_GPU_VIRTUAL_ADDRESS, 3>& shaderSlots,
-							  const uint& instanceCount );
 	void RenderActorInstances( ID3D12GraphicsCommandList* cmdList,
 							   const std::vector <PipelineStateKey>& pipelineStates,
 							   const std::vector<D3D12_VERTEX_BUFFER_VIEW*>& vbViews,
@@ -90,9 +86,10 @@ public:
 							   const bool& isStatic );
 	void SetPipelineState( ID3D12GraphicsCommandList* cmdList, const PipelineStateKey& psoKey );
 	void BindShaderSlots( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS textureSlots, D3D12_GPU_VIRTUAL_ADDRESS vectorSlots, D3D12_GPU_VIRTUAL_ADDRESS scalarSlots );
-	void BindSceneData( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer );
-	ComPtr<ID3DBlob> LoadShaderBlob( const wchar_t* filename );
-	PipelineStateKey CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob* dsBlob = nullptr, ID3DBlob* hsBlob = nullptr );
+	void BindSceneConstantBuffer( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer );
+	ComPtr<ID3DBlob> LoadShaderBlob( const std::string& fileName );
+	void CompileShader( const std::string& shaderCode, const ShaderType& type, const std::string& name, ComPtr<ID3DBlob>& blob );
+	PipelineStateKey CreatePipelineState( ComPtr<ID3DBlob>& vsBlob, ComPtr<ID3DBlob>& psBlob, ComPtr<ID3DBlob>& dsBlob, ComPtr<ID3DBlob>& hsBlob );
 private:
 	void CreateRenderTargets();
 	void CreateDepthStencils( uint width, uint height );
@@ -101,7 +98,12 @@ private:
 	void BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* constants );
 	void CleanupRenderTargets();
 	uint64_t HashBlob( const void* data, size_t size );
-
+	std::string GetLatestShaderModel();
+	void RenderMeshInstances( ID3D12GraphicsCommandList* cmdList,
+							  D3D12_VERTEX_BUFFER_VIEW* vbView,
+							  D3D12_INDEX_BUFFER_VIEW* ibView,
+							  const std::array<D3D12_GPU_VIRTUAL_ADDRESS, 3>& shaderSlots,
+							  const uint& instanceCount );
 private:
 	ComPtr<ID3D12Device> device;
 	ComPtr<ID3D12CommandQueue> commandQueue;

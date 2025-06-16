@@ -8,6 +8,7 @@
 #include "JsonSerializer.h"
 #include "Mesh.h"
 #include "SubMesh.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 std::string Mesh::Serialize( JsonSerializer& serializer ) const
@@ -72,13 +73,16 @@ std::string Mesh::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void Mesh::Load( GpuResourceManager& resourceManager, JsonSerializer& serializer )
+void Mesh::Load( SystemManager* systemManager )
 {
-	Deserialize( serializer );
+	auto* resourceManager = systemManager->GetResourceManager();
+	auto* serializer = systemManager->GetSerializer();
+
+	Deserialize( *serializer );
 	for( const auto& meshDatum : meshData )
 	{
-		auto vbId = resourceManager.CreateVertexBuffer( meshDatum.vertices, name );
-		auto ibId = resourceManager.CreateIndexBuffer( meshDatum.indices, name );
+		auto vbId = resourceManager->CreateVertexBuffer( meshDatum.vertices, name );
+		auto ibId = resourceManager->CreateIndexBuffer( meshDatum.indices, name );
 
 		auto subMesh = std::make_unique<SubMesh>( vbId, ibId, name );
 		AddSubAsset( std::move( subMesh ) );

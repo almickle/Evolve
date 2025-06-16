@@ -20,12 +20,6 @@ void UploadManager::Init()
 	device->CreateCommandList( 0, D3D12_COMMAND_LIST_TYPE_COPY, uploadAllocator.Get(), nullptr, IID_PPV_ARGS( &uploadCmdList ) );
 	uploadCmdList->Close(); // Start closed
 
-	// Create upload command queue
-	D3D12_COMMAND_QUEUE_DESC copyQueueDesc = {};
-	copyQueueDesc.Type = D3D12_COMMAND_LIST_TYPE_COPY;
-	copyQueueDesc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
-	device->CreateCommandQueue( &copyQueueDesc, IID_PPV_ARGS( &uploadCommandQueue ) );
-
 	// Create upload fence
 	device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS( &uploadFence ) );
 	uploadFenceValue = 1;
@@ -38,11 +32,6 @@ void UploadManager::Init()
 		device->CreateCommandAllocator( D3D12_COMMAND_LIST_TYPE_COPY, IID_PPV_ARGS( &frameAllocators[i] ) );
 		device->CreateCommandList( 0, D3D12_COMMAND_LIST_TYPE_COPY, frameAllocators[i].Get(), nullptr, IID_PPV_ARGS( &frameCmdLists[i] ) );
 		frameCmdLists[i]->Close(); // Start closed
-
-		// Create fencess for each frame
-		device->CreateFence( 0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS( &frameFences[i] ) );
-		frameFenceValues[i] = 1;
-		frameFenceEvents[i] = CreateEvent( nullptr, FALSE, FALSE, nullptr );
 	}
 }
 
@@ -81,10 +70,10 @@ void UploadManager::Flush()
 
 		uploadCmdList->Close();
 		ID3D12CommandList* lists[] = { uploadCmdList.Get() };
-		uploadCommandQueue->ExecuteCommandLists( 1, lists );
+		renderer->GetCommandQueue()->ExecuteCommandLists( 1, lists );
 
 		uploadFenceValue++;
-		uploadCommandQueue->Signal( uploadFence.Get(), uploadFenceValue );
+		renderer->GetCommandQueue()->Signal( uploadFence.Get(), uploadFenceValue );
 
 		// Optionally, wait for completion and call all callbacks
 		// (You can track callbacks in a vector if needed)
@@ -124,13 +113,6 @@ void UploadManager::FlushCurrentFrame()
 			localQueue.pop();
 		}
 
-		frameCmdLists[frameIndex]->Close();
-		ID3D12CommandList* lists[] = { frameCmdLists[frameIndex].Get() };
-		uploadCommandQueue->ExecuteCommandLists( 1, lists );
-
-		frameFenceValues[frameIndex]++;
-		uploadCommandQueue->Signal( frameFences[frameIndex].Get(), frameFenceValues[frameIndex] );
-
 		// Optionally, wait for completion and call all callbacks
 		// (You can track callbacks in a vector if needed)
 
@@ -141,21 +123,9 @@ void UploadManager::FlushCurrentFrame()
 void UploadManager::WaitForInitialUpload()
 {
 	const uint64_t fenceToWait = ++uploadFenceValue;
-	uploadCommandQueue->Signal( uploadFence.Get(), fenceToWait );
+	renderer->GetCommandQueue()->Signal( uploadFence.Get(), fenceToWait );
 	if( uploadFence->GetCompletedValue() < fenceToWait ) {
 		uploadFence->SetEventOnCompletion( fenceToWait, uploadFenceEvent );
 		WaitForSingleObject( uploadFenceEvent, INFINITE );
-	}
-}
-
-void UploadManager::WaitForCurrentFrame()
-{
-	auto frameIndex = renderer->GetCurrentFrameIndex();
-
-	const uint64_t fenceToWait = ++frameFenceValues[frameIndex];
-	uploadCommandQueue->Signal( frameFences[frameIndex].Get(), fenceToWait );
-	if( frameFences[frameIndex]->GetCompletedValue() < fenceToWait ) {
-		frameFences[frameIndex]->SetEventOnCompletion( fenceToWait, frameFenceEvents[frameIndex] );
-		WaitForSingleObject( frameFenceEvents[frameIndex], INFINITE );
 	}
 }

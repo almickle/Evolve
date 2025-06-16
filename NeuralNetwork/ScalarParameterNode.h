@@ -1,5 +1,4 @@
 #pragma once
-#include <DirectXMath.h>
 #include <format>
 #include <string>
 #include "MaterialNode.h"
@@ -13,8 +12,8 @@ public:
 	ScalarParameterNode( const std::string& name = "ScalarParameterNode" )
 		: MaterialNode( 0, 1, 1, name )
 	{
-		AddOutput( valueOutputSlot, NodeSlot{ "value", DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f} } );
-		AddParameter( scalarParameterSlot, NodeParameter( NodeParameterTypes::Scalar, "scalarIndex" ) );
+		AddOutput( valueOutputSlot, NodeSlot{ "value", 0.0f } );
+		AddParameter( scalarParameterSlot, NodeParameter( NodeParameterTypes::Scalar, "scalar" ) );
 	}
 	~ScalarParameterNode() {}
 public:

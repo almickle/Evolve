@@ -1,11 +1,13 @@
 #pragma once
+#include <d3dcommon.h>
 #include <string>
 #include <vector>
+#include <wrl\client.h>
 #include "Asset.h"
-#include "GpuResourceManager.h"
 #include "JsonSerializer.h"
 #include "NodeLibrary.h"
 #include "NodeTypes.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 struct MaterialEdge {
@@ -21,6 +23,8 @@ struct ParameterBinding {
 	NodeParameterTypes parameterType;
 	uint cbufferSlot;
 };
+
+using Microsoft::WRL::ComPtr;
 
 class MaterialTemplate :
 	public Asset {
@@ -39,7 +43,7 @@ public:
 		edges( edges ),
 		nodeLibrary( nodeLibrary )
 	{
-		BuildParameterBindings( nodeLibrary );
+		BuildParameterBindings();
 	}
 	MaterialTemplate() = default;
 	~MaterialTemplate()
@@ -49,15 +53,16 @@ public:
 		parameterBindings.clear();
 	}
 public:
-	void GenerateShaderCode( NodeLibrary& nodeLibrary );
-	void Load( GpuResourceManager& resourceManager, JsonSerializer& serializer ) override;
+	void GenerateShaderCode();
+	void Load( SystemManager* systemManager ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
 public:
 	void AddNode( const NodeTypes& node ) { nodes.push_back( node ); }
 	void AddEdge( const MaterialEdge& edge ) { edges.push_back( edge ); }
-	void BuildParameterBindings( NodeLibrary& nodeLibrary );
+	void BuildParameterBindings();
 public:
+	ComPtr<ID3DBlob>& GetPixelShaderBlob() { return psBlob; };
 	const std::string& GetShaderCode() const { return shaderCode; }
 	const std::vector<NodeTypes>& GetNodes() const { return nodes; }
 	const std::vector<MaterialEdge>& GetEdges() const { return edges; }
@@ -66,10 +71,11 @@ public:
 private:
 	std::vector<uint> TopologicalSort() const;
 	std::vector<MaterialEdge> GetIncomingEdges( uint nodeIndex ) const;
-	std::string GetInputStructs( NodeLibrary& nodeLibrary );
-	std::string GetOutputStructs( NodeLibrary& nodeLibrary );
-	std::string GetParameterStructs( NodeLibrary& nodeLibrary );
-	std::string GetShaderFunctions( NodeLibrary& nodeLibrary );
+	std::vector<uint> GetUnconnectedInputSlots( uint nodeIndex ) const;
+	std::string GetInputStructs();
+	std::string GetOutputStructs();
+	std::string GetParameterStructs();
+	std::string GetShaderFunctions();
 private:
 	std::string shaderCode;
 	std::vector<NodeTypes> nodes;
@@ -77,4 +83,5 @@ private:
 	std::vector<ParameterBinding> parameterBindings;
 private:
 	NodeLibrary& nodeLibrary;
+	ComPtr<ID3DBlob> psBlob;
 };

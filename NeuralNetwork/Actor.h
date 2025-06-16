@@ -21,7 +21,7 @@ public:
 	const DirectX::XMFLOAT4& GetRotation() const { return rotation; }
 	const DirectX::XMFLOAT3& GetScale() const { return scale; }
 	const AssetID GetModelID() const { return modelId; }
-	const DirectX::XMMATRIX GetTransform() const;
+	const DirectX::XMFLOAT4X4 GetTransform() const;
 private:
 	DirectX::XMFLOAT3 position = { 0, 0, 0 };
 	DirectX::XMFLOAT4 rotation = { 0, 0, 0, 1 }; // Quaternion (x, y, z, w)

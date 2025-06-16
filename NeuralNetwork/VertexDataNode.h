@@ -14,9 +14,9 @@ public:
 		: MaterialNode( 0, 5, 0, name )
 	{
 		AddOutput( pixelPosOutputSlot, NodeSlot{ "pixelPos", DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
-		AddOutput( worldPosOutputSlot, NodeSlot{ "worldPos", DirectX::XMFLOAT3{ 0, 0, 0 } } );
-		AddOutput( normalOutputSlot, NodeSlot{ "normal", DirectX::XMFLOAT3{ 0, 0, 0 } } );
-		AddOutput( uvOutputSlot, NodeSlot{ "uv", DirectX::XMFLOAT2{ 0, 0 } } );
+		AddOutput( worldPosOutputSlot, NodeSlot{ "worldPos", DirectX::XMFLOAT4{ 0, 0, 0,0 } } );
+		AddOutput( normalOutputSlot, NodeSlot{ "normal", DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
+		AddOutput( uvOutputSlot, NodeSlot{ "uv",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 		AddOutput( tangentOutputSlot, NodeSlot{ "tangent", DirectX::XMFLOAT4{ 0, 0, 0, 1 } } );
 	}
 	~VertexDataNode() {}
@@ -29,9 +29,9 @@ public:
 
 		std::string functionBody =
 			"output.pixelPos = vertexData.pixelPos;\n"
-			"output.worldPos = vertexData.worldPos;\n"
-			"output.normal = vertexData.normal;\n"
-			"output.uv = vertexData.uv;\n"
+			"output.worldPos = float4(vertexData.worldPos, 0.0f);\n"
+			"output.normal = float4(vertexData.normal, 0.0f);\n"
+			"output.uv = float4(vertexData.uv, 0.0f, 0.0f);\n"
 			"output.tangent = vertexData.tangent;\n";
 
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );

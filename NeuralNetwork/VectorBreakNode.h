@@ -13,7 +13,7 @@ public:
 	VectorBreakNode( const std::string& name = "VectorBreakNode" )
 		: MaterialNode( 1, 3, 0, name )
 	{
-		AddInput( vectorInputSlot, NodeSlot{ "vector", DirectX::XMFLOAT3{0.0f, 0.0f, 0.0f} } );
+		AddInput( vectorInputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 		AddOutput( xOutputSlot, NodeSlot{ "x", 0.0f } );
 		AddOutput( yOutputSlot, NodeSlot{ "y", 0.0f } );
 		AddOutput( zOutputSlot, NodeSlot{ "z", 0.0f } );

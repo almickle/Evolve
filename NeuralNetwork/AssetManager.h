@@ -11,6 +11,7 @@
 #include "SystemManager.h"
 #include "Types.h"
 
+class Renderer;
 class JsonSerializer;
 class TaskManager;
 class GpuResourceManager;
@@ -20,7 +21,8 @@ class ImportManager;
 class AssetManager : public System {
 public:
 	AssetManager( SystemManager& systemManager )
-		: serializer( systemManager.GetSerializer() ),
+		: renderer( systemManager.GetRenderer() ),
+		serializer( systemManager.GetSerializer() ),
 		taskManager( systemManager.GetTaskManager() ),
 		resourceManager( systemManager.GetResourceManager() ),
 		nodeLibrary( systemManager.GetNodeLibrary() ),
@@ -29,20 +31,21 @@ public:
 	};
 	~AssetManager() = default;
 public:
-	void Init();
+	void Init( SystemManager* systemManager );
 public:
 	AssetID RegisterAsset( std::unique_ptr<Asset> asset );
 	void RegisterAsset( const AssetID& assetId, std::unique_ptr<Asset> asset );
 	void RemoveAsset( const AssetID& id );
 	void SaveAsset( const AssetID& id, const std::string& additionalPath = "" ) const;
-	void LoadAsset( const std::string& path, JsonSerializer& serializer );
+	void LoadAsset( const std::string& path, SystemManager* systemManager );
 public:
 	void ImportMesh( const std::string& path, const std::string& name );
 	void ImportTexture( const std::string& path, const std::string& name );
 public:
 	Asset* GetAsset( const AssetID& id );
 	const Asset* GetAsset( const AssetID& id ) const;
-	std::vector<Asset*> GetAllAssets() const;
+	const std::vector<Asset*> GetAllAssets() const;
+	std::vector<Asset*> GetAllAssets();
 private:
 	AssetID GenerateUniqueAssetId();
 private:
@@ -52,6 +55,7 @@ private:
 	std::filesystem::path assetDirectory = std::filesystem::path( "Assets" );
 	std::string assetFileExtension = ".json";
 private:
+	Renderer* renderer;
 	JsonSerializer* serializer;
 	TaskManager* taskManager;
 	GpuResourceManager* resourceManager;

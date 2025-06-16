@@ -1,24 +1,26 @@
 #include <string>
 #include "Asset.h"
-#include "ImportManager.h"
+#include "GpuResourceManager.h"
 #include "JsonSerializer.h"
 #include "Types.h"
 
-class GpuResourceManager;
+class SystemManager;
 
 class TextureAsset : public Asset {
 public:
-	TextureAsset( ImportManager& importManager, const std::string& name = "TextureAsset" )
-		: Asset( AssetType::Texture, name ),
-		importManager( importManager )
+	TextureAsset( const std::string& name = "TextureAsset" )
+		: Asset( AssetType::Texture, name )
 	{
 	}
 	~TextureAsset() = default;
 public:
-	void Load( GpuResourceManager& resourceManager, JsonSerializer& serializer ) override;
+	void Load( SystemManager* systemManager ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
+public:
+	uint GetSrvHeapIndex( GpuResourceManager& resourceManager ) const;
 private:
 	std::string texturePath;
-	ImportManager& importManager;
+private:
+	ResourceID textureId;
 };

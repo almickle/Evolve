@@ -1,8 +1,11 @@
+#include <combaseapi.h>
 #include <d3d12.h>
 #include <memory>
 #include <vector>
 #include <wrl\client.h>
 #include "GraphPass.h"
+#include "Renderer.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 GraphPass* GraphPass::AddDependency( GraphPass* dependency )
@@ -33,4 +36,24 @@ bool GraphPass::IsReady() const
 		}
 	}
 	return true;
+}
+
+void GraphPass::Init( SystemManager& systemManager )
+{
+	uint frames = Renderer::BackBufferCount;
+
+	for( uint i = 0; i < frames; ++i ) {
+		systemManager.GetRenderer()->GetDevice()->CreateCommandAllocator(
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			IID_PPV_ARGS( &commandAllocators[i] )
+		);
+		systemManager.GetRenderer()->GetDevice()->CreateCommandList(
+			0,
+			D3D12_COMMAND_LIST_TYPE_DIRECT,
+			commandAllocators[i].Get(),
+			nullptr,
+			IID_PPV_ARGS( &commandLists[i] )
+		);
+		commandLists[i]->Close();
+	}
 }

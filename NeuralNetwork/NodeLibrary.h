@@ -11,6 +11,7 @@
 #include "System.h"
 #include "TextureSamplerNode.h"
 #include "VectorBreakNode.h"
+#include "VectorMakeNode.h"
 #include "VectorScaleNode.h"
 #include "VertexDataNode.h"
 
@@ -26,6 +27,7 @@ public:
 		RegisterNode( NodeTypes::NormalMap, std::make_unique<NormalMapNode>() );
 		RegisterNode( NodeTypes::VectorBreak, std::make_unique<VectorBreakNode>() );
 		RegisterNode( NodeTypes::ScalarParameter, std::make_unique<ScalarParameterNode>() );
+		RegisterNode( NodeTypes::VectorMakeNode, std::make_unique<VectorMakeNode>() );
 	}
 
 	// Register a node type with a node instance

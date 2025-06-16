@@ -1,0 +1,9 @@
+{
+    "id": "Asset_7",
+    "name": "modifier",
+    "type": 5,
+    "assetIds": [
+        "Asset_8"
+    ],
+    "modifierTemplate": "Asset_8"
+}

@@ -1,17 +1,18 @@
 #include <algorithm>
 #include <format>
 #include <queue>
+#include <set>
 #include <sstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
 #include "Asset.h"
-#include "GpuResourceManager.h"
 #include "JsonSerializer.h"
 #include "MaterialNode.h"
 #include "MaterialTemplate.h"
 #include "NodeLibrary.h"
 #include "NodeTypes.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 std::string MaterialTemplate::Serialize( JsonSerializer& serializer ) const
@@ -55,9 +56,9 @@ std::string MaterialTemplate::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void MaterialTemplate::Load( GpuResourceManager& resourceManager, JsonSerializer& serializer )
+void MaterialTemplate::Load( SystemManager* systemManager )
 {
-	Deserialize( serializer );
+	Deserialize( *systemManager->GetSerializer() );
 }
 
 void MaterialTemplate::Deserialize( JsonSerializer& serializer )
@@ -94,7 +95,7 @@ void MaterialTemplate::Deserialize( JsonSerializer& serializer )
 }
 
 
-void MaterialTemplate::BuildParameterBindings( NodeLibrary& nodeLibrary )
+void MaterialTemplate::BuildParameterBindings()
 {
 	parameterBindings.clear();
 	uint texturebufferSlot = 0;
@@ -189,16 +190,16 @@ std::vector<uint> MaterialTemplate::TopologicalSort() const
 	return sorted;
 }
 
-void MaterialTemplate::GenerateShaderCode( NodeLibrary& nodeLibrary )
+void MaterialTemplate::GenerateShaderCode()
 {
 	std::ostringstream oss;
 
-	auto includes = "#include \"Common.hlsli\"";
-	auto inputStructs = GetInputStructs( nodeLibrary );
-	auto outputStructs = GetOutputStructs( nodeLibrary );
-	auto parameterStructs = GetParameterStructs( nodeLibrary );
-	auto shaderFunctions = GetShaderFunctions( nodeLibrary );
-	std::string signature = "float4 main(VSOutput input) : SV_TARGET";
+	auto includes = "#include \"Common.hlsli\"\n";
+	auto inputStructs = GetInputStructs();
+	auto outputStructs = GetOutputStructs();
+	auto parameterStructs = GetParameterStructs();
+	auto shaderFunctions = GetShaderFunctions();
+	std::string signature = "float4 main(VSOutput vertexData) : SV_TARGET";
 
 	oss << includes << inputStructs << outputStructs << parameterStructs << shaderFunctions << signature << "\n" << "{";
 
@@ -213,7 +214,6 @@ void MaterialTemplate::GenerateShaderCode( NodeLibrary& nodeLibrary )
 		auto nodeRef = nodeLibrary.GetNode( node );
 
 		shaderChunk << nodeRef->GetInputStatement( nodeIndex ) << "\n";
-		shaderChunk << nodeRef->GetParameterStatement( nodeIndex ) << "\n";
 
 		auto incomingEdges = GetIncomingEdges( nodeIndex );
 		for( auto& incomingEdge : incomingEdges )
@@ -230,6 +230,16 @@ void MaterialTemplate::GenerateShaderCode( NodeLibrary& nodeLibrary )
 				<< incomingNodeRef->GetOutputSlotName( incomingEdge.fromSlot )
 				<< ";\n";
 		}
+		for( auto& unconnectedSlot : GetUnconnectedInputSlots( nodeIndex ) ) {
+			shaderChunk
+				<< nodeRef->GetInputDataName( nodeIndex )
+				<< "."
+				<< nodeRef->GetInputSlotName( unconnectedSlot )
+				<< " = "
+				<< nodeRef->GetInput( unconnectedSlot ).GetHlslValue()
+				<< ";\n";
+		}
+		shaderChunk << nodeRef->GetParameterStatement( nodeIndex ) << "\n";
 		for( uint parameterIndex = 0; parameterIndex < nodeRef->GetParameterCount(); ++parameterIndex )
 		{
 			shaderChunk
@@ -257,6 +267,34 @@ void MaterialTemplate::GenerateShaderCode( NodeLibrary& nodeLibrary )
 	shaderCode = oss.str();
 }
 
+std::vector<uint> MaterialTemplate::GetUnconnectedInputSlots( uint nodeIndex ) const
+{
+	// 1. Get the node reference
+	auto nodeType = nodes[nodeIndex];
+	auto nodeRef = nodeLibrary.GetNode( nodeType );
+
+	// 2. Get the total number of input slots
+	uint inputCount = nodeRef->GetInputCount();
+
+	// 3. Collect connected input slots
+	std::set<uint> connectedSlots;
+	for( const auto& edge : edges )
+	{
+		if( edge.toNode == nodeIndex )
+			connectedSlots.insert( edge.toSlot );
+	}
+
+	// 4. Find unconnected input slots
+	std::vector<uint> unconnectedSlots;
+	for( uint i = 0; i < inputCount; ++i )
+	{
+		if( connectedSlots.find( i ) == connectedSlots.end() )
+			unconnectedSlots.push_back( i );
+	}
+
+	return unconnectedSlots;
+}
+
 std::vector<MaterialEdge> MaterialTemplate::GetIncomingEdges( uint nodeIndex ) const
 {
 	std::vector<MaterialEdge> result;
@@ -267,35 +305,51 @@ std::vector<MaterialEdge> MaterialTemplate::GetIncomingEdges( uint nodeIndex ) c
 	}
 	return result;
 }
-std::string MaterialTemplate::GetInputStructs( NodeLibrary& nodeLibrary )
+std::string MaterialTemplate::GetInputStructs()
 {
 	std::ostringstream oss;
+	std::set<NodeTypes> recordedTypes;
 	for( const auto& node : nodes ) {
+		if( recordedTypes.find( node ) != recordedTypes.end() )
+			continue;
 		oss << nodeLibrary.GetNode( node )->GetInputStruct() << "\n";
+		recordedTypes.insert( node );
 	}
 	return oss.str();
 }
-std::string MaterialTemplate::GetOutputStructs( NodeLibrary& nodeLibrary )
+std::string MaterialTemplate::GetOutputStructs()
 {
 	std::ostringstream oss;
+	std::set<NodeTypes> recordedTypes;
 	for( const auto& node : nodes ) {
+		if( recordedTypes.find( node ) != recordedTypes.end() )
+			continue;
 		oss << nodeLibrary.GetNode( node )->GetOutputStruct() << "\n";
+		recordedTypes.insert( node );
 	}
 	return oss.str();
 }
-std::string MaterialTemplate::GetParameterStructs( NodeLibrary& nodeLibrary )
+std::string MaterialTemplate::GetParameterStructs()
 {
 	std::ostringstream oss;
+	std::set<NodeTypes> recordedTypes;
 	for( const auto& node : nodes ) {
+		if( recordedTypes.find( node ) != recordedTypes.end() )
+			continue;
 		oss << nodeLibrary.GetNode( node )->GetParameterStruct() << "\n";
+		recordedTypes.insert( node );
 	}
 	return oss.str();
 }
-std::string MaterialTemplate::GetShaderFunctions( NodeLibrary& nodeLibrary )
+std::string MaterialTemplate::GetShaderFunctions()
 {
 	std::ostringstream oss;
+	std::set<NodeTypes> recordedTypes;
 	for( const auto& node : nodes ) {
+		if( recordedTypes.find( node ) != recordedTypes.end() )
+			continue;
 		oss << nodeLibrary.GetNode( node )->GetShaderFunction() << "\n";
+		recordedTypes.insert( node );
 	}
 	return oss.str();
 }

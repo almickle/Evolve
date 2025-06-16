@@ -9,10 +9,6 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="Source Files\Neuron">
       <UniqueIdentifier>{ca4e9beb-4061-47fa-a612-c7c8f4ddc464}</UniqueIdentifier>
     </Filter>
@@ -130,6 +126,10 @@
     <Filter Include="Source Files\Systems\Serializers">
       <UniqueIdentifier>{f409bd13-887f-478b-ba69-a295d59fa1d8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -175,9 +175,6 @@
       <Filter>Source Files\Systems\Managers</Filter>
     </ClCompile>
     <ClCompile Include="ExecutionGraph.cpp">
-      <Filter>Source Files\Render\Graphs</Filter>
-    </ClCompile>
-    <ClCompile Include="InitializationGraph.cpp">
       <Filter>Source Files\Render\Graphs</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
@@ -297,11 +294,14 @@
     <ClCompile Include="Scene.cpp">
       <Filter>Source Files\Assets\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="ModifierTemplate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Modifier.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="ModifierTemplate.cpp">
+      <Filter>Source Files\Assets\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="ScenePass.cpp">
+      <Filter>Source Files\Passes\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,9 +367,6 @@
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>Header Files\Common</Filter>
-    </ClInclude>
-    <ClInclude Include="InitializationGraph.h">
-      <Filter>Header Files\Render\Graphs</Filter>
     </ClInclude>
     <ClInclude Include="ExecutionGraph.h">
       <Filter>Header Files\Render\Graphs</Filter>
@@ -506,6 +503,12 @@
     <ClInclude Include="ShaderBindings.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
+    <ClInclude Include="VectorMakeNode.h">
+      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ScenePass.h">
+      <Filter>Header Files\Passes\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="PbrPS.hlsl">
@@ -528,6 +531,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Common.hlsli">
       <Filter>Shaders</Filter>
     </None>

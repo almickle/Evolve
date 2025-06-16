@@ -10,6 +10,5 @@ public:
 		: GraphPass( "EndFrame" )
 	{
 	}
-	void Init( SystemManager& systemManager ) override;
-	void Execute( SystemManager& systemManager ) override;
+	void Execute( SystemManager& systemManager, const AssetID& sceneID ) override;
 };

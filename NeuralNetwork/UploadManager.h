@@ -33,12 +33,10 @@ public:
 	void Enqueue( UploadRequest req );
 	void Flush();
 	void FlushCurrentFrame();
-	void WaitForCurrentFrame();
 private:
 	void WaitForInitialUpload();
 private:
 	std::mutex queueMutex;
-	ComPtr<ID3D12CommandQueue> uploadCommandQueue;
 	std::queue<UploadRequest> uploadQueue;
 	std::atomic<bool> batchInProgress{ false };
 private:
@@ -51,8 +49,6 @@ private:
 	ComPtr<ID3D12CommandAllocator> frameAllocators[Renderer::BackBufferCount];
 	ComPtr<ID3D12GraphicsCommandList> frameCmdLists[Renderer::BackBufferCount];
 	ComPtr<ID3D12Fence> frameFences[Renderer::BackBufferCount];
-	uint64_t frameFenceValues[Renderer::BackBufferCount]{ 0 };
-	HANDLE frameFenceEvents[Renderer::BackBufferCount]{ nullptr };
 private:
 	ThreadManager* threadManager;
 	Renderer* renderer;

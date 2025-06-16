@@ -3,6 +3,7 @@
 #include <combaseapi.h>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <d3d12.h>
 #include <d3d12sdklayers.h>
 #include <d3dcommon.h>
@@ -11,6 +12,7 @@
 #include <d3dx12_default.h>
 #include <d3dx12_root_signature.h>
 #include <debugapi.h>
+#include <dxcapi.h>
 #include <dxgi.h>
 #include <dxgi1_2.h>
 #include <dxgi1_3.h>
@@ -19,8 +21,9 @@
 #include <dxgiformat.h>
 #include <fstream>
 #include <handleapi.h>
+#include <ios>
 #include <memory>
-#include <rpcndr.h>
+#include <string>
 #include <synchapi.h>
 #include <vector>
 #include <Windows.h>
@@ -270,9 +273,9 @@ void Renderer::CreateDepthStencils( uint width, uint height )
 	}
 }
 
-ComPtr<ID3DBlob> Renderer::LoadShaderBlob( const wchar_t* filename )
+ComPtr<ID3DBlob> Renderer::LoadShaderBlob( const std::string& fileName )
 {
-	std::ifstream file( filename, std::ios::binary | std::ios::ate );
+	std::ifstream file( fileName, std::ios::binary | std::ios::ate );
 	if( !file ) return nullptr;
 	std::streamsize size = file.tellg();
 	file.seekg( 0, std::ios::beg );
@@ -280,6 +283,104 @@ ComPtr<ID3DBlob> Renderer::LoadShaderBlob( const wchar_t* filename )
 	if( FAILED( D3DCreateBlob( static_cast<SIZE_T>(size), &blob ) ) ) return nullptr;
 	file.read( reinterpret_cast<char*>(blob->GetBufferPointer()), size );
 	return blob;
+}
+
+std::string Renderer::GetLatestShaderModel()
+{
+	D3D12_FEATURE_DATA_SHADER_MODEL shaderModel = { D3D_SHADER_MODEL_6_8 };
+	if( FAILED( device->CheckFeatureSupport( D3D12_FEATURE_SHADER_MODEL, &shaderModel, sizeof( shaderModel ) ) ) ) {
+		shaderModel.HighestShaderModel = D3D_SHADER_MODEL_6_0;
+	}
+	// Convert to string, e.g., "6_8"
+	uint16_t major = (shaderModel.HighestShaderModel >> 4) & 0xF;
+	uint16_t minor = shaderModel.HighestShaderModel & 0xF;
+	return std::to_string( major ) + "_" + std::to_string( minor );
+}
+
+void Renderer::CompileShader( const std::string& shaderCode, const ShaderType& type, const std::string& name, ComPtr<ID3DBlob>& blob )
+{
+	using Microsoft::WRL::ComPtr;
+
+	// 1. Determine entry point and target profile
+	std::wstring entryPoint = L"main";
+	std::wstring targetProfile;
+	std::string model = GetLatestShaderModel();
+	switch( type )
+	{
+		case ShaderType::Pixel:
+			targetProfile = L"ps_" + std::wstring( model.begin(), model.end() );
+			break;
+		case ShaderType::Vertex:
+			targetProfile = L"vs_" + std::wstring( model.begin(), model.end() );
+			break;
+		case ShaderType::Domain:
+			targetProfile = L"ds_" + std::wstring( model.begin(), model.end() );
+			break;
+		case ShaderType::Hull:
+			targetProfile = L"hs_" + std::wstring( model.begin(), model.end() );
+			break;
+		case ShaderType::Compute:
+			targetProfile = L"cs_" + std::wstring( model.begin(), model.end() );
+			break;
+		default:
+			throw "Unsupported shader type";
+			break;
+	}
+
+	// 2. Create DXC interfaces
+	ComPtr<IDxcUtils> utils;
+	ComPtr<IDxcCompiler3> compiler;
+	ComPtr<IDxcIncludeHandler> includeHandler;
+	DxcCreateInstance( CLSID_DxcUtils, IID_PPV_ARGS( &utils ) );
+	DxcCreateInstance( CLSID_DxcCompiler, IID_PPV_ARGS( &compiler ) );
+	utils->CreateDefaultIncludeHandler( &includeHandler );
+
+	// 3. Create source blob from shader code string
+	ComPtr<IDxcBlobEncoding> sourceBlob;
+	utils->CreateBlob( shaderCode.data(), (UINT32)shaderCode.size(), DXC_CP_UTF8, &sourceBlob );
+
+	// 4. Prepare compile arguments
+	std::wstring wName( name.begin(), name.end() );
+	const wchar_t* args[] = {
+		wName.c_str(),
+		L"-E", entryPoint.c_str(),
+		L"-T", targetProfile.c_str(),
+		L"-Zi",              // Debug info (optional)
+		L"-Qstrip_debug"     // Strip debug info from output (optional)
+	};
+
+	// 5. Prepare source buffer
+	DxcBuffer sourceBuffer = {};
+	sourceBuffer.Ptr = sourceBlob->GetBufferPointer();
+	sourceBuffer.Size = sourceBlob->GetBufferSize();
+	sourceBuffer.Encoding = DXC_CP_UTF8;
+
+	// 6. Compile
+	ComPtr<IDxcResult> result;
+	HRESULT hr = compiler->Compile(
+		&sourceBuffer,
+		args, _countof( args ),
+		includeHandler.Get(),
+		IID_PPV_ARGS( &result )
+	);
+
+	// 7. Output errors if any
+	ComPtr<IDxcBlobUtf8> errors;
+	result->GetOutput( DXC_OUT_ERRORS, IID_PPV_ARGS( &errors ), nullptr );
+	if( errors && errors->GetStringLength() > 0 ) {
+		OutputDebugStringA( (const char*)errors->GetStringPointer() );
+	}
+
+	// 8. Get compiled shader
+	ComPtr<IDxcBlob> shaderBlob;
+	hr = result->GetOutput( DXC_OUT_OBJECT, IID_PPV_ARGS( &shaderBlob ), nullptr );
+	if( FAILED( hr ) || !shaderBlob ) {
+		if( blob ) blob = nullptr;
+		return;
+	}
+	// 9. Copy shader to blob
+	D3DCreateBlob( shaderBlob->GetBufferSize(), &blob );
+	memcpy( blob->GetBufferPointer(), shaderBlob->GetBufferPointer(), shaderBlob->GetBufferSize() );
 }
 
 void Renderer::CleanupRenderTargets()
@@ -362,7 +463,7 @@ bool Renderer::ConfigureRootSignature()
 	return true;
 }
 
-PipelineStateKey Renderer::CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBlob, ID3DBlob* dsBlob, ID3DBlob* hsBlob )
+PipelineStateKey Renderer::CreatePipelineState( ComPtr<ID3DBlob>& vsBlob, ComPtr<ID3DBlob>& psBlob, ComPtr<ID3DBlob>& dsBlob, ComPtr<ID3DBlob>& hsBlob )
 {
 	PipelineStateKey key{
 		vsBlob ? HashBlob( vsBlob->GetBufferPointer(), vsBlob->GetBufferSize() ) : 0,
@@ -379,9 +480,9 @@ PipelineStateKey Renderer::CreatePipelineState( ID3DBlob* vsBlob, ID3DBlob* psBl
 
 	// Create new pso if cache miss
 	D3D12_INPUT_ELEMENT_DESC inputLayout[4] = {
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,   D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	{ "UV",       0, DXGI_FORMAT_R32G32_FLOAT,    0, 24,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT,	 0,	0,  D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT,	 0,	12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	{ "UV",       0, DXGI_FORMAT_R32G32_FLOAT,		 0, 24, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	{ "TANGENT",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
 
@@ -438,7 +539,7 @@ void Renderer::BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* cons
 
 }
 
-void Renderer::BindSceneData( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer )
+void Renderer::BindSceneConstantBuffer( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer )
 {
 	BindConstantBuffer( cmdList, 0, sceneBuffer );
 }

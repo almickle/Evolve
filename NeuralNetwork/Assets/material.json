@@ -1,11 +1,11 @@
 {
   "id": "Asset_2",
-  "name": "PBR_Material",
+  "name": "material",
   "type": 3,
   "assetIds": [
     "Asset_1"
   ],
-  "materialTemplateId": "Asset_1",
+  "materialTemplate": "Asset_1",
   "textureBindings": [
     {
       "slot": 0,

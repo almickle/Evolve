@@ -7,12 +7,17 @@
 #include <vector>
 #include "Asset.h"
 #include "AssetManager.h"
+#include "ImportManager.h"
 #include "JsonSerializer.h"
 #include "Material.h"
 #include "MaterialTemplate.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "Modifier.h"
+#include "ModifierTemplate.h"
+#include "Renderer.h"
 #include "SubMesh.h"
+#include "SystemManager.h"
 #include "TaskManager.h"
 #include "TextureAsset.h"
 #include "Types.h"
@@ -24,7 +29,7 @@ void AssetManager::SaveAsset( const AssetID& id, const std::string& additionalPa
 	asset->Save( assetDirectory / additionalPath, content );
 }
 
-void AssetManager::Init()
+void AssetManager::Init( SystemManager* systemManager )
 {
 	//auto entries = std::filesystem::directory_iterator( assetDirectory );
 
@@ -37,9 +42,9 @@ void AssetManager::Init()
 			std::string path = std::filesystem::absolute( entry.path() ).string();
 			Task task;
 			task.path = path;
-			task.taskFunc = [this]( const std::string& filePath ) {
+			task.taskFunc = [this, systemManager]( const std::string& filePath ) {
 				JsonSerializer localSerializer;
-				this->LoadAsset( filePath, localSerializer );
+				this->LoadAsset( filePath, systemManager );
 				};
 			// Optionally, set onComplete if you want a callback after loading
 			task.onComplete = nullptr;
@@ -48,21 +53,64 @@ void AssetManager::Init()
 	}
 	auto fence = taskManager->InsertFence();
 	fence.wait();
+
+	for( const auto& asset : GetAllAssets() )
+	{
+		auto type = asset->GetType();
+		switch( type )
+		{
+			case AssetType::MaterialTemplate:
+			{
+				auto* assetRef = static_cast<MaterialTemplate*>(asset);
+				assetRef->GenerateShaderCode();
+				renderer->CompileShader( assetRef->GetShaderCode(), ShaderType::Pixel, assetRef->GetName(), assetRef->GetPixelShaderBlob() );
+			}
+			break;
+			case AssetType::ModifierTemplate:
+			{
+				auto* assetRef = static_cast<ModifierTemplate*>(asset);
+				assetRef->GenerateShaderCode();
+				renderer->CompileShader( assetRef->GetShaderCode(), ShaderType::Vertex, assetRef->GetName(), assetRef->GetVertexShaderBlob() );
+			}
+			break;
+		}
+	}
+
+
+	for( const auto& asset : GetAllAssets() )
+	{
+		if( asset->GetType() == AssetType::Model )
+		{
+			auto* model = static_cast<Model*>(asset);
+			for( uint i = 0; i < model->GetMaterialSlots().size(); i++ )
+			{
+				auto* material = static_cast<Material*>( GetAsset( model->GetMaterialSlots()[i] ) );
+				auto* matTemplate = static_cast<MaterialTemplate*>( GetAsset( material->GetMaterialTemplate() ) );
+				auto* modifier = static_cast<Modifier*>( GetAsset( model->GetModifierSlots()[i] ) );
+				auto* modTemplate = static_cast<ModifierTemplate*>( GetAsset( modifier->GetModifierTemplate() ) );
+
+				auto psoKey = renderer->CreatePipelineState( modTemplate->GetVertexShaderBlob(), matTemplate->GetPixelShaderBlob(), modTemplate->GetDomainShaderBlob(), modTemplate->GetHullShaderBlob() );
+				model->AddPsoKey( psoKey );
+			}
+		}
+	}
 }
 
-void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serializer )
+void AssetManager::LoadAsset( const std::string& path, SystemManager* systemManager )
 {
-	std::filesystem::path assetPath = assetDirectory / path;
-	serializer.LoadFromFile( assetPath.string() );
+	auto* serializer = systemManager->GetSerializer();
 
-	AssetType assetId = serializer.Read<AssetType>( "type" );
+	std::filesystem::path assetPath = assetDirectory / path;
+	serializer->LoadFromFile( assetPath.string() );
+
+	AssetType assetId = serializer->Read<AssetType>( "type" );
 
 	switch( assetId )
 	{
 		case AssetType::Texture:
 		{
-			auto asset = std::make_unique<TextureAsset>( *importManager );
-			asset->Load( *resourceManager, serializer );
+			auto asset = std::make_unique<TextureAsset>();
+			asset->Load( systemManager );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -70,7 +118,7 @@ void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serialize
 		case AssetType::Mesh:
 		{
 			auto asset = std::make_unique<Mesh>();
-			asset->Load( *resourceManager, serializer );
+			asset->Load( systemManager );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -78,7 +126,7 @@ void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serialize
 		case AssetType::Model:
 		{
 			auto asset = std::make_unique<Model>();
-			asset->Load( *resourceManager, serializer );
+			asset->Load( systemManager );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -86,7 +134,7 @@ void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serialize
 		case AssetType::Material:
 		{
 			auto asset = std::make_unique<Material>();
-			asset->Load( *resourceManager, serializer );
+			asset->Load( systemManager );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -94,7 +142,23 @@ void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serialize
 		case AssetType::MaterialTemplate:
 		{
 			auto asset = std::make_unique<MaterialTemplate>( *nodeLibrary );
-			asset->Load( *resourceManager, serializer );
+			asset->Load( systemManager );
+			auto id = asset->GetAssetID();
+			RegisterAsset( id, std::move( asset ) );
+		}
+		break;
+		case AssetType::Modifier:
+		{
+			auto asset = std::make_unique<Modifier>();
+			asset->Load( systemManager );
+			auto id = asset->GetAssetID();
+			RegisterAsset( id, std::move( asset ) );
+		}
+		break;
+		case AssetType::ModifierTemplate:
+		{
+			auto asset = std::make_unique<ModifierTemplate>();
+			asset->Load( systemManager );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
 		}
@@ -104,7 +168,6 @@ void AssetManager::LoadAsset( const std::string& path, JsonSerializer& serialize
 
 void AssetManager::ImportMesh( const std::string& path, const std::string& name )
 {
-
 	auto meshData = importManager->LoadMesh( path );
 	auto mesh = std::make_unique<Mesh>( meshData, name );
 	for( const auto& meshDatum : meshData )
@@ -122,7 +185,7 @@ void AssetManager::ImportMesh( const std::string& path, const std::string& name 
 void AssetManager::ImportTexture( const std::string& path, const std::string& name )
 {
 	auto image = importManager->LoadTexture( path );
-	auto texture = std::make_unique<TextureAsset>( *importManager, name );
+	auto texture = std::make_unique<TextureAsset>( name );
 	auto texId = resourceManager->CreateTexture( std::move( image ), name );
 	texture->AddResource( texId );
 	auto id = RegisterAsset( std::move( texture ) );
@@ -191,7 +254,17 @@ Asset* AssetManager::GetAsset( const AssetID& id )
 	return (it != assetHeap.end()) ? it->second.get() : nullptr;
 }
 
-std::vector<Asset*> AssetManager::GetAllAssets() const
+const std::vector<Asset*> AssetManager::GetAllAssets() const
+{
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	std::vector<Asset*> all;
+	for( const auto& pair : assetHeap ) {
+		all.push_back( pair.second.get() );
+	}
+	return all;
+}
+
+std::vector<Asset*> AssetManager::GetAllAssets()
 {
 	std::lock_guard<std::mutex> lock( assetHeapMutex );
 	std::vector<Asset*> all;

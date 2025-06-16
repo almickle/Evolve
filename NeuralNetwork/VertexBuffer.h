@@ -20,10 +20,9 @@ public:
 		vertices.clear();
 	}
 public:
-	const void* GetData() const override { return vertices.data(); }
 	size_t GetDataSize() const override { return vertices.size() * sizeof( Vertex ); }
 public:
-	const D3D12_VERTEX_BUFFER_VIEW& GetView() const { return vbView; }
+	D3D12_VERTEX_BUFFER_VIEW* GetView() { return &vbView; }
 	uint GetVertexCount() const { return vertexCount; }
 	uint GetVertexStride() const { return vertexStride; }
 	const std::vector<Vertex>& GetVertices() const { return vertices; }

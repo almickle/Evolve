@@ -20,10 +20,9 @@ public:
 		indices.clear();
 	}
 public:
-	const void* GetData() const override { return indices.data(); }
 	size_t GetDataSize() const override { return indices.size() * sizeof( uint ); }
 public:
-	const D3D12_INDEX_BUFFER_VIEW& GetView() const { return ibView; }
+	D3D12_INDEX_BUFFER_VIEW* GetView() { return &ibView; }
 	uint GetIndexCount() const { return indexCount; }
 	DXGI_FORMAT GetFormat() const { return format; }
 	const std::vector<uint>& GetIndices() const { return indices; }

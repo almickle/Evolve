@@ -4,6 +4,7 @@
 #include "Asset.h"
 #include "JsonSerializer.h"
 #include "ShaderBindings.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 class Modifier :
@@ -16,9 +17,11 @@ public:
 	}
 	~Modifier() = default;
 public:
-	void Load( GpuResourceManager& resourceManager, JsonSerializer& serializer ) override;
+	void Load( SystemManager* systemManager ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
+public:
+	AssetID GetModifierTemplate() { return modifierTemplate; }
 private:
 	AssetID modifierTemplate;
 	std::vector<TextureBinding> textureBindings;

@@ -1,4 +1,3 @@
-#include <combaseapi.h>
 #include <d3d12.h>
 #include <Windows.h>
 #include "BeginFramePass.h"
@@ -7,28 +6,7 @@
 #include "SystemManager.h"
 #include "Types.h"
 
-void BeginFramePass::Init( SystemManager& systemManager )
-{
-	// Allocate per-frame command allocators and command lists
-	uint frames = Renderer::BackBufferCount;
-
-	for( uint i = 0; i < frames; ++i ) {
-		systemManager.GetRenderer()->GetDevice()->CreateCommandAllocator(
-			D3D12_COMMAND_LIST_TYPE_DIRECT,
-			IID_PPV_ARGS( &commandAllocators[i] )
-		);
-		systemManager.GetRenderer()->GetDevice()->CreateCommandList(
-			0,
-			D3D12_COMMAND_LIST_TYPE_DIRECT,
-			commandAllocators[i].Get(),
-			nullptr,
-			IID_PPV_ARGS( &commandLists[i] )
-		);
-		commandLists[i]->Close();
-	}
-}
-
-void BeginFramePass::Execute( SystemManager& systemManager )
+void BeginFramePass::Execute( SystemManager& systemManager, const AssetID& sceneID )
 {
 	auto* renderer = systemManager.GetRenderer();
 	auto* srvHeapManager = systemManager.GetSrvHeapManager();

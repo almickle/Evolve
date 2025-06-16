@@ -9,10 +9,10 @@
 #include "GpuResource.h"
 #include "Renderer.h"
 
-void ConstantBuffer::Update( const void* data, size_t size )
+void ConstantBuffer::Update( const void* newData, size_t size )
 {
-	if( size == bufferData.size() ) {
-		std::memcpy( bufferData.data(), data, size );
+	if( size == GetDataSize() ) {
+		std::memcpy( data, newData, size );
 	}
 	// Optionally handle size mismatch or reallocation
 }
@@ -41,7 +41,7 @@ std::unique_ptr<GpuResource> ConstantBuffer::Clone( DescriptorHeapManager& srvHe
 	);
 	if( FAILED( hr ) ) return nullptr;
 
-	auto clone = std::make_unique<ConstantBuffer>( bufferData, name );
+	auto clone = std::make_unique<ConstantBuffer>( data, name );
 	clone->resource = newResource;
 	clone->resourceSize = resourceSize;
 	clone->name = name;
