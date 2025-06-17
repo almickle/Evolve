@@ -7,9 +7,10 @@
 #include <DirectXTex.h>
 #include <dxgiformat.h>
 #include <memory>
-#include <rpcndr.h>
+#include <mutex>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <Windows.h>
 #include <wrl\client.h>
@@ -39,7 +40,7 @@ public:
 public:
 	ResourceID CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name = "VertexBuffer" );
 	ResourceID CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& name = "IndexBuffer" );
-	ResourceID CreateConstantBuffer( void* data, const std::string& name = "ConstantBuffer" );
+	ResourceID CreateConstantBuffer( void* data, uint size, const std::string& name = "ConstantBuffer" );
 	template<typename T>
 	ResourceID CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& name = "StructuredBuffer" );
 	template<typename T>
@@ -52,6 +53,8 @@ public:
 private:
 	std::unordered_map<ResourceID, std::unique_ptr<GpuResource>> resourceHeap;
 	std::unordered_map<ResourceID, std::vector<std::unique_ptr<GpuResource>>> perFrameResourceHeap;
+	mutable std::mutex resourceHeapMutex;
+	mutable std::mutex perFrameResourceHeapMutex;
 	std::atomic<uint64_t> g_resourceIdCounter{ 0 };
 private:
 	Renderer* renderer;
@@ -61,9 +64,7 @@ private:
 template<typename T>
 ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& name )
 {
-	if( data.empty() ) return;
-
-	auto device = renderer.GetDevice();
+	auto device = renderer->GetDevice();
 	uint elementSize = sizeof( T );
 	uint elementCount = static_cast<uint>(data.size());
 	uint64_t bufferSize = static_cast<uint64_t>(elementSize) * elementCount;
@@ -101,7 +102,6 @@ ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T
 	sb->SetResource( std::move( gpuResource ) );
 	sb->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 	sb->SetUploadResource( std::move( uploadResource ) );
-	sb->SetResourceSize( bufferSize );
 
 	// Create SRV
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -111,7 +111,7 @@ ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T
 	srvDesc.Buffer.NumElements = elementCount;
 	srvDesc.Buffer.StructureByteStride = elementSize;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	sb->CreateSRV( *renderer, srvDesc );
+	sb->CreateSRV( *srvHeapManager, *renderer, srvDesc, true );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( sb ) );
@@ -121,9 +121,7 @@ ResourceID GpuResourceManager::CreateStaticStructuredBuffer( const std::vector<T
 template<typename T>
 ResourceID GpuResourceManager::CreateDynamicStructuredBuffer( const std::vector<T>& data, const std::string& name )
 {
-	if( data.empty() ) return;
-
-	auto device = renderer.GetDevice();
+	auto device = renderer->GetDevice();
 	uint elementSize = sizeof( T );
 	uint elementCount = static_cast<uint>(data.size());
 	uint64_t bufferSize = static_cast<uint64_t>(elementSize) * elementCount;
@@ -161,7 +159,6 @@ ResourceID GpuResourceManager::CreateDynamicStructuredBuffer( const std::vector<
 	sb->SetResource( std::move( gpuResource ) );
 	sb->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 	sb->SetUploadResource( std::move( uploadResource ) );
-	sb->SetResourceSize( bufferSize );
 
 	// Create SRV
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -171,7 +168,7 @@ ResourceID GpuResourceManager::CreateDynamicStructuredBuffer( const std::vector<
 	srvDesc.Buffer.NumElements = elementCount;
 	srvDesc.Buffer.StructureByteStride = elementSize;
 	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	sb->CreateSRV( *renderer, srvDesc );
+	sb->CreateSRV( *srvHeapManager, *renderer, srvDesc, true );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterPerFrameResource( id, std::move( sb ) );

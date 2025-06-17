@@ -25,11 +25,11 @@ public:
 	}
 	virtual ~GpuResource() = default;
 public:
-	virtual std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const { return nullptr; };
-	virtual void Update( const void* data, size_t size ) {};
+	virtual std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const { return nullptr; }
+	virtual void Update( const void* data, size_t size ) {}
 	virtual void Upload( ID3D12GraphicsCommandList* cmdList );
-	virtual void* GetData() const { return nullptr; }
-	virtual size_t GetDataSize() const = 0;
+	virtual void* GetData() { return nullptr; }
+	virtual size_t GetDataSize() const { return size; }
 public:
 	void Transition( ID3D12GraphicsCommandList* commandList, const D3D12_RESOURCE_STATES& requestedState );
 	void TransitionToTargetState( ID3D12GraphicsCommandList* commandList );
@@ -47,12 +47,12 @@ public:
 	void SetCurrentState( D3D12_RESOURCE_STATES newState ) { state.current = newState; }
 	void SetResourceId( const ResourceID& id ) { resourceId = id; }
 	void SetUploadResourceId( const ResourceID& id ) { uploadResourceId = id; }
-	void SetResourceSize( size_t size ) { resourceSize = size; }
+	void SetResourceSize( size_t resourceSize ) { size = resourceSize; }
 	void SetResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& res );
 	void SetUploadResource( Microsoft::WRL::ComPtr<ID3D12Resource>&& heap );
 	void SetIsReady( bool ready ) { state.ready.store( ready, std::memory_order_release ); }
 public:
-	void CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc );
+	void CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, bool reserved = false );
 	bool IsReady() const { return state.ready.load( std::memory_order_acquire ); }
 protected:
 	ResourceState state;
@@ -60,9 +60,9 @@ protected:
 	ResourceID uploadResourceId;
 	Microsoft::WRL::ComPtr<ID3D12Resource> resource;
 	Microsoft::WRL::ComPtr<ID3D12Resource> uploadResource;
-	size_t resourceSize = 0;
 	int srvHeapIndex = -1;
 	D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = {};
 	D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = {};
 	std::string name;
+	size_t size = 0;
 };

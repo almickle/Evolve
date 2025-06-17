@@ -10,18 +10,18 @@
 #include <wrl\client.h>
 #include "GpuResource.h"
 #include "Renderer.h"
-#include "SystemManager.h"
-
-using uint = unsigned int;
+#include "Types.h"
 
 template<typename T>
 class StructuredBuffer : public GpuResource {
 public:
-	StructuredBuffer( const std::vector<T>& data, const std::string& name = "StructuredBuffer" )
+	StructuredBuffer( const std::vector<T>& _data, const std::string& name = "StructuredBuffer" )
 		: GpuResource( D3D12_RESOURCE_STATE_GENERIC_READ ),
 		elementSize( sizeof( T ) ),
-		elementCount( data.size() )
+		elementCount( _data.size() ),
+		data( _data )
 	{
+		size = (uint)data.size() * sizeof( T );
 	}
 	~StructuredBuffer()
 	{
@@ -29,13 +29,9 @@ public:
 	};
 public:
 	std::unique_ptr<GpuResource> Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const override;
-public:
-	const void* GetData() const override { return data.data(); }
-	size_t GetDataSize() const override { return data.size() * sizeof( T ); }
-public:
 	uint GetElementSize() const { return elementSize; }
 	uint GetElementCount() const { return elementCount; }
-	std::vector<T> GetData() { return data; }
+	void* GetData() override { return data.data(); }
 private:
 	uint elementSize = 0;
 	uint elementCount = 0;
@@ -61,8 +57,6 @@ std::unique_ptr<GpuResource> StructuredBuffer<T>::Clone( DescriptorHeapManager& 
 
 	auto clone = std::make_unique<StructuredBuffer<T>>( data, name );
 	clone->resource = newResource;
-	clone->resourceSize = resourceSize;
-	clone->name = name;
 
 	// Create SRV
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

@@ -30,5 +30,5 @@ private:
 	InputState inputState;
 private:
 	std::unique_ptr<SystemManager> systemManager;
-	AssetID sceneID;
+	AssetID sceneID = "Asset_9";
 };

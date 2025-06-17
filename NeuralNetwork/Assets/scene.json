@@ -1,0 +1,66 @@
+{
+    "id": "Asset_9",
+    "name": "scene",
+    "type": 7,
+    "assetIds": [
+        "Asset_6"
+    ],
+    "lights": [
+        {
+            "type": 0,
+            "position": [
+                5,
+                1,
+                3
+            ],
+            "intensity": 20,
+            "color": [
+                1,
+                1,
+                1
+            ]
+        }
+    ],
+    "cameras": [
+        {
+            "position": [
+                0,
+                -10,
+                0
+            ]
+        }
+    ],
+    "activeCamera": 0,
+    "staticActors": [
+        {
+            "model": "Asset_6",
+            "position": [
+                0,
+                0,
+                0
+            ],
+            "rotation": [
+                0,
+                0,
+                0,
+                1
+            ],
+            "scale": [
+                1,
+                1,
+                1
+            ],
+            "velocity": [
+                0,
+                0,
+                0
+            ],
+            "acceleration": [
+                0,
+                0,
+                0
+            ]
+        }
+    ],
+    "dynamicActors": []
+}

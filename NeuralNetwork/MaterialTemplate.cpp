@@ -1,8 +1,10 @@
 #include <algorithm>
+#include <exception>
 #include <format>
 #include <queue>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -56,41 +58,48 @@ std::string MaterialTemplate::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void MaterialTemplate::Load( SystemManager* systemManager )
+void MaterialTemplate::Load( SystemManager* systemManager, JsonSerializer& serializer )
 {
-	Deserialize( *systemManager->GetSerializer() );
+	Deserialize( serializer );
 }
 
 void MaterialTemplate::Deserialize( JsonSerializer& serializer )
 {
-	// Base asset fields (id, name, type, assetIds, etc.)
-	DeserializeBaseAsset( serializer );
+	try
+	{
+		// Base asset fields (id, name, type, assetIds, etc.)
+		DeserializeBaseAsset( serializer );
 
-	// Nodes
-	nodes = serializer.ReadArray<NodeTypes>( "nodes" );
+		// Nodes
+		nodes = serializer.ReadArray<NodeTypes>( "nodes" );
 
-	// Edges
-	edges.clear();
-	auto edgeArray = serializer.GetSubObject( "edges" );
-	for( const auto& e : edgeArray ) {
-		MaterialEdge edge{};
-		edge.fromNode = e.at( "fromNode" ).get<uint>();
-		edge.fromSlot = e.at( "fromSlot" ).get<uint>();
-		edge.toNode = e.at( "toNode" ).get<uint>();
-		edge.toSlot = e.at( "toSlot" ).get<uint>();
-		edges.push_back( edge );
+		// Edges
+		edges.clear();
+		auto edgeArray = serializer.GetSubObject( "edges" );
+		for( const auto& e : edgeArray ) {
+			MaterialEdge edge{};
+			edge.fromNode = e.at( "fromNode" ).get<uint>();
+			edge.fromSlot = e.at( "fromSlot" ).get<uint>();
+			edge.toNode = e.at( "toNode" ).get<uint>();
+			edge.toSlot = e.at( "toSlot" ).get<uint>();
+			edges.push_back( edge );
+		}
+
+		// Parameter Bindings
+		parameterBindings.clear();
+		auto paramArray = serializer.GetSubObject( "parameterBindings" );
+		for( const auto& p : paramArray ) {
+			ParameterBinding binding{};
+			binding.nodeIndex = p.at( "nodeIndex" ).get<uint>();
+			binding.parameterIndex = p.at( "parameterIndex" ).get<uint>();
+			binding.parameterType = static_cast<NodeParameterTypes>(p.at( "parameterType" ).get<int>());
+			binding.cbufferSlot = p.at( "cbufferSlot" ).get<uint>();
+			parameterBindings.push_back( binding );
+		}
 	}
-
-	// Parameter Bindings
-	parameterBindings.clear();
-	auto paramArray = serializer.GetSubObject( "parameterBindings" );
-	for( const auto& p : paramArray ) {
-		ParameterBinding binding{};
-		binding.nodeIndex = p.at( "nodeIndex" ).get<uint>();
-		binding.parameterIndex = p.at( "parameterIndex" ).get<uint>();
-		binding.parameterType = static_cast<NodeParameterTypes>(p.at( "parameterType" ).get<int>());
-		binding.cbufferSlot = p.at( "cbufferSlot" ).get<uint>();
-		parameterBindings.push_back( binding );
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize MaterialTemplate" );
 	}
 }
 
@@ -139,7 +148,7 @@ std::string MaterialTemplate::GetParameterValue( uint nodeIndex, uint parameterI
 			switch( binding.parameterType )
 			{
 				case NodeParameterTypes::Texture:
-					return std::format( "textureSlots[{}]", binding.cbufferSlot );
+					return std::format( "GetTextureSlot({})", binding.cbufferSlot );
 				case NodeParameterTypes::Vector:
 					return std::format( "vectorSlots[{}]", binding.cbufferSlot );
 				case NodeParameterTypes::Scalar:
@@ -257,6 +266,7 @@ void MaterialTemplate::GenerateShaderCode()
 
 	auto root = nodeLibrary.GetNode( nodes[0] );
 	std::string outputStatement = std::format( "return {}.{};", root->GetOutputDataName( 0 ), root->GetOutputs()[0].name );
+	//outputStatement = "return MaterialOutputNodeInputData0.normal;";
 
 	for( auto it = shaderChunks.rbegin(); it != shaderChunks.rend(); ++it ) {
 		oss << *it << "\n";

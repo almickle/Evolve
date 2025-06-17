@@ -32,7 +32,7 @@ public:
 	}
 	~Material() = default;
 public:
-	void Load( SystemManager* systemManager ) override;
+	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
 public:

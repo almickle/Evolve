@@ -1,3 +1,5 @@
+#include <exception>
+#include <stdexcept>
 #include <string>
 #include "JsonSerializer.h"
 #include "Model.h"
@@ -25,19 +27,27 @@ std::string Model::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void Model::Load( SystemManager* systemManager )
+void Model::Load( SystemManager* systemManager, JsonSerializer& serializer )
 {
-	Deserialize( *systemManager->GetSerializer() );
+	Deserialize( serializer );
 }
 
 void Model::Deserialize( JsonSerializer& serializer )
 {
-	DeserializeBaseAsset( serializer );
+	try
+	{
+		DeserializeBaseAsset( serializer );
 
-	// Mesh reference
-	meshId = serializer.Read<AssetID>( "meshId" );
+		// Mesh reference
+		meshId = serializer.Read<AssetID>( "meshId" );
 
-	// Material slots
-	materialSlots = serializer.ReadArray<AssetID>( "materialSlots" );
-	modifierSlots = serializer.ReadArray<AssetID>( "modifierSlots" );
+		// Material slots
+		materialSlots = serializer.ReadArray<AssetID>( "materialSlots" );
+		modifierSlots = serializer.ReadArray<AssetID>( "modifierSlots" );
+	}
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize Model" );
+	}
+
 }

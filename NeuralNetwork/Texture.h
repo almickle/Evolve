@@ -16,6 +16,11 @@ public:
 		subresourceData( subresourceData ),
 		numSubresources( static_cast<uint>(subresourceData.size()) )
 	{
+		size_t total = 0;
+		for( const auto& sub : subresourceData ) {
+			total += sub.SlicePitch;
+		}
+		size = total;
 	};
 	~Texture()
 	{
@@ -23,7 +28,12 @@ public:
 	}
 public:
 	void Upload( ID3D12GraphicsCommandList* cmdList ) override;
-	size_t GetDataSize() const override;
+	void* GetData() override
+	{
+		if( image && image->GetImages() && image->GetImageCount() > 0 )
+			return const_cast<void*>(static_cast<const void*>(image->GetImages()->pixels));
+		return nullptr;
+	};
 private:
 	std::shared_ptr<DirectX::ScratchImage> image;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresourceData;

@@ -4,7 +4,7 @@
 #include <d3dx12_core.h>
 #include <DirectXTex.h>
 #include <memory>
-#include <rpcndr.h>
+#include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
@@ -24,12 +24,19 @@ using ResourceID = std::string;
 
 GpuResourceManager::~GpuResourceManager()
 {
-	resourceHeap.clear();
-	perFrameResourceHeap.clear();
+	{
+		std::lock_guard<std::mutex> lock( resourceHeapMutex );
+		resourceHeap.clear();
+	}
+	{
+		std::lock_guard<std::mutex> lock( perFrameResourceHeapMutex );
+		perFrameResourceHeap.clear();
+	}
 }
 
 bool GpuResourceManager::RegisterResource( ResourceID id, std::unique_ptr<GpuResource> resource )
 {
+	std::lock_guard<std::mutex> lock( resourceHeapMutex );
 	resource->SetResourceId( id );
 	return resourceHeap.emplace( id, std::move( resource ) ).second;
 }
@@ -50,6 +57,7 @@ bool GpuResourceManager::RegisterPerFrameResource( ResourceID id, std::unique_pt
 		clone->SetResourceId( id + "_frame" + std::to_string( i ) );
 		resources.push_back( std::move( clone ) );
 	}
+	std::lock_guard<std::mutex> lock( perFrameResourceHeapMutex );
 	return perFrameResourceHeap.emplace( id, std::move( resources ) ).second;
 }
 
@@ -91,8 +99,14 @@ std::vector<GpuResource*> GpuResourceManager::GetCurrentFrameResources() const
 
 void GpuResourceManager::RemoveResource( const ResourceID& id )
 {
-	resourceHeap.erase( id );
-	perFrameResourceHeap.erase( id );
+	{
+		std::lock_guard<std::mutex> lock( resourceHeapMutex );
+		resourceHeap.erase( id );
+	}
+	{
+		std::lock_guard<std::mutex> lock( perFrameResourceHeapMutex );
+		perFrameResourceHeap.erase( id );
+	}
 }
 
 ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name )
@@ -133,7 +147,6 @@ ResourceID GpuResourceManager::CreateVertexBuffer( const std::vector<Vertex>& ve
 	vb->SetResource( std::move( vbResource ) );
 	vb->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 	vb->SetUploadResource( std::move( uploadResource ) );
-	vb->SetResourceSize( bufferSize );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( vb ) );
@@ -186,7 +199,6 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 	ib->SetResource( std::move( ibResource ) );
 	ib->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
 	ib->SetUploadResource( std::move( uploadResource ) );
-	ib->SetResourceSize( bufferSize );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( ib ) );
@@ -204,13 +216,12 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 	return id;
 }
 
-ResourceID GpuResourceManager::CreateConstantBuffer( void* data, const std::string& name )
+ResourceID GpuResourceManager::CreateConstantBuffer( void* data, uint size, const std::string& name )
 {
 	auto device = renderer->GetDevice();
-	uint bufferSize = sizeof( data );
 
 	CD3DX12_HEAP_PROPERTIES heapProps( D3D12_HEAP_TYPE_UPLOAD );
-	CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer( bufferSize );
+	CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer( size );
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> cbResource;
 	HRESULT hr = device->CreateCommittedResource(
@@ -223,10 +234,9 @@ ResourceID GpuResourceManager::CreateConstantBuffer( void* data, const std::stri
 	);
 	if( FAILED( hr ) ) return "resource not found";
 
-	auto cb = std::make_unique<ConstantBuffer>( data, name );
+	auto cb = std::make_unique<ConstantBuffer>( data, size, name );
 	cb->SetResource( std::move( cbResource ) );
 	cb->SetCurrentState( D3D12_RESOURCE_STATE_GENERIC_READ );
-	cb->SetResourceSize( bufferSize );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterPerFrameResource( id, std::move( cb ) );
@@ -296,8 +306,37 @@ ResourceID GpuResourceManager::CreateTexture( std::shared_ptr<DirectX::ScratchIm
 	auto tex = std::make_unique<Texture>( std::move( image ), subresources, name );
 	tex->SetResource( std::move( textureResource ) );
 	tex->SetUploadResource( std::move( uploadResource ) );
-	tex->SetResourceSize( uploadBufferSize );
 	tex->SetCurrentState( D3D12_RESOURCE_STATE_COMMON );
+
+	// 6. Create SRV
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Format = texDesc.Format;
+	switch( texDesc.Dimension ) {
+		case D3D12_RESOURCE_DIMENSION_TEXTURE1D:
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D;
+			srvDesc.Texture1D.MostDetailedMip = 0;
+			srvDesc.Texture1D.MipLevels = texDesc.MipLevels;
+			srvDesc.Texture1D.ResourceMinLODClamp = 0.0f;
+			break;
+		case D3D12_RESOURCE_DIMENSION_TEXTURE2D:
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+			srvDesc.Texture2D.MostDetailedMip = 0;
+			srvDesc.Texture2D.MipLevels = texDesc.MipLevels;
+			srvDesc.Texture2D.PlaneSlice = 0;
+			srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
+			break;
+		case D3D12_RESOURCE_DIMENSION_TEXTURE3D:
+			srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+			srvDesc.Texture3D.MostDetailedMip = 0;
+			srvDesc.Texture3D.MipLevels = texDesc.MipLevels;
+			srvDesc.Texture3D.ResourceMinLODClamp = 0.0f;
+			break;
+		default:
+			// Handle or assert unsupported types as needed
+			break;
+	}
+	tex->CreateSRV( *srvHeapManager, *renderer, srvDesc, false );
 
 	ResourceID id = GenerateUniqueResourceId();
 	RegisterResource( id, std::move( tex ) );

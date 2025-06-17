@@ -27,28 +27,33 @@ public:
 		}
 		return 0;
 	}
-	std::vector<ActorTransformData> GetInstanceData( AssetID assetID )
+	std::vector<ActorTransformData> GetAllInstanceData() const
 	{
-		auto it = instanceHeap.find( assetID );
-		if( it != instanceHeap.end() ) {
-			std::vector<ActorTransformData> instanceData;
-			instanceData.reserve( it->second.size() );
-			for( Actor* actor : it->second ) {
-				instanceData.push_back( { actor->GetTransform() } );
+		std::vector<ActorTransformData> allData;
+		for( const auto& assetID : uniqueAssets )
+		{
+			auto it = instanceHeap.find( assetID );
+			if( it != instanceHeap.end() )
+			{
+				for( Actor* actor : it->second )
+				{
+					allData.push_back( { actor->GetTransform() } );
+				}
 			}
-			return instanceData;
 		}
-		return {};
+		return allData;
 	}
-	void AddInstance( AssetID assetID, Actor* actor )
+	void AddInstance( Actor* actor )
 	{
+		auto assetID = actor->GetModelID();
 		instanceHeap[assetID].push_back( actor );
 		if( std::find( uniqueAssets.begin(), uniqueAssets.end(), assetID ) == uniqueAssets.end() ) {
 			uniqueAssets.push_back( assetID );
 		}
 	}
-	void AddInstances( AssetID assetID, std::vector<Actor*> actors )
+	void AddInstances( std::vector<Actor*> actors )
 	{
+		auto assetID = actors[0]->GetModelID();
 		instanceHeap[assetID].insert( instanceHeap[assetID].end(), actors.begin(), actors.end() );
 		for( Actor* actor : actors ) {
 			if( std::find( uniqueAssets.begin(), uniqueAssets.end(), assetID ) == uniqueAssets.end() ) {

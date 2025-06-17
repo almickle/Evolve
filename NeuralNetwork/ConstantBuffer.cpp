@@ -6,13 +6,14 @@
 #include <Windows.h>
 #include <wrl\client.h>
 #include "ConstantBuffer.h"
+#include "DescriptorHeapManager.h"
 #include "GpuResource.h"
 #include "Renderer.h"
 
 void ConstantBuffer::Update( const void* newData, size_t size )
 {
 	if( size == GetDataSize() ) {
-		std::memcpy( data, newData, size );
+		memcpy( data, newData, size );
 	}
 	// Optionally handle size mismatch or reallocation
 }
@@ -20,9 +21,9 @@ void ConstantBuffer::Update( const void* newData, size_t size )
 void ConstantBuffer::Upload( ID3D12GraphicsCommandList* cmdList )
 {
 	void* mapped = nullptr;
-	uploadResource->Map( 0, nullptr, &mapped );
+	resource->Map( 0, nullptr, &mapped );
 	memcpy( mapped, GetData(), GetDataSize() );
-	uploadResource->Unmap( 0, nullptr );
+	resource->Unmap( 0, nullptr );
 }
 
 std::unique_ptr<GpuResource> ConstantBuffer::Clone( DescriptorHeapManager& srvHeapManager, Renderer& renderer ) const
@@ -41,10 +42,8 @@ std::unique_ptr<GpuResource> ConstantBuffer::Clone( DescriptorHeapManager& srvHe
 	);
 	if( FAILED( hr ) ) return nullptr;
 
-	auto clone = std::make_unique<ConstantBuffer>( data, name );
+	auto clone = std::make_unique<ConstantBuffer>( data, size, name );
 	clone->resource = newResource;
-	clone->resourceSize = resourceSize;
-	clone->name = name;
 	// Copy other relevant metadata as needed
 	return clone;
 }

@@ -90,6 +90,8 @@ public:
 	ComPtr<ID3DBlob> LoadShaderBlob( const std::string& fileName );
 	void CompileShader( const std::string& shaderCode, const ShaderType& type, const std::string& name, ComPtr<ID3DBlob>& blob );
 	PipelineStateKey CreatePipelineState( ComPtr<ID3DBlob>& vsBlob, ComPtr<ID3DBlob>& psBlob, ComPtr<ID3DBlob>& dsBlob, ComPtr<ID3DBlob>& hsBlob );
+	void SetViewport( ID3D12GraphicsCommandList* cmdList ) const;
+	void SetScissorRect( ID3D12GraphicsCommandList* cmdList ) const;
 private:
 	void CreateRenderTargets();
 	void CreateDepthStencils( uint width, uint height );

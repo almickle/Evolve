@@ -3,7 +3,10 @@
   "name": "material",
   "type": 3,
   "assetIds": [
-    "Asset_1"
+    "Asset_1",
+    "Asset_3",
+    "Asset_4",
+    "Asset_5"
   ],
   "materialTemplate": "Asset_1",
   "textureBindings": [

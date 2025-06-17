@@ -23,7 +23,7 @@ public:
 		auto returnObject = GetReturnObject();
 		auto returnStatement = GetReturnStatement();
 
-		std::string functionBody = std::format( " output.{} = scalarSlots[parameters.{}];\n", GetOutput( valueOutputSlot ).name, GetParameter( scalarParameterSlot ).name );
+		std::string functionBody = std::format( " output.{} = parameters.{};\n", GetOutput( valueOutputSlot ).name, GetParameter( scalarParameterSlot ).name );
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );
 
 		return shaderFunction;

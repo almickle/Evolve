@@ -87,7 +87,7 @@ struct VectorBreakNodeParameters
 };
 struct ScalarParameterNodeParameters
 {
-    uint scalarIndex;
+    uint scalar;
 };
 MaterialOutputNodeOutput MaterialOutputNode(MaterialOutputNodeInput input, MaterialOutputNodeParameters parameters, VSOutput vertexData)
 {
@@ -167,19 +167,27 @@ VertexDataNodeOutput VertexDataNode(VertexDataNodeInput input, VertexDataNodePar
 VectorScaleNodeOutput VectorScaleNode(VectorScaleNodeInput input, VectorScaleNodeParameters parameters, VSOutput vertexData)
 {
     VectorScaleNodeOutput output;
-    output.vec = float4(input.vec.xyz * input.scale, 0.0f);
+    output.vec = float4(mul(input.vec.xyz, input.scale), 0.0f);
 
     return output;
 }
 NormalMapNodeOutput NormalMapNode(NormalMapNodeInput input, NormalMapNodeParameters parameters, VSOutput vertexData)
 {
     NormalMapNodeOutput output;
+
+	// Build TBN basis (world space)
     float3 T = normalize(vertexData.tangent.xyz);
     float3 N = normalize(vertexData.normal.xyz);
     float3 B = normalize(cross(N, T) * vertexData.tangent.w);
     float3x3 TBN = float3x3(T, B, N);
-    output.normal = float4(mul(TBN, input.color.rgb), 0.0f);
 
+	// Sampled normal is in [0,1] ? remap to [-1,1]
+    float3 nTS = input.color.rgb * 2.0f - 1.0f;
+
+	// Row-vector convention: rowVec * matrix
+    float3 nWS = normalize(mul(nTS, TBN));
+    output.normal = float4(nWS, 0.0f);
+		
     return output;
 }
 VectorBreakNodeOutput VectorBreakNode(VectorBreakNodeInput input, VectorBreakNodeParameters parameters, VSOutput vertexData)
@@ -194,7 +202,7 @@ VectorBreakNodeOutput VectorBreakNode(VectorBreakNodeInput input, VectorBreakNod
 ScalarParameterNodeOutput ScalarParameterNode(ScalarParameterNodeInput input, ScalarParameterNodeParameters parameters, VSOutput vertexData)
 {
     ScalarParameterNodeOutput output;
-    output.value = scalarSlots[parameters.scalarIndex];
+    output.value = parameters.scalar;
 
     return output;
 }
@@ -205,7 +213,7 @@ float4 main(VSOutput vertexData) : SV_TARGET
     VertexDataNodeOutput VertexDataNodeOutputData4 = VertexDataNode(VertexDataNodeInputData4, VertexDataNodeParameterData4, vertexData);
     ScalarParameterNodeInput ScalarParameterNodeInputData8;
     ScalarParameterNodeParameters ScalarParameterNodeParameterData8;
-    ScalarParameterNodeParameterData8.scalarIndex = scalarSlots[0];
+    ScalarParameterNodeParameterData8.scalar = scalarSlots[0];
     ScalarParameterNodeOutput ScalarParameterNodeOutputData8 = ScalarParameterNode(ScalarParameterNodeInputData8, ScalarParameterNodeParameterData8, vertexData);
     VectorScaleNodeInput VectorScaleNodeInputData5;
     VectorScaleNodeInputData5.vec = VertexDataNodeOutputData4.uv;
@@ -215,17 +223,17 @@ float4 main(VSOutput vertexData) : SV_TARGET
     TextureSamplerNodeInput TextureSamplerNodeInputData1;
     TextureSamplerNodeInputData1.uv = VectorScaleNodeOutputData5.vec;
     TextureSamplerNodeParameters TextureSamplerNodeParameterData1;
-    TextureSamplerNodeParameterData1.textureIndex = textureSlots[0];
+    TextureSamplerNodeParameterData1.textureIndex = GetTextureSlot(0);
     TextureSamplerNodeOutput TextureSamplerNodeOutputData1 = TextureSamplerNode(TextureSamplerNodeInputData1, TextureSamplerNodeParameterData1, vertexData);
     TextureSamplerNodeInput TextureSamplerNodeInputData2;
     TextureSamplerNodeInputData2.uv = VectorScaleNodeOutputData5.vec;
     TextureSamplerNodeParameters TextureSamplerNodeParameterData2;
-    TextureSamplerNodeParameterData2.textureIndex = textureSlots[1];
+    TextureSamplerNodeParameterData2.textureIndex = GetTextureSlot(1);
     TextureSamplerNodeOutput TextureSamplerNodeOutputData2 = TextureSamplerNode(TextureSamplerNodeInputData2, TextureSamplerNodeParameterData2, vertexData);
     TextureSamplerNodeInput TextureSamplerNodeInputData3;
     TextureSamplerNodeInputData3.uv = VectorScaleNodeOutputData5.vec;
     TextureSamplerNodeParameters TextureSamplerNodeParameterData3;
-    TextureSamplerNodeParameterData3.textureIndex = textureSlots[2];
+    TextureSamplerNodeParameterData3.textureIndex = GetTextureSlot(2);
     TextureSamplerNodeOutput TextureSamplerNodeOutputData3 = TextureSamplerNode(TextureSamplerNodeInputData3, TextureSamplerNodeParameterData3, vertexData);
     VectorBreakNodeInput VectorBreakNodeInputData7;
     VectorBreakNodeInputData7.vec = TextureSamplerNodeOutputData2.color;

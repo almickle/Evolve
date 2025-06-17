@@ -1,5 +1,7 @@
+#include <exception>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include "JsonSerializer.h"
 #include "ModifierTemplate.h"
@@ -18,9 +20,9 @@ void ModifierTemplate::GenerateShaderCode()
 	shaderCode = ss.str();
 }
 
-void ModifierTemplate::Load( SystemManager* systemManager )
+void ModifierTemplate::Load( SystemManager* systemManager, JsonSerializer& serializer )
 {
-	Deserialize( *systemManager->GetSerializer() );
+	Deserialize( serializer );
 }
 
 std::string ModifierTemplate::Serialize( JsonSerializer& serializer ) const
@@ -33,5 +35,12 @@ std::string ModifierTemplate::Serialize( JsonSerializer& serializer ) const
 
 void ModifierTemplate::Deserialize( JsonSerializer& serializer )
 {
-	DeserializeBaseAsset( serializer );
+	try
+	{
+		DeserializeBaseAsset( serializer );
+	}
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize ModifierTemplate" );
+	}
 }

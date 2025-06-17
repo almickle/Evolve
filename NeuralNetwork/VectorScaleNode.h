@@ -25,7 +25,7 @@ public:
 		auto returnObject = GetReturnObject();
 		auto returnStatement = GetReturnStatement();
 
-		std::string functionBody = std::format( " output.{} = float4(input.{}.xyz * input.{}, 0.0f);\n", GetOutput( vectorOutputSlot ).name, GetInput( vectorInputSlot ).name, GetInput( scaleInputSlot ).name );
+		std::string functionBody = std::format( " output.{} = float4(mul(input.{}.xyz, input.{}), 0.0f);\n", GetOutput( vectorOutputSlot ).name, GetInput( vectorInputSlot ).name, GetInput( scaleInputSlot ).name );
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );
 
 		return shaderFunction;

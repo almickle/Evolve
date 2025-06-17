@@ -345,8 +345,8 @@ void Renderer::CompileShader( const std::string& shaderCode, const ShaderType& t
 		wName.c_str(),
 		L"-E", entryPoint.c_str(),
 		L"-T", targetProfile.c_str(),
-		L"-Zi",              // Debug info (optional)
-		L"-Qstrip_debug"     // Strip debug info from output (optional)
+		L"-Zi",		        // Debug info (optional)
+		L"-Qembed_debug",   // Embed debug info in the shader (optional)
 	};
 
 	// 5. Prepare source buffer
@@ -392,31 +392,31 @@ void Renderer::CleanupRenderTargets()
 
 bool Renderer::ConfigureRootSignature()
 {
-	CD3DX12_DESCRIPTOR_RANGE1 ranges[2]{};
-	ranges[1].Init(
-		D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-		2,			  // Num of srvs
-		0,            // Base shader register t0
-		1,            // Register space
-		D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE,
-		0             // Offset in descriptors
-	);
+	CD3DX12_DESCRIPTOR_RANGE1 ranges[1]{};
+	//ranges[1].Init(
+	//	D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+	//	2,			  // Num of srvs
+	//	0,            // Base shader register t0
+	//	0,            // Register space
+	//	D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE,
+	//	0             // Offset in descriptors
+	//);
 	ranges[0].Init(
 		D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 		UINT_MAX,     // Or a reasonable maximum like 10000
 		0,            // Base shader register t0
 		0,            // Register space
 		D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE,
-		2             // Offset in descriptors
+		0             // Offset in descriptors
 	);
 
 	CD3DX12_ROOT_PARAMETER1 rootParameters[6]{};
-	rootParameters[0].InitAsConstants( 8, 0 );
+	rootParameters[0].InitAsConstants( 2, 0 );
 	rootParameters[1].InitAsConstantBufferView( 1 ); // Light and camera data
 	rootParameters[2].InitAsConstantBufferView( 2 ); // Shader texture slots
 	rootParameters[3].InitAsConstantBufferView( 3 ); // Shader vector slots
 	rootParameters[4].InitAsConstantBufferView( 4 ); // Shader scalar slots
-	rootParameters[5].InitAsDescriptorTable( 2, ranges, D3D12_SHADER_VISIBILITY_ALL );
+	rootParameters[5].InitAsDescriptorTable( 1, ranges, D3D12_SHADER_VISIBILITY_ALL );
 
 	D3D12_STATIC_SAMPLER_DESC sampler = {};
 	sampler.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
@@ -521,6 +521,28 @@ uint64_t Renderer::HashBlob( const void* data, size_t size )
 	return hash;
 }
 
+void Renderer::SetViewport( ID3D12GraphicsCommandList* cmdList ) const
+{
+	D3D12_VIEWPORT viewport = {};
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	viewport.Width = width;
+	viewport.Height = height;
+	viewport.MinDepth = 0.0f;
+	viewport.MaxDepth = 1.0f;
+	cmdList->RSSetViewports( 1, &viewport );
+}
+
+void Renderer::SetScissorRect( ID3D12GraphicsCommandList* cmdList ) const
+{
+	D3D12_RECT rect = {};
+	rect.left = 0;
+	rect.top = 0;
+	rect.right = width;
+	rect.bottom = height;
+	cmdList->RSSetScissorRects( 1, &rect );
+}
+
 void Renderer::SetPipelineState( ID3D12GraphicsCommandList* cmdList, const PipelineStateKey& psoKey )
 {
 	if( psoKey == currentPipelineState ) return;
@@ -536,12 +558,11 @@ void Renderer::BindConstantBuffer( ID3D12GraphicsCommandList* cmdList, const uin
 void Renderer::BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* constants )
 {
 	cmdList->SetGraphicsRoot32BitConstants( 0, 2, &constants, 0 );
-
 }
 
 void Renderer::BindSceneConstantBuffer( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer )
 {
-	BindConstantBuffer( cmdList, 0, sceneBuffer );
+	BindConstantBuffer( cmdList, 1, sceneBuffer );
 }
 
 void Renderer::BindShaderSlots( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS textureSlots, D3D12_GPU_VIRTUAL_ADDRESS vectorSlots, D3D12_GPU_VIRTUAL_ADDRESS scalarSlots )
@@ -585,7 +606,7 @@ void Renderer::RenderActorInstances( ID3D12GraphicsCommandList* cmdList,
 									 const uint& instanceBufferStart,
 									 const bool& isStatic )
 {
-	uint constants[2] = { instanceBufferStart, isStatic };
+	uint constants[2] = { instanceBufferStart, (uint)isStatic };
 	BindRootConstants( cmdList, &constants );
 
 	auto numMeshes = (uint)vbViews.size();

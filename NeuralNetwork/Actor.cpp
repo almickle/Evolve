@@ -9,7 +9,8 @@ const DirectX::XMFLOAT4X4 Actor::GetTransform() const
 	XMMATRIX S = XMMatrixScaling( scale.x, scale.y, scale.z );
 	XMMATRIX R = XMMatrixRotationQuaternion( XMLoadFloat4( &rotation ) );
 	XMMATRIX T = XMMatrixTranslation( position.x, position.y, position.z );
+	XMMATRIX transform = XMMatrixTranspose( S * R * T );
 	DirectX::XMFLOAT4X4 world;
-	DirectX::XMStoreFloat4x4( &world, S * R * T );
+	DirectX::XMStoreFloat4x4( &world, transform );
 	return world;
 }

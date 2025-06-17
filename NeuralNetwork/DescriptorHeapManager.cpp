@@ -13,9 +13,10 @@ DescriptorHeapManager::DescriptorHeapManager( SystemManager& systemManager )
 
 }
 
-void DescriptorHeapManager::Init( D3D12_DESCRIPTOR_HEAP_TYPE type, uint numDescriptors, bool shaderVisible )
+void DescriptorHeapManager::Init( D3D12_DESCRIPTOR_HEAP_TYPE type, uint numDescriptors, bool shaderVisible, uint reserved )
 {
 	capacity = numDescriptors;
+	reservedCount = reserved;
 
 	D3D12_DESCRIPTOR_HEAP_DESC desc = {};
 	desc.NumDescriptors = numDescriptors;
@@ -24,9 +25,14 @@ void DescriptorHeapManager::Init( D3D12_DESCRIPTOR_HEAP_TYPE type, uint numDescr
 	renderer->GetDevice()->CreateDescriptorHeap( &desc, IID_PPV_ARGS( &heap ) );
 	descriptorSize = renderer->GetDevice()->GetDescriptorHandleIncrementSize( type );
 
-	// Fill free list
-	for( int i = 0; i < (int)numDescriptors; ++i )
+	// Initialize reserved free list
+	for( uint i = 0; i < reservedCount; i++ ) {
+		reservedFreeList.push( i );
+	}
+	// Initialize freeList with indices after the reserved region
+	for( uint i = reservedCount; i < numDescriptors; i++ ) {
 		freeList.push( i );
+	}
 }
 
 int DescriptorHeapManager::Allocate()
@@ -38,10 +44,27 @@ int DescriptorHeapManager::Allocate()
 	return idx;
 }
 
+int DescriptorHeapManager::AllocateReserved()
+{
+	std::lock_guard<std::mutex> lock( allocMutex );
+	if( reservedFreeList.empty() ) return -1; // Out of reserved descriptors
+	int idx = reservedFreeList.front();
+	reservedFreeList.pop();
+	return idx;
+}
+
 void DescriptorHeapManager::Free( int index )
 {
 	std::lock_guard<std::mutex> lock( allocMutex );
 	freeList.push( index );
+}
+
+void DescriptorHeapManager::FreeReserved( int index )
+{
+	std::lock_guard<std::mutex> lock( allocMutex );
+	if( index >= 0 && static_cast<uint>(index) < reservedCount ) {
+		reservedFreeList.push( index );
+	}
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE DescriptorHeapManager::GetCpuHandle( int index ) const

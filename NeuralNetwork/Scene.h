@@ -9,6 +9,7 @@
 #include "InstanceManager.h"
 #include "JsonSerializer.h"
 #include "Light.h"
+#include "SystemManager.h"
 #include "Types.h"
 
 class Scene :
@@ -22,7 +23,7 @@ public:
 	}
 	~Scene() = default;
 public:
-	void Load( SystemManager* systemManager ) override;
+	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override;
 	std::string Serialize( JsonSerializer& serializer ) const override;
 	void Deserialize( JsonSerializer& serializer ) override;
 public:
@@ -35,7 +36,7 @@ public:
 	const std::vector<std::unique_ptr<Actor>>& GetDynamicActors() const { return dynamicActors; }
 	InstanceManager* GetStaticInstanceManager() const { return staticInstanceManager.get(); }
 	InstanceManager* GetDynamicInstanceManager() const { return dynamicInstanceManager.get(); }
-	const ResourceID GetSceneBuffer() const { return sceneBuffer; }
+	ResourceID GetSceneBuffer() const { return sceneConstantBuffer; }
 public:
 	Camera* GetActiveCamera() const { return activeCamera; }
 	void SetActiveCamera( const uint& index ) { activeCamera = cameras[index].get(); }
@@ -48,7 +49,7 @@ private:
 	std::unique_ptr<InstanceManager> staticInstanceManager;
 	std::unique_ptr<InstanceManager> dynamicInstanceManager;
 private:
-	std::vector<AssetID> staticModels;
-	std::vector<AssetID> dynamicModels;
-	ResourceID sceneBuffer;
+	ResourceID sceneConstantBuffer;
+	ResourceID staticStructuredBuffer;
+	ResourceID dynamicStructuredBuffer;
 };

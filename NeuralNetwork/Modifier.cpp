@@ -1,3 +1,5 @@
+#include <exception>
+#include <stdexcept>
 #include <string>
 #include "Asset.h"
 #include "JsonSerializer.h"
@@ -5,9 +7,9 @@
 #include "SystemManager.h"
 #include "Types.h"
 
-void Modifier::Load( SystemManager* systemManager )
+void Modifier::Load( SystemManager* systemManager, JsonSerializer& serializer )
 {
-	Deserialize( *systemManager->GetSerializer() );
+	Deserialize( serializer );
 }
 
 std::string Modifier::Serialize( JsonSerializer& serializer ) const
@@ -21,6 +23,13 @@ std::string Modifier::Serialize( JsonSerializer& serializer ) const
 
 void Modifier::Deserialize( JsonSerializer& serializer )
 {
-	DeserializeBaseAsset( serializer );
-	modifierTemplate = serializer.Read<AssetID>( "modifierTemplate" );
+	try
+	{
+		DeserializeBaseAsset( serializer );
+		modifierTemplate = serializer.Read<AssetID>( "modifierTemplate" );
+	}
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize Modifier" );
+	}
 }

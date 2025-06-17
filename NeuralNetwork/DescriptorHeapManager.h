@@ -14,19 +14,24 @@ public:
 	DescriptorHeapManager( SystemManager& systemManager );
 	~DescriptorHeapManager() = default;
 public:
-	void Init( D3D12_DESCRIPTOR_HEAP_TYPE type, uint numDescriptors, bool shaderVisible );
+	void Init( D3D12_DESCRIPTOR_HEAP_TYPE type, uint numDescriptors, bool shaderVisible, uint reservedCount = 0 );
 	int Allocate();
 	void Free( int index );
+	int AllocateReserved();
+	void FreeReserved( int index );
 public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuHandle( int index ) const;
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuHandle( int index ) const;
 	ID3D12DescriptorHeap* GetHeap() const { return heap.Get(); }
 	uint GetDescriptorSize() const { return descriptorSize; }
+	uint GetReservedCount() const { return reservedCount; }
 private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
 	uint descriptorSize = 0;
 	uint capacity = 0;
+	uint reservedCount = 0;
 	std::queue<int> freeList;
+	std::queue<int> reservedFreeList;
 	std::mutex allocMutex;
 private:
 	Renderer* renderer;

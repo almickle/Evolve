@@ -1,3 +1,5 @@
+#include <exception>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include "GpuResourceManager.h"
@@ -24,13 +26,12 @@ std::string TextureAsset::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void TextureAsset::Load( SystemManager* systemManager )
+void TextureAsset::Load( SystemManager* systemManager, JsonSerializer& serializer )
 {
-	auto* serializer = systemManager->GetSerializer();
 	auto* importManager = systemManager->GetImportManager();
 	auto* resourceManager = systemManager->GetResourceManager();
 
-	Deserialize( *serializer );
+	Deserialize( serializer );
 	auto data = importManager->LoadTexture( texturePath );
 	textureId = resourceManager->CreateTexture( std::move( data ), name );
 	AddResource( textureId );
@@ -38,9 +39,15 @@ void TextureAsset::Load( SystemManager* systemManager )
 
 void TextureAsset::Deserialize( JsonSerializer& serializer )
 {
-	DeserializeBaseAsset( serializer );
-
-	texturePath = serializer.Read<std::string>( "texturePath" );
+	try
+	{
+		DeserializeBaseAsset( serializer );
+		texturePath = serializer.Read<std::string>( "texturePath" );
+	}
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize TextureAsset" );
+	}
 }
 
 uint TextureAsset::GetSrvHeapIndex( GpuResourceManager& resourceManager ) const

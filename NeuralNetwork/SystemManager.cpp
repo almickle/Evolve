@@ -34,7 +34,7 @@ void SystemManager::Init( const AppContext& appContext )
 	threadManager = std::make_unique<ThreadManager>();
 	threadManager->Init();
 	srvHeapManager = std::make_unique<DescriptorHeapManager>( *this );
-	srvHeapManager->Init( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024, true );
+	srvHeapManager->Init( D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1024, true, 2 );
 	uiLayer = std::make_unique<ImGuiLayer>( *this );
 	uiLayer->Init();
 	serializer = std::make_unique<JsonSerializer>();

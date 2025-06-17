@@ -19,7 +19,7 @@ public:
 	}
 	virtual ~Asset() = default;
 public:
-	virtual void Load( SystemManager* systemManager ) = 0;
+	virtual void Load( SystemManager* systemManager, JsonSerializer& serializer ) = 0;
 	virtual std::string Serialize( JsonSerializer& serializer ) const = 0;
 	virtual void Deserialize( JsonSerializer& serializer ) = 0;
 	void Save( const std::filesystem::path& dirPath, const std::string& content ) const;

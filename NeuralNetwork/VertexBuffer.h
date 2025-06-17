@@ -14,18 +14,18 @@ public:
 		vertexStride( sizeof( Vertex ) ),
 		vertices( vertices )
 	{
+		size = vertices.size() * sizeof( Vertex );
 	}
 	~VertexBuffer()
 	{
 		vertices.clear();
 	}
 public:
-	size_t GetDataSize() const override { return vertices.size() * sizeof( Vertex ); }
-public:
 	D3D12_VERTEX_BUFFER_VIEW* GetView() { return &vbView; }
 	uint GetVertexCount() const { return vertexCount; }
 	uint GetVertexStride() const { return vertexStride; }
 	const std::vector<Vertex>& GetVertices() const { return vertices; }
+	void* GetData() override { return vertices.data(); }
 public:
 	void SetVertexBufferView( const D3D12_VERTEX_BUFFER_VIEW& view ) { vbView = view; }
 private:

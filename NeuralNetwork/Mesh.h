@@ -29,7 +29,7 @@ public:
 	}
 	~Mesh() = default;
 public:
-	void Load( SystemManager* systemManager ) override;
+	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override;
 	virtual std::string Serialize( JsonSerializer& serializer ) const override;
 	virtual void Deserialize( JsonSerializer& serializer ) override;
 public:

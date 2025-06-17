@@ -3,38 +3,37 @@
 
 class Camera {
 public:
-    Camera();
+	Camera();
 public:
-    void SetPosition(const DirectX::XMFLOAT3& pos) { position = pos; }
-    void SetTarget(const DirectX::XMFLOAT3& tgt) { target = tgt; }
-    void SetUp(const DirectX::XMFLOAT3& upVec) { up = upVec; }
-    void SetFovY(float fov) { fovY = fov; }
-    void SetAspect(float a) { aspect = a; }
-    void SetNearZ(float n) { nearZ = n; }
-    void SetFarZ(float f) { farZ = f; }
+	void SetPosition( const DirectX::XMFLOAT3& pos ) { position = pos; }
+	void SetFovY( float fov ) { fovY = fov; }
+	void SetAspect( float a ) { aspect = a; }
+	void SetNearZ( float n ) { nearZ = n; }
+	void SetFarZ( float f ) { farZ = f; }
+	void SetForwardVec( const DirectX::XMFLOAT3& forward ) { forwardVec = forward; }
 public:
-    const DirectX::XMFLOAT3& GetPosition() const { return position; }
-    const DirectX::XMFLOAT3& GetTarget() const { return target; }
-    const DirectX::XMFLOAT3& GetUp() const { return up; }
-    float GetFovY() const { return fovY; }
-    float GetAspect() const { return aspect; }
-    float GetNearZ() const { return nearZ; }
-    float GetFarZ() const { return farZ; }
+	const DirectX::XMFLOAT3& GetPosition() const { return position; }
+	const DirectX::XMFLOAT3& GetUp() const { return up; }
+	float GetFovY() const { return fovY; }
+	float GetAspect() const { return aspect; }
+	float GetNearZ() const { return nearZ; }
+	float GetFarZ() const { return farZ; }
 public:
-    virtual DirectX::XMMATRIX GetViewMatrix() const = 0;
-    DirectX::XMMATRIX GetProjMatrix() const;
+	DirectX::XMFLOAT4X4 GetViewMatrix() const;
+	DirectX::XMFLOAT4X4 GetProjectionMatrix() const;
 public:
-    virtual void MoveForward(float amount) = 0;
-    virtual void MoveRight(float amount) = 0;
-    virtual void Rotate(float yawDelta, float pitchDelta) = 0;
+	void MoveForward( float amount ) {};
+	void MoveRight( float amount ) {};
+	void Rotate( float yawDelta, float pitchDelta ) {};
 protected:
-    DirectX::XMFLOAT3 position{0, 0, -5};
-    DirectX::XMFLOAT3 target{0, 0, 0};
-    DirectX::XMFLOAT3 up{0, 0, 1};
-    float fovY = DirectX::XM_PIDIV4;
-    float aspect = 2.333f; // 21:9
-    float nearZ = 0.1f;
-    float farZ = 1000.0f;
-    float yaw = 0.0f;
-    float pitch = 0.0f;
+	DirectX::XMFLOAT3 position{ 0, 0, 0 };
+	DirectX::XMFLOAT3 forwardVec{ 0, 1, 0 };
+	DirectX::XMFLOAT3 rightVec{ 1, 0, 0 };
+	DirectX::XMFLOAT3 up{ 0, 0, 1 };
+	float fovY = DirectX::XM_PIDIV4;
+	float aspect = 2.333f; // 21:9
+	float nearZ = 0.1f;
+	float farZ = 1000.0f;
+	float yaw = 0.0f;
+	float pitch = 0.0f;
 };

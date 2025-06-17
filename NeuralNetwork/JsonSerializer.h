@@ -10,6 +10,7 @@
 class JsonSerializer : public System {
 public:
 	JsonSerializer() = default;
+public:
 	void StartDocument();
 	void EndDocument();
 	std::string GetString() const { return ss.str(); }

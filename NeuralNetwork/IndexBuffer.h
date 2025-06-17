@@ -14,18 +14,18 @@ public:
 		indices( indices ),
 		format( format )
 	{
+		size = indices.size() * sizeof( uint );
 	}
 	~IndexBuffer()
 	{
 		indices.clear();
 	}
 public:
-	size_t GetDataSize() const override { return indices.size() * sizeof( uint ); }
-public:
 	D3D12_INDEX_BUFFER_VIEW* GetView() { return &ibView; }
 	uint GetIndexCount() const { return indexCount; }
 	DXGI_FORMAT GetFormat() const { return format; }
 	const std::vector<uint>& GetIndices() const { return indices; }
+	void* GetData() override { return indices.data(); }
 public:
 	void SetIndexBufferView( const D3D12_INDEX_BUFFER_VIEW& view ) { ibView = view; }
 private:

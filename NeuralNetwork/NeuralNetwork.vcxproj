@@ -124,6 +124,7 @@
     <PostBuildEvent>
       <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)Shaders"
 xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
+xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -156,6 +157,7 @@ xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
     <PostBuildEvent>
       <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)Shaders"
 xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
+xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
 </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

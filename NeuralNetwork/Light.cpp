@@ -1,5 +1,7 @@
 #include "Light.h"
+#include "SceneData.h"
 
-Light::Light(Type type)
-    : type(type)
-{}
+Light::Light( LightType type )
+	: type( type )
+{
+}

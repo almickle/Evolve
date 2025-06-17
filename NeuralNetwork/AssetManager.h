@@ -19,6 +19,7 @@ class NodeLibrary;
 class ImportManager;
 
 class AssetManager : public System {
+	enum class LoadState { NotLoaded, Loading, Loaded };
 public:
 	AssetManager( SystemManager& systemManager )
 		: renderer( systemManager.GetRenderer() ),
@@ -37,7 +38,7 @@ public:
 	void RegisterAsset( const AssetID& assetId, std::unique_ptr<Asset> asset );
 	void RemoveAsset( const AssetID& id );
 	void SaveAsset( const AssetID& id, const std::string& additionalPath = "" ) const;
-	void LoadAsset( const std::string& path, SystemManager* systemManager );
+	void LoadAsset( const std::string& path, SystemManager* systemManager, JsonSerializer& serializer );
 public:
 	void ImportMesh( const std::string& path, const std::string& name );
 	void ImportTexture( const std::string& path, const std::string& name );
@@ -48,9 +49,11 @@ public:
 	std::vector<Asset*> GetAllAssets();
 private:
 	AssetID GenerateUniqueAssetId();
+	void PostLoadProcessing();
 private:
 	std::unordered_map<AssetID, std::unique_ptr<Asset>> assetHeap;
 	mutable std::mutex assetHeapMutex;
+	std::unordered_map<AssetID, LoadState> assetLoadState;
 	uint64_t assetIdCounter = 0;
 	std::filesystem::path assetDirectory = std::filesystem::path( "Assets" );
 	std::string assetFileExtension = ".json";

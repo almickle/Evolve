@@ -1,5 +1,7 @@
 #include <DirectXMath.h>
+#include <exception>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -73,12 +75,11 @@ std::string Mesh::Serialize( JsonSerializer& serializer ) const
 	return serializer.GetString();
 }
 
-void Mesh::Load( SystemManager* systemManager )
+void Mesh::Load( SystemManager* systemManager, JsonSerializer& serializer )
 {
 	auto* resourceManager = systemManager->GetResourceManager();
-	auto* serializer = systemManager->GetSerializer();
 
-	Deserialize( *serializer );
+	Deserialize( serializer );
 	for( const auto& meshDatum : meshData )
 	{
 		auto vbId = resourceManager->CreateVertexBuffer( meshDatum.vertices, name );
@@ -91,30 +92,37 @@ void Mesh::Load( SystemManager* systemManager )
 
 void Mesh::Deserialize( JsonSerializer& serializer )
 {
-	DeserializeBaseAsset( serializer );
+	try
+	{
+		DeserializeBaseAsset( serializer );
 
-	// meshData is an array of objects
-	auto meshDataArray = serializer.GetSubObject( "meshData" );
-	meshData.clear();
-	for( const auto& meshJson : meshDataArray ) {
-		MeshData md;
-		for( const auto& vertexJson : meshJson.at( "vertices" ) ) {
-			Vertex vertex{};
-			// Deserialize XMFLOAT3 position
-			auto& positionArray = vertexJson.at( "position" );
-			vertex.position = DirectX::XMFLOAT3( positionArray[0].get<float>(), positionArray[1].get<float>(), positionArray[2].get<float>() );
-			// Deserialize XMFLOAT3 normal
-			auto&& normalArray = vertexJson.at( "normal" );
-			vertex.normal = DirectX::XMFLOAT3( normalArray[0].get<float>(), normalArray[1].get<float>(), normalArray[2].get<float>() );
-			// Deserialize XMFLOAT2 uv
-			auto& uvArray = vertexJson.at( "uv" );
-			vertex.uv = DirectX::XMFLOAT2( uvArray[0].get<float>(), uvArray[1].get<float>() );
-			// Deserialize XMFLOAT3 tangent
-			auto& tangentArray = vertexJson.at( "tangent" );
-			vertex.tangent = DirectX::XMFLOAT4( tangentArray[0].get<float>(), tangentArray[1].get<float>(), tangentArray[2].get<float>(), tangentArray[3].get<float>() );
-			md.vertices.push_back( vertex );
+		// meshData is an array of objects
+		auto meshDataArray = serializer.GetSubObject( "meshData" );
+		meshData.clear();
+		for( const auto& meshJson : meshDataArray ) {
+			MeshData md;
+			for( const auto& vertexJson : meshJson.at( "vertices" ) ) {
+				Vertex vertex{};
+				// Deserialize XMFLOAT3 position
+				auto& positionArray = vertexJson.at( "position" );
+				vertex.position = DirectX::XMFLOAT3( positionArray[0].get<float>(), positionArray[1].get<float>(), positionArray[2].get<float>() );
+				// Deserialize XMFLOAT3 normal
+				auto&& normalArray = vertexJson.at( "normal" );
+				vertex.normal = DirectX::XMFLOAT3( normalArray[0].get<float>(), normalArray[1].get<float>(), normalArray[2].get<float>() );
+				// Deserialize XMFLOAT2 uv
+				auto& uvArray = vertexJson.at( "uv" );
+				vertex.uv = DirectX::XMFLOAT2( uvArray[0].get<float>(), uvArray[1].get<float>() );
+				// Deserialize XMFLOAT3 tangent
+				auto& tangentArray = vertexJson.at( "tangent" );
+				vertex.tangent = DirectX::XMFLOAT4( tangentArray[0].get<float>(), tangentArray[1].get<float>(), tangentArray[2].get<float>(), tangentArray[3].get<float>() );
+				md.vertices.push_back( vertex );
+			}
+			md.indices = meshJson.at( "indices" ).get<std::vector<uint>>();
+			meshData.push_back( md );
 		}
-		md.indices = meshJson.at( "indices" ).get<std::vector<uint>>();
-		meshData.push_back( md );
+	}
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize Mesh: " + name );
 	}
 }

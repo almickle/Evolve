@@ -7,9 +7,12 @@
 #include "GpuResource.h"
 #include "Renderer.h"
 
-void GpuResource::CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc )
+void GpuResource::CreateSRV( DescriptorHeapManager& srvHeapManager, Renderer& renderer, const D3D12_SHADER_RESOURCE_VIEW_DESC& srvDesc, bool reserved )
 {
-	srvHeapIndex = srvHeapManager.Allocate();
+	if( reserved )
+		srvHeapIndex = srvHeapManager.AllocateReserved();
+	else
+		srvHeapIndex = srvHeapManager.Allocate();
 	srvCpuHandle = srvHeapManager.GetCpuHandle( srvHeapIndex );
 	srvGpuHandle = srvHeapManager.GetGpuHandle( srvHeapIndex );
 
@@ -23,6 +26,8 @@ void GpuResource::Upload( ID3D12GraphicsCommandList* cmdList )
 
 	void* mapped = nullptr;
 	uploadResource->Map( 0, nullptr, &mapped );
+	auto x = GetData();
+	auto y = GetDataSize();
 	memcpy( mapped, GetData(), GetDataSize() );
 	uploadResource->Unmap( 0, nullptr );
 
@@ -31,6 +36,8 @@ void GpuResource::Upload( ID3D12GraphicsCommandList* cmdList )
 		uploadResource.Get(), 0,
 		GetDataSize()
 	);
+
+	TransitionToTargetState( cmdList );
 }
 
 void GpuResource::Transition( ID3D12GraphicsCommandList* commandList, const D3D12_RESOURCE_STATES& requestedState )

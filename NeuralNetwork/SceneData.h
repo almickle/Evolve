@@ -1,12 +1,18 @@
 #pragma once
 #include <DirectXMath.h>
 
+enum class LightType {
+	Point,
+	Directional,
+	Spot
+};
+
 struct LightData {
-	DirectX::XMFLOAT3 direction;
+	DirectX::XMFLOAT3 position;
 	float intensity;
 	DirectX::XMFLOAT3 color;
-	int type;
-	DirectX::XMFLOAT3 position;
+	LightType type;
+	DirectX::XMFLOAT3 direction;
 	float pad; // Padding for alignment
 };
 
