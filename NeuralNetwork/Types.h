@@ -29,3 +29,8 @@ enum class ShaderType {
 	Hull,
 	Compute
 };
+
+enum class ColorSpace {
+	Linear,
+	sRGB
+};

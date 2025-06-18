@@ -7,6 +7,7 @@
 #include "Mesh.h"
 #include "System.h"
 #include "SystemManager.h"
+#include "Types.h"
 
 class AssetManager;
 class GpuResourceManager;
@@ -26,6 +27,6 @@ public:
 	~ImportManager() = default;
 public:
 	std::vector<MeshData> LoadMesh( const std::string& path );
-	std::shared_ptr<DirectX::ScratchImage> LoadTexture( const std::string& path );
+	std::shared_ptr<DirectX::ScratchImage> LoadTexture( const std::string& path, const ColorSpace& colorSpace );
 };
 

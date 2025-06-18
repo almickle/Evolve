@@ -1,4 +1,5 @@
 #pragma once
+#include "Scene.h"
 #include "System.h"
 #include "SystemManager.h"
 
@@ -10,7 +11,8 @@ struct InputState {
 	int mouseDeltaY = 0;
 	int lastMouseX = 0;
 	int lastMouseY = 0;
-	bool firstMouse = true;
+	bool mouseLeftDown = false;
+	bool mouseMiddleDown = false;
 };
 
 class InputSystem : public System {
@@ -20,9 +22,10 @@ public:
 	{
 	}
 public:
+	void Update( Scene* scene );
 	void CenterMouse();
 	void UpdateInputState();
-	void UpdateCameraFromInput();
+	void UpdateCameraFromInput( Scene* scene );
 	const InputState& GetInputState() const { return inputState; }
 private:
 	InputState inputState;

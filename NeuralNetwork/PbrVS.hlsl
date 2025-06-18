@@ -3,7 +3,7 @@
 VSOutput main(VSInput input, uint instanceId : SV_InstanceID)
 {
     VSOutput output;
-    float4x4 world = instanceBuffers[isStaticInstance][instanceBufferStart + instanceId];
+    float4x4 world = (root.bufferIndex == 0) ? staticBuffer[root.instanceBufferStart + instanceId] : dynamicBuffer[root.instanceBufferStart + instanceId];
     float4 worldPos = mul(float4(input.position, 1.0f), world);
     output.worldPos = worldPos.xyz;
     output.normal = mul((float3x3)world, input.normal);

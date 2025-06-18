@@ -3,12 +3,14 @@
 #include <utility>
 #include <Windows.h>
 #include "App.h"
-#include "BeginFramePass.h"
-#include "EndFramePass.h"
+#include "AssetManager.h"
 #include "ExecutionGraph.h"
+#include "InputSystem.h"
 #include "Renderer.h"
+#include "Scene.h"
 #include "ScenePass.h"
 #include "SystemManager.h"
+#include "UpdatePass.h"
 #include "UploadPass.h"
 #include "Window.h"
 
@@ -37,15 +39,16 @@ bool App::Init( HINSTANCE hInstance, int nCmdShow )
 
 void App::Run()
 {
+	auto* scene = static_cast<Scene*>(systemManager->GetAssetManager()->GetAsset( sceneID ));
 	auto uploadPass = std::make_unique<UploadPass>();
+	auto updatePass = std::make_unique<UpdatePass>();
 	uploadPass->Init( *systemManager );
 	while( !systemManager->GetWindow()->ShouldClose() ) {
 		systemManager->GetWindow()->PollEvents();
-		//UpdateInputState();
-		//UpdateCameraFromInput();
 		systemManager->GetRenderer()->WaitForCurrentFrame();
-
-		//uploadPass->Execute( *systemManager, sceneID );
+		systemManager->GetInputSystem()->Update( scene );
+		updatePass->Execute( *systemManager, sceneID );
+		uploadPass->Execute( *systemManager, sceneID );
 		systemManager->GetRenderer()->GetRenderGraph()->ExecuteAsync( *systemManager, sceneID );
 		systemManager->GetRenderer()->Present();
 	}
@@ -53,17 +56,9 @@ void App::Run()
 
 void App::BuildRenderGraph()
 {
-	//auto beginPass = std::make_unique<BeginFramePass>();
 	auto scenePass = std::make_unique<ScenePass>();
-	//auto endPass = std::make_unique<EndFramePass>();
-
-	//scenePass->AddDependency( beginPass.get() );
-	//endPass->AddDependency( scenePass.get() );
-
 	systemManager->GetRenderer()->GetRenderGraph()
-		//->AddPass( std::move( beginPass ) )
 		->AddPass( std::move( scenePass ) );
-	//->AddPass( std::move( endPass ) );
 
 	for( const auto& pass : systemManager->GetRenderer()->GetRenderGraph()->GetPasses() )
 	{

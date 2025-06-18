@@ -393,14 +393,6 @@ void Renderer::CleanupRenderTargets()
 bool Renderer::ConfigureRootSignature()
 {
 	CD3DX12_DESCRIPTOR_RANGE1 ranges[1]{};
-	//ranges[1].Init(
-	//	D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
-	//	2,			  // Num of srvs
-	//	0,            // Base shader register t0
-	//	0,            // Register space
-	//	D3D12_DESCRIPTOR_RANGE_FLAG_DESCRIPTORS_VOLATILE,
-	//	0             // Offset in descriptors
-	//);
 	ranges[0].Init(
 		D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 		UINT_MAX,     // Or a reasonable maximum like 10000
@@ -411,7 +403,7 @@ bool Renderer::ConfigureRootSignature()
 	);
 
 	CD3DX12_ROOT_PARAMETER1 rootParameters[6]{};
-	rootParameters[0].InitAsConstants( 2, 0 );
+	rootParameters[0].InitAsConstants( 4, 0 );
 	rootParameters[1].InitAsConstantBufferView( 1 ); // Light and camera data
 	rootParameters[2].InitAsConstantBufferView( 2 ); // Shader texture slots
 	rootParameters[3].InitAsConstantBufferView( 3 ); // Shader vector slots
@@ -555,9 +547,9 @@ void Renderer::BindConstantBuffer( ID3D12GraphicsCommandList* cmdList, const uin
 	cmdList->SetGraphicsRootConstantBufferView( slot, buffer );
 }
 
-void Renderer::BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* constants )
+void Renderer::BindRootConstants( ID3D12GraphicsCommandList* cmdList, const void* constants )
 {
-	cmdList->SetGraphicsRoot32BitConstants( 0, 2, &constants, 0 );
+	cmdList->SetGraphicsRoot32BitConstants( 0, 4, constants, 0 );
 }
 
 void Renderer::BindSceneConstantBuffer( ID3D12GraphicsCommandList* cmdList, D3D12_GPU_VIRTUAL_ADDRESS sceneBuffer )
@@ -606,7 +598,12 @@ void Renderer::RenderActorInstances( ID3D12GraphicsCommandList* cmdList,
 									 const uint& instanceBufferStart,
 									 const bool& isStatic )
 {
-	uint constants[2] = { instanceBufferStart, (uint)isStatic };
+	struct RootConstants
+	{
+		uint instanceBufferStart;
+		uint isDynamic;
+	};
+	RootConstants constants{ instanceBufferStart, isStatic ? 0u : 1u };
 	BindRootConstants( cmdList, &constants );
 
 	auto numMeshes = (uint)vbViews.size();

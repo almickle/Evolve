@@ -32,7 +32,7 @@ void TextureAsset::Load( SystemManager* systemManager, JsonSerializer& serialize
 	auto* resourceManager = systemManager->GetResourceManager();
 
 	Deserialize( serializer );
-	auto data = importManager->LoadTexture( texturePath );
+	auto data = importManager->LoadTexture( texturePath, colorSpace );
 	textureId = resourceManager->CreateTexture( std::move( data ), name );
 	AddResource( textureId );
 }
@@ -43,6 +43,7 @@ void TextureAsset::Deserialize( JsonSerializer& serializer )
 	{
 		DeserializeBaseAsset( serializer );
 		texturePath = serializer.Read<std::string>( "texturePath" );
+		colorSpace = serializer.Read<ColorSpace>( "colorSpace" );
 	}
 	catch( const std::exception& )
 	{

@@ -36,5 +36,5 @@ struct SceneData {
 
 struct SceneConstants {
 	unsigned int instanceBufferStart;
-	bool isStaticInstance;
+	unsigned int bufferIndex;
 };

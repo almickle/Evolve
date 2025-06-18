@@ -31,6 +31,7 @@ public:
 	void AddCamera( std::unique_ptr<Camera> camera ) { cameras.push_back( std::move( camera ) ); }
 public:
 	const std::vector<std::unique_ptr<Light>>& GetLights() const { return lights; }
+	uint GetLightCount() const { return lights.size(); }
 	const std::vector<std::unique_ptr<Camera>>& GetCameras() const { return cameras; }
 	const std::vector<std::unique_ptr<Actor>>& GetStaticActors() const { return staticActors; }
 	const std::vector<std::unique_ptr<Actor>>& GetDynamicActors() const { return dynamicActors; }

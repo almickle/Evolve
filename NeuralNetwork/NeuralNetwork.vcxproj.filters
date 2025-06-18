@@ -303,6 +303,9 @@
     <ClCompile Include="ScenePass.cpp">
       <Filter>Source Files\Passes\Render</Filter>
     </ClCompile>
+    <ClCompile Include="UpdatePass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -508,6 +511,9 @@
     </ClInclude>
     <ClInclude Include="ScenePass.h">
       <Filter>Header Files\Passes\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdatePass.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

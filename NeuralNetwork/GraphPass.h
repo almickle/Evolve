@@ -31,7 +31,7 @@ public:
 	bool IsNotStarted() const { return state.notStarted; }
 	const std::string& GetName() const { return name; };
 	const std::vector<GraphPass*>& GetDependencies() const { return dependencies; }
-	ID3D12CommandList* GetCurrentCommandList( uint& frameIndex ) const;
+	ID3D12CommandList* GetCurrentCommandList( const uint& frameIndex ) const;
 public:
 	GraphPass* AddDependency( GraphPass* dependency );
 	void RemoveDependency( GraphPass* dependency );

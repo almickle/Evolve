@@ -73,7 +73,7 @@ public:
 
             // Final color
             float3 color = ambient + Lo + input.emissive.rgb;
-            color = color / (color + 1.0); // HDR tonemapping
+            color = TonemapACES(color); // Tonemapping
             color = pow(color, 1.0 / 2.2); // Gamma correction
 
             output.color = float4(color, input.opacity);

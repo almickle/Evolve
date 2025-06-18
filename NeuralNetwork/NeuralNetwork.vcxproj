@@ -125,7 +125,7 @@
       <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)Shaders"
 xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
 xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
-</Command>
+xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,7 +158,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
       <Command>xcopy /Y /I /S "$(ProjectDir)\Shaders\*.cso" "$(OutDir)Shaders"
 xcopy /Y /I /S "$(ProjectDir)\Assets\*.json" "$(OutDir)Assets"
 xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
-</Command>
+xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -211,6 +211,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
     <ClCompile Include="SceneRenderPass.cpp" />
     <ClCompile Include="SensoryNeuron.cpp" />
     <ClCompile Include="Synapse.cpp" />
+    <ClCompile Include="UpdatePass.cpp" />
     <ClCompile Include="UploadManager.cpp" />
     <ClCompile Include="UploadPass.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -280,6 +281,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsli" "$(OutDir)"
     <ClInclude Include="SceneRenderPass.h" />
     <ClInclude Include="SensoryNeuron.h" />
     <ClInclude Include="Synapse.h" />
+    <ClInclude Include="UpdatePass.h" />
     <ClInclude Include="UploadManager.h" />
     <ClInclude Include="UploadPass.h" />
     <ClInclude Include="Utils.h" />

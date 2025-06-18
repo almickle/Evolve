@@ -18,6 +18,7 @@
 #include "DataStructures.h"
 #include "ImportManager.h"
 #include "Mesh.h"
+#include "Types.h"
 
 namespace {
 	enum class ImageType {
@@ -94,7 +95,7 @@ std::vector<MeshData> ImportManager::LoadMesh( const std::string& path )
 	return meshData;
 }
 
-std::shared_ptr<DirectX::ScratchImage> ImportManager::LoadTexture( const std::string& path )
+std::shared_ptr<DirectX::ScratchImage> ImportManager::LoadTexture( const std::string& path, const ColorSpace& colorSpace )
 {
 	auto image = std::make_shared<DirectX::ScratchImage>();
 	HRESULT hr = S_OK;
@@ -102,11 +103,21 @@ std::shared_ptr<DirectX::ScratchImage> ImportManager::LoadTexture( const std::st
 
 	ImageType type = GetImageTypeFromExtension( filePath );
 
+	// Choose flags based on color space
+	DirectX::DDS_FLAGS ddsFlags = DirectX::DDS_FLAGS_NONE;
+	DirectX::WIC_FLAGS wicFlags = DirectX::WIC_FLAGS_NONE;
+
+	switch( colorSpace ) {
+		case ColorSpace::sRGB:
+			wicFlags |= DirectX::WIC_FLAGS_FORCE_SRGB;
+			break;
+	}
+
 	switch( type ) {
 		case ImageType::DDS:
 			hr = DirectX::LoadFromDDSFile(
 				filePath.c_str(),
-				DirectX::DDS_FLAGS_NONE,
+				ddsFlags,
 				nullptr,
 				*image
 			);
@@ -129,7 +140,7 @@ std::shared_ptr<DirectX::ScratchImage> ImportManager::LoadTexture( const std::st
 		default:
 			hr = DirectX::LoadFromWICFile(
 				filePath.c_str(),
-				DirectX::WIC_FLAGS_NONE,
+				wicFlags,
 				nullptr,
 				*image
 			);

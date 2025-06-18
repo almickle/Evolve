@@ -10,15 +10,19 @@ struct LightData
 
 SamplerState samp : register(s0);
 
-StructuredBuffer<float4x4> instanceBuffers[2] : register(t0);
-
-Texture2D<float4> textures[] : register(t0);
-
-cbuffer constants : register(b0)
+struct RootConstants
 {
     uint instanceBufferStart;
-    uint isStaticInstance;
-}
+    uint bufferIndex;
+};
+
+ConstantBuffer<RootConstants> root : register(b0);
+
+StructuredBuffer<float4x4> staticBuffer : register(t0);
+
+StructuredBuffer<float4x4> dynamicBuffer : register(t1);
+
+Texture2D<float4> textures[] : register(t0);
 
 cbuffer sceneData : register(b1)
 {
@@ -495,4 +499,14 @@ float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
 float3 FresnelSchlick(float cosTheta, float3 F0)
 {
     return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
+float3 TonemapACES(float3 color)
+{
+    const float a = 2.51;
+    const float b = 0.03;
+    const float c = 2.43;
+    const float d = 0.59;
+    const float e = 0.14;
+    return saturate((color * (a * color + b)) / (color * (c * color + d) + e));
 }

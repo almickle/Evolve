@@ -23,7 +23,7 @@ void GraphPass::RemoveDependency( GraphPass* dependency )
 	);
 }
 
-ID3D12CommandList* GraphPass::GetCurrentCommandList( uint& frameIndex ) const
+ID3D12CommandList* GraphPass::GetCurrentCommandList( const uint& frameIndex ) const
 {
 	return commandLists[frameIndex].Get();
 }

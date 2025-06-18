@@ -4,15 +4,6 @@
 #include "SystemManager.h"
 #include "Types.h"
 
-struct InputState {
-	bool keys[256] = {};
-	int mouseDeltaX = 0;
-	int mouseDeltaY = 0;
-	int lastMouseX = 0;
-	int lastMouseY = 0;
-	bool firstMouse = true;
-};
-
 class App {
 public:
 	App() :
@@ -26,8 +17,6 @@ public:
 
 public:
 	void BuildRenderGraph();
-private:
-	InputState inputState;
 private:
 	std::unique_ptr<SystemManager> systemManager;
 	AssetID sceneID = "Asset_9";

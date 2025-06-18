@@ -22,18 +22,24 @@ public:
 	DirectX::XMFLOAT4X4 GetViewMatrix() const;
 	DirectX::XMFLOAT4X4 GetProjectionMatrix() const;
 public:
-	void MoveForward( float amount ) {};
-	void MoveRight( float amount ) {};
-	void Rotate( float yawDelta, float pitchDelta ) {};
+	void MoveLeft( float amount = 1.0f );
+	void MoveRight( float amount = 1.0f );
+	void MoveForward( float amount = 1.0f );
+	void MoveBack( float amount = 1.0f );
+	void MoveUp( float amount = 1.0f );
+	void MoveDown( float amount = 1.0f );
+	void Rotate( float yawDelta, float pitchDelta );
 protected:
 	DirectX::XMFLOAT3 position{ 0, 0, 0 };
 	DirectX::XMFLOAT3 forwardVec{ 0, 1, 0 };
 	DirectX::XMFLOAT3 rightVec{ 1, 0, 0 };
 	DirectX::XMFLOAT3 up{ 0, 0, 1 };
 	float fovY = DirectX::XM_PIDIV4;
-	float aspect = 2.333f; // 21:9
+	float aspect = 2.333f;	  // 21:9
 	float nearZ = 0.1f;
 	float farZ = 1000.0f;
 	float yaw = 0.0f;
 	float pitch = 0.0f;
+	float sensitivity = 0.003f; // Default sensitivity
+	float speed = 0.1f;         // Default movement speed
 };

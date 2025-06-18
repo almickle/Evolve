@@ -97,7 +97,7 @@ private:
 	void CreateDepthStencils( uint width, uint height );
 	bool ConfigureRootSignature();
 	void BindConstantBuffer( ID3D12GraphicsCommandList* cmdList, const uint& slot, D3D12_GPU_VIRTUAL_ADDRESS buffer );
-	void BindRootConstants( ID3D12GraphicsCommandList* cmdList, void* constants );
+	void BindRootConstants( ID3D12GraphicsCommandList* cmdList, const void* constants );
 	void CleanupRenderTargets();
 	uint64_t HashBlob( const void* data, size_t size );
 	std::string GetLatestShaderModel();

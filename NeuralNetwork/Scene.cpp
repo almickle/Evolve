@@ -39,7 +39,7 @@ void Scene::Load( SystemManager* systemManager, JsonSerializer& serializer )
 				   lightData[4], lightData[5], lightData[6], lightData[7]},
 		.numLights = static_cast<uint>( lights.size() )
 	};
-	sceneConstantBuffer = resourceManager->CreateConstantBuffer( &sceneData, sizeof( sceneData ), "SceneData" );
+	sceneConstantBuffer = resourceManager->CreateConstantBuffer( &sceneData, sizeof( SceneData ), "SceneData" );
 	auto staticData = staticInstanceManager->GetAllInstanceData();
 	staticData.resize( 1024 );
 	staticStructuredBuffer = resourceManager->CreateStaticStructuredBuffer<ActorTransformData>( staticData, "StaticActors" );

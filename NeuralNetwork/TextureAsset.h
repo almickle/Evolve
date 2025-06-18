@@ -9,7 +9,8 @@ class SystemManager;
 class TextureAsset : public Asset {
 public:
 	TextureAsset( const std::string& name = "TextureAsset" )
-		: Asset( AssetType::Texture, name )
+		: Asset( AssetType::Texture, name ),
+		colorSpace( ColorSpace::sRGB )
 	{
 	}
 	~TextureAsset() = default;
@@ -21,6 +22,7 @@ public:
 	uint GetSrvHeapIndex( GpuResourceManager& resourceManager ) const;
 private:
 	std::string texturePath;
+	ColorSpace colorSpace;
 private:
 	ResourceID textureId;
 };

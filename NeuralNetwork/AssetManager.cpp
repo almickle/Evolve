@@ -311,7 +311,7 @@ void AssetManager::ImportMesh( const std::string& path, const std::string& name 
 
 void AssetManager::ImportTexture( const std::string& path, const std::string& name )
 {
-	auto image = importManager->LoadTexture( path );
+	auto image = importManager->LoadTexture( path, ColorSpace::sRGB );
 	auto texture = std::make_unique<TextureAsset>( name );
 	auto texId = resourceManager->CreateTexture( std::move( image ), name );
 	texture->AddResource( texId );
