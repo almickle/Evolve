@@ -4,16 +4,16 @@
 #include "NodeTypes.h"
 #include "Types.h"
 
-class MaterialNode {
+class ShaderNode {
 public:
-	MaterialNode( uint inputCount, uint outputCount, uint parameterCount, const std::string& name = "MaterialNode" )
+	ShaderNode( uint inputCount, uint outputCount, uint parameterCount, const std::string& name = "ShaderNode" )
 		: name( name )
 	{
 		inputs.resize( inputCount );
 		outputs.resize( outputCount );
 		parameters.resize( parameterCount );
 	}
-	virtual ~MaterialNode() = default;
+	virtual ~ShaderNode() = default;
 public:
 	virtual std::string GetShaderFunction() = 0;
 	std::string GetInputStruct() const;
@@ -43,7 +43,6 @@ public:
 	void AddParameter( const uint& slot, NodeParameter parameter ) { parameters[slot] = parameter; }
 protected:
 	std::string GetFunctionName() const;
-	//std::string GetParameterName( const uint& index ) const;
 	std::string GetInputStructName() const;
 	std::string GetOutputStructName() const;
 	std::string GetParameterStructName() const;

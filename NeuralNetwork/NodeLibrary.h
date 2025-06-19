@@ -3,11 +3,11 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "MaterialNode.h"
 #include "MaterialOutputNode.h"
 #include "NodeTypes.h"
 #include "NormalMapNode.h"
 #include "ScalarParameterNode.h"
+#include "ShaderNode.h"
 #include "System.h"
 #include "TextureSamplerNode.h"
 #include "VectorBreakNode.h"
@@ -31,13 +31,13 @@ public:
 	}
 
 	// Register a node type with a node instance
-	void RegisterNode( const NodeTypes& typeName, std::unique_ptr<MaterialNode> node )
+	void RegisterNode( const NodeTypes& typeName, std::unique_ptr<ShaderNode> node )
 	{
 		nodes[typeName] = std::move( node );
 	}
 
 	// Get a node by type name (returns nullptr if not found)
-	MaterialNode* GetNode( const NodeTypes& typeName ) const
+	ShaderNode* GetNode( const NodeTypes& typeName ) const
 	{
 		auto it = nodes.find( typeName );
 		if( it != nodes.end() ) {
@@ -57,5 +57,5 @@ public:
 	}
 
 private:
-	std::unordered_map<NodeTypes, std::unique_ptr<MaterialNode>> nodes;
+	std::unordered_map<NodeTypes, std::unique_ptr<ShaderNode>> nodes;
 };

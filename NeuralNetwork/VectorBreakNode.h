@@ -2,16 +2,16 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 #include "Types.h"
 
 class VectorBreakNode :
-	public MaterialNode
+	public ShaderNode
 {
 public:
 	VectorBreakNode( const std::string& name = "VectorBreakNode" )
-		: MaterialNode( 1, 3, 0, name )
+		: ShaderNode( 1, 3, 0, name )
 	{
 		AddInput( vectorInputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 		AddOutput( xOutputSlot, NodeSlot{ "x", 0.0f } );

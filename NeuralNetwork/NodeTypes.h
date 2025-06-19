@@ -3,6 +3,7 @@
 #include <string>
 #include <type_traits>
 #include <variant>
+#include "Types.h"
 
 enum class NodeTypes
 {
@@ -16,10 +17,11 @@ enum class NodeTypes
 	VectorMakeNode
 };
 
-enum class NodeParameterTypes {
+enum class NodeParameterType {
 	Texture,
 	Vector,
 	Scalar,
+	Integer
 };
 
 struct NodeSlot {
@@ -72,7 +74,21 @@ public:
 };
 
 struct NodeParameter {
-	NodeParameterTypes type;
+	NodeParameterType type;
 	std::string name;
 	std::string GetHlslSnippet() const { return "uint " + name; }
+};
+
+struct NodeConnection {
+	uint fromNode;      // Index source node
+	uint fromSlot;		// Index of output slot
+	uint toNode;        // Index destination node
+	uint toSlot;		// Index of input slot
+};
+
+struct ParameterBinding {
+	uint nodeIndex;
+	uint parameterIndex;
+	NodeParameterType parameterType;
+	uint cbufferSlot;
 };

@@ -10,7 +10,7 @@
 #include <vector>
 #include "Asset.h"
 #include "JsonSerializer.h"
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "MaterialTemplate.h"
 #include "NodeLibrary.h"
 #include "NodeTypes.h"
@@ -77,7 +77,7 @@ void MaterialTemplate::Deserialize( JsonSerializer& serializer )
 		edges.clear();
 		auto edgeArray = serializer.GetSubObject( "edges" );
 		for( const auto& e : edgeArray ) {
-			MaterialEdge edge{};
+			NodeConnection edge{};
 			edge.fromNode = e.at( "fromNode" ).get<uint>();
 			edge.fromSlot = e.at( "fromSlot" ).get<uint>();
 			edge.toNode = e.at( "toNode" ).get<uint>();
@@ -92,7 +92,7 @@ void MaterialTemplate::Deserialize( JsonSerializer& serializer )
 			ParameterBinding binding{};
 			binding.nodeIndex = p.at( "nodeIndex" ).get<uint>();
 			binding.parameterIndex = p.at( "parameterIndex" ).get<uint>();
-			binding.parameterType = static_cast<NodeParameterTypes>(p.at( "parameterType" ).get<int>());
+			binding.parameterType = static_cast<NodeParameterType>(p.at( "parameterType" ).get<int>());
 			binding.cbufferSlot = p.at( "cbufferSlot" ).get<uint>();
 			parameterBindings.push_back( binding );
 		}
@@ -111,20 +111,20 @@ void MaterialTemplate::BuildParameterBindings()
 	uint vectorbufferSlot = 0;
 	uint scalarbufferSlot = 0;
 	for( uint nodeIdx = 0; nodeIdx < nodes.size(); ++nodeIdx ) {
-		MaterialNode* node = nodeLibrary.GetNode( nodes[nodeIdx] );
+		ShaderNode* node = nodeLibrary.GetNode( nodes[nodeIdx] );
 		uint paramCount = node->GetParameterCount();
 		auto& params = node->GetParameters();
 		for( uint paramIdx = 0; paramIdx < paramCount; ++paramIdx ) {
 			NodeParameter param = params[paramIdx];
 			switch( param.type )
 			{
-				case NodeParameterTypes::Texture:
+				case NodeParameterType::Texture:
 					parameterBindings.push_back( { nodeIdx, paramIdx, param.type, texturebufferSlot++ } );
 					break;
-				case NodeParameterTypes::Vector:
+				case NodeParameterType::Vector:
 					parameterBindings.push_back( { nodeIdx, paramIdx, param.type, vectorbufferSlot++ } );
 					break;
-				case NodeParameterTypes::Scalar:
+				case NodeParameterType::Scalar:
 					parameterBindings.push_back( { nodeIdx, paramIdx, param.type, scalarbufferSlot++ } );
 					break;
 			}
@@ -147,11 +147,11 @@ std::string MaterialTemplate::GetParameterValue( uint nodeIndex, uint parameterI
 		if( binding.nodeIndex == nodeIndex && binding.parameterIndex == parameterIndex ) {
 			switch( binding.parameterType )
 			{
-				case NodeParameterTypes::Texture:
+				case NodeParameterType::Texture:
 					return std::format( "GetTextureSlot({})", binding.cbufferSlot );
-				case NodeParameterTypes::Vector:
+				case NodeParameterType::Vector:
 					return std::format( "vectorSlots[{}]", binding.cbufferSlot );
-				case NodeParameterTypes::Scalar:
+				case NodeParameterType::Scalar:
 					return std::format( "scalarSlots[{}]", binding.cbufferSlot );
 				default:
 					return "/* invalid parameter type */";
@@ -305,9 +305,9 @@ std::vector<uint> MaterialTemplate::GetUnconnectedInputSlots( uint nodeIndex ) c
 	return unconnectedSlots;
 }
 
-std::vector<MaterialEdge> MaterialTemplate::GetIncomingEdges( uint nodeIndex ) const
+std::vector<NodeConnection> MaterialTemplate::GetIncomingEdges( uint nodeIndex ) const
 {
-	std::vector<MaterialEdge> result;
+	std::vector<NodeConnection> result;
 	for( const auto& edge : edges )
 	{
 		if( edge.toNode == nodeIndex )

@@ -15,7 +15,8 @@ enum class AssetType {
 	MaterialTemplate,
 	Modifier,
 	ModifierTemplate,
-	Scene
+	Scene,
+	MeshShader
 };
 
 enum class SubAssetType {
@@ -27,10 +28,17 @@ enum class ShaderType {
 	Vertex,
 	Domain,
 	Hull,
-	Compute
+	Compute,
+	Mesh
 };
 
 enum class ColorSpace {
 	Linear,
 	sRGB
+};
+
+enum class PrimitiveType {
+	Plane,
+	Sphere,
+	Cube
 };

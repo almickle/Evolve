@@ -172,13 +172,13 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="DescriptorHeapManager.cpp" />
     <ClCompile Include="EndFramePass.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="ShaderGraph.cpp" />
     <ClCompile Include="Modifier.cpp" />
     <ClCompile Include="ModifierTemplate.cpp" />
     <ClCompile Include="ScenePass.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="TaskManager.cpp" />
-    <ClCompile Include="FPCamera.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="ExecutionGraph.cpp" />
     <ClCompile Include="GpuResourceManager.cpp" />
@@ -190,7 +190,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="Landscape.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialTemplate.cpp" />
-    <ClCompile Include="MaterialNode.cpp" />
+    <ClCompile Include="ShaderNode.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="NormalMapNode.cpp" />
@@ -230,8 +230,13 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DescriptorHeapManager.h" />
+    <ClInclude Include="DisplacementNode.h" />
+    <ClInclude Include="EmitTriangleNode.h" />
+    <ClInclude Include="EmitVertexNode.h" />
     <ClInclude Include="EndFramePass.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="MeshPrimitiveNode.h" />
+    <ClInclude Include="ShaderGraph.h" />
     <ClInclude Include="Modifier.h" />
     <ClInclude Include="ModifierTemplate.h" />
     <ClInclude Include="SceneData.h" />
@@ -240,7 +245,6 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="System.h" />
     <ClInclude Include="SystemManager.h" />
     <ClInclude Include="TaskManager.h" />
-    <ClInclude Include="FPCamera.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="GpuResourceManager.h" />
     <ClInclude Include="ImGuiLayer.h" />
@@ -255,7 +259,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="MaterialOutputNode.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ExecutionGraph.h" />
-    <ClInclude Include="MaterialNode.h" />
+    <ClInclude Include="ShaderNode.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="NodeLibrary.h" />
     <ClInclude Include="NodeTypes.h" />
@@ -293,34 +297,26 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Material.hlsl">
+    <FxCompile Include="GridShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="PbrPS.hlsl">
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    <FxCompile Include="LandscapeMS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mesh</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.7</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Compute</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Mesh</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.7</ShaderModel>
     </FxCompile>
     <FxCompile Include="PbrVS.hlsl">
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-    </FxCompile>
-    <FxCompile Include="LandscapePS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="LandscapeVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="scratch.hlsl">

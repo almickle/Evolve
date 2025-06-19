@@ -10,20 +10,6 @@
 #include "SystemManager.h"
 #include "Types.h"
 
-struct MaterialEdge {
-	uint fromNode;      // Index source node
-	uint fromSlot;		// Index of output slot
-	uint toNode;        // Index destination node
-	uint toSlot;		// Index of input slot
-};
-
-struct ParameterBinding {
-	uint nodeIndex;
-	uint parameterIndex;
-	NodeParameterTypes parameterType;
-	uint cbufferSlot;
-};
-
 using Microsoft::WRL::ComPtr;
 
 class MaterialTemplate :
@@ -35,7 +21,7 @@ public:
 	{
 	}
 	MaterialTemplate( const std::vector<NodeTypes>& nodes,
-					  const std::vector<MaterialEdge>& edges,
+					  const std::vector<NodeConnection>& edges,
 					  NodeLibrary& nodeLibrary,
 					  const std::string& name = "MaterialTemplate" )
 		: Asset( AssetType::MaterialTemplate, name ),
@@ -59,18 +45,18 @@ public:
 	void Deserialize( JsonSerializer& serializer ) override;
 public:
 	void AddNode( const NodeTypes& node ) { nodes.push_back( node ); }
-	void AddEdge( const MaterialEdge& edge ) { edges.push_back( edge ); }
+	void AddEdge( const NodeConnection& edge ) { edges.push_back( edge ); }
 	void BuildParameterBindings();
 public:
 	ComPtr<ID3DBlob>& GetPixelShaderBlob() { return psBlob; };
 	const std::string& GetShaderCode() const { return shaderCode; }
 	const std::vector<NodeTypes>& GetNodes() const { return nodes; }
-	const std::vector<MaterialEdge>& GetEdges() const { return edges; }
+	const std::vector<NodeConnection>& GetEdges() const { return edges; }
 	const ParameterBinding* GetParameterBinding( uint nodeIndex, uint parameterIndex, NodeParameter parameter ) const;
 	std::string GetParameterValue( uint nodeIndex, uint parameterIndex, NodeParameter parameter ) const;
 private:
 	std::vector<uint> TopologicalSort() const;
-	std::vector<MaterialEdge> GetIncomingEdges( uint nodeIndex ) const;
+	std::vector<NodeConnection> GetIncomingEdges( uint nodeIndex ) const;
 	std::vector<uint> GetUnconnectedInputSlots( uint nodeIndex ) const;
 	std::string GetInputStructs();
 	std::string GetOutputStructs();
@@ -79,7 +65,7 @@ private:
 private:
 	std::string shaderCode;
 	std::vector<NodeTypes> nodes;
-	std::vector<MaterialEdge> edges;
+	std::vector<NodeConnection> edges;
 	std::vector<ParameterBinding> parameterBindings;
 private:
 	NodeLibrary& nodeLibrary;

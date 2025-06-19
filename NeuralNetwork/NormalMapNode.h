@@ -2,16 +2,16 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 #include "Types.h"
 
 class NormalMapNode :
-	public MaterialNode
+	public ShaderNode
 {
 public:
 	NormalMapNode( const std::string& name = "NormalMapNode" )
-		: MaterialNode( 1, 1, 0, name )
+		: ShaderNode( 1, 1, 0, name )
 	{
 		AddInput( normalInputSlot, NodeSlot{ "color",  DirectX::XMFLOAT4{ 0, 0, 0, 0} } );
 		AddOutput( normalOutputSlot, NodeSlot{ "normal",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );

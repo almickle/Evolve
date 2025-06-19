@@ -11,6 +11,7 @@ public:
 	void SetNearZ( float n ) { nearZ = n; }
 	void SetFarZ( float f ) { farZ = f; }
 	void SetForwardVec( const DirectX::XMFLOAT3& forward ) { forwardVec = forward; }
+	void SetRightVec( const DirectX::XMFLOAT3& right ) { rightVec = right; }
 public:
 	const DirectX::XMFLOAT3& GetPosition() const { return position; }
 	const DirectX::XMFLOAT3& GetUp() const { return up; }

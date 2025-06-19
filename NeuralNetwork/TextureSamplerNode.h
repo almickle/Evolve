@@ -2,18 +2,18 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
-class TextureSamplerNode : public MaterialNode {
+class TextureSamplerNode : public ShaderNode {
 public:
 	TextureSamplerNode( const std::string& name = "TextureSamplerNode" )
-		: MaterialNode( 1, 1, 1, name )
+		: ShaderNode( 1, 1, 1, name )
 	{
 		AddInput( uvInputSlotIndex, NodeSlot{ "uv",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 		AddOutput( colorOutputSlotIndex, NodeSlot{ "color", DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f } } );
-		AddParameter( textureParameter, NodeParameter( NodeParameterTypes::Texture, "textureIndex" ) );
+		AddParameter( textureParameter, NodeParameter( NodeParameterType::Texture, "textureIndex" ) );
 	}
 public:
 	std::string GetShaderFunction() override

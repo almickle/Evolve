@@ -1,39 +1,39 @@
 #include <sstream>
 #include <string>
-#include "MaterialNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
-std::string MaterialNode::GetInputStatement( const uint& nodeIndex ) const
+std::string ShaderNode::GetInputStatement( const uint& nodeIndex ) const
 {
 	return GetInputStructName() + " " + GetInputDataName( nodeIndex ) + ";";
 }
 
-std::string MaterialNode::GetOutputStatement( const uint& nodeIndex ) const
+std::string ShaderNode::GetOutputStatement( const uint& nodeIndex ) const
 {
 	return GetOutputStructName() + " " + GetOutputDataName( nodeIndex ) + " = " + GetFunctionName() + "(" + GetInputDataName( nodeIndex ) + ", " + GetParameterDataName( nodeIndex ) + ", " + "vertexData" + ");";
 }
-std::string MaterialNode::GetParameterStatement( const uint& nodeIndex ) const
+std::string ShaderNode::GetParameterStatement( const uint& nodeIndex ) const
 {
 	return GetParameterStructName() + " " + GetParameterDataName( nodeIndex ) + ";";
 }
 
-std::string MaterialNode::GetInputSlotName( const uint& slot ) const
+std::string ShaderNode::GetInputSlotName( const uint& slot ) const
 {
 	return inputs[slot].name;
 }
 
-std::string MaterialNode::GetOutputSlotName( const uint& slot ) const
+std::string ShaderNode::GetOutputSlotName( const uint& slot ) const
 {
 	return outputs[slot].name;
 }
 
-std::string MaterialNode::GetParameterSlotName( const uint& slot ) const
+std::string ShaderNode::GetParameterSlotName( const uint& slot ) const
 {
 	return parameters[slot].name;
 }
 
-std::string MaterialNode::GetInputStruct() const
+std::string ShaderNode::GetInputStruct() const
 {
 	std::ostringstream oss;
 	oss << "struct " << GetInputStructName() << "{\n";
@@ -44,7 +44,7 @@ std::string MaterialNode::GetInputStruct() const
 	return oss.str();
 }
 
-std::string MaterialNode::GetOutputStruct() const
+std::string ShaderNode::GetOutputStruct() const
 {
 	std::ostringstream oss;
 	oss << "struct " << GetOutputStructName() << "{\n";
@@ -55,7 +55,7 @@ std::string MaterialNode::GetOutputStruct() const
 	return oss.str();
 }
 
-std::string MaterialNode::GetParameterStruct() const
+std::string ShaderNode::GetParameterStruct() const
 {
 	std::ostringstream oss;
 	oss << "struct " << GetParameterStructName() << "{\n";
@@ -66,55 +66,55 @@ std::string MaterialNode::GetParameterStruct() const
 	return oss.str();
 }
 
-std::string MaterialNode::GetFunctionName() const
+std::string ShaderNode::GetFunctionName() const
 {
 	return name;
 }
 
-std::string MaterialNode::GetInputStructName() const
+std::string ShaderNode::GetInputStructName() const
 {
 	return name + "Input";
 }
 
-std::string MaterialNode::GetOutputStructName() const
+std::string ShaderNode::GetOutputStructName() const
 {
 	return name + "Output";
 }
 
-std::string MaterialNode::GetParameterStructName() const
+std::string ShaderNode::GetParameterStructName() const
 {
 	return name + "Parameters";
 }
 
 
-std::string MaterialNode::GetInputDataName( const uint& nodeIndex ) const
+std::string ShaderNode::GetInputDataName( const uint& nodeIndex ) const
 {
 	return name + "InputData" + std::to_string( nodeIndex );
 }
 
-std::string MaterialNode::GetOutputDataName( const uint& nodeIndex ) const
+std::string ShaderNode::GetOutputDataName( const uint& nodeIndex ) const
 {
 	return name + "OutputData" + std::to_string( nodeIndex );
 }
 
-std::string MaterialNode::GetParameterDataName( const uint& nodeIndex ) const
+std::string ShaderNode::GetParameterDataName( const uint& nodeIndex ) const
 {
 	return name + "ParameterData" + std::to_string( nodeIndex );
 }
 
-std::string MaterialNode::GetReturnObject() const
+std::string ShaderNode::GetReturnObject() const
 {
 	std::ostringstream oss;
 	oss << name << "Output output;";
 	return oss.str();
 }
 
-std::string MaterialNode::GetFunctionSignature() const
+std::string ShaderNode::GetFunctionSignature() const
 {
 	return GetOutputStructName() + " " + GetFunctionName() + "(" + GetInputStructName() + " input" + ", " + GetParameterStructName() + " parameters" + ", " + "VSOutput vertexData" + ")";
 }
 
-std::string MaterialNode::GetReturnStatement() const
+std::string ShaderNode::GetReturnStatement() const
 {
 	return "return output;";
 }

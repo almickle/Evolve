@@ -322,6 +322,10 @@ void Renderer::CompileShader( const std::string& shaderCode, const ShaderType& t
 		case ShaderType::Compute:
 			targetProfile = L"cs_" + std::wstring( model.begin(), model.end() );
 			break;
+		case ShaderType::Mesh:
+			targetProfile = L"ms_" + std::wstring( model.begin(), model.end() );
+			break;
+
 		default:
 			throw "Unsupported shader type";
 			break;

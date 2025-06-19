@@ -2,16 +2,16 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 #include "Types.h"
 
 class VectorScaleNode :
-	public MaterialNode
+	public ShaderNode
 {
 public:
 	VectorScaleNode( const std::string& name = "VectorScaleNode" )
-		: MaterialNode( 2, 1, 0, name )
+		: ShaderNode( 2, 1, 0, name )
 	{
 		AddInput( vectorInputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 		AddInput( scaleInputSlot, NodeSlot{ "scale", 1.0f } );

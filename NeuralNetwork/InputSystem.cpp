@@ -1,4 +1,3 @@
-#include <DirectXMath.h>
 #include <Windows.h>
 #include "InputSystem.h"
 #include "Scene.h"
@@ -12,28 +11,24 @@ void InputSystem::Update( Scene* scene )
 
 void InputSystem::UpdateInputState()
 {
-	// Keyboard
-	for( int i = 0; i < 256; ++i ) {
-		inputState.keys[i] = (GetAsyncKeyState( i ) & 0x8000) != 0;
-	}
-
-	// Mouse
-	POINT p;
 	HWND hwnd = window->GetHWND();
-	if( GetCursorPos( &p ) ) {
-		//	ScreenToClient( hwnd, &p );
-		//		inputState.lastMouseX = p.x;
-		//		inputState.lastMouseY = p.y;
-		inputState.mouseDeltaX = p.x - inputState.lastMouseX;
-		inputState.mouseDeltaY = p.y - inputState.lastMouseY;
-		inputState.lastMouseX = p.x;
-		inputState.lastMouseY = p.y;
-		inputState.mouseLeftDown = (GetAsyncKeyState( VK_LBUTTON ) & 0x8000) != 0;
-		inputState.mouseMiddleDown = (GetAsyncKeyState( VK_MBUTTON ) & 0x8000) != 0;
-	}
-	// Only recenter if window is focused
 	if( GetForegroundWindow() == hwnd ) {
-		//CenterMouse();
+
+		// Keyboard
+		for( int i = 0; i < 256; ++i ) {
+			inputState.keys[i] = (GetAsyncKeyState( i ) & 0x8000) != 0;
+		}
+
+		// Mouse
+		POINT p;
+		if( GetCursorPos( &p ) ) {
+			inputState.mouseDeltaX = p.x - inputState.lastMouseX;
+			inputState.mouseDeltaY = p.y - inputState.lastMouseY;
+			inputState.lastMouseX = p.x;
+			inputState.lastMouseY = p.y;
+			inputState.mouseLeftDown = (GetAsyncKeyState( VK_LBUTTON ) & 0x8000) != 0;
+			inputState.mouseMiddleDown = (GetAsyncKeyState( VK_MBUTTON ) & 0x8000) != 0;
+		}
 	}
 }
 
@@ -57,10 +52,6 @@ void InputSystem::UpdateCameraFromInput( Scene* scene )
 {
 	auto* camera = scene->GetActiveCamera();
 	if( !camera ) return;
-
-	//float moveSpeed = 0.1f;
-	//float rotSpeed = 0.005f;
-	//float panSpeed = 0.01f; // Adjust as needed
 
 	if( inputState.keys['W'] ) camera->MoveForward();
 	if( inputState.keys['S'] ) camera->MoveBack();

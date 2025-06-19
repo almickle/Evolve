@@ -2,13 +2,13 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 
-class MaterialOutputNode : public MaterialNode {
+class MaterialOutputNode : public ShaderNode {
 public:
 	MaterialOutputNode( const std::string& name = "MaterialOutputNode" )
-		: MaterialNode( 7, 1, 0, name )
+		: ShaderNode( 7, 1, 0, name )
 	{
 		AddInput( 0, NodeSlot{ "baseColor", DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f} } );
 		AddInput( 1, NodeSlot{ "metallic", 0.0f } );

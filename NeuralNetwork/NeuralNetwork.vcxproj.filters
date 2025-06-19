@@ -12,9 +12,6 @@
     <Filter Include="Source Files\Neuron">
       <UniqueIdentifier>{ca4e9beb-4061-47fa-a612-c7c8f4ddc464}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Render">
-      <UniqueIdentifier>{16270c6e-5137-466d-b630-7773de029b33}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{2d9f043f-db75-475f-acf3-6a1f04e2c136}</UniqueIdentifier>
     </Filter>
@@ -23,9 +20,6 @@
     </Filter>
     <Filter Include="Header Files\Neuron">
       <UniqueIdentifier>{2c687ecb-acfd-4561-87ca-e33e848c7e88}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Render\Passes">
-      <UniqueIdentifier>{85cca647-dd04-4782-9cd6-a4ed04aaf688}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Render\Passes">
       <UniqueIdentifier>{f83da41f-d2fc-4ba1-af54-7f17e6118675}</UniqueIdentifier>
@@ -44,9 +38,6 @@
     </Filter>
     <Filter Include="Header Files\Render\Graphs">
       <UniqueIdentifier>{a1ab680a-5d77-4cee-89be-6042f1f9ae0a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Render\Graphs">
-      <UniqueIdentifier>{d0015645-90ac-458e-a1d5-02e2d8ce235c}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\UI">
       <UniqueIdentifier>{7a9a3ee6-3503-444b-b1f0-1cbe70522613}</UniqueIdentifier>
@@ -75,20 +66,8 @@
     <Filter Include="Source Files\Assets\Assets">
       <UniqueIdentifier>{8bb6d231-ec9f-41bb-a37a-8077d40a13bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Assets\Material Graph">
-      <UniqueIdentifier>{6f3ea7da-0b11-4768-b740-d3781a5d95a7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Assets\Assets">
       <UniqueIdentifier>{70e68596-c268-443c-8aa6-fd8ea44c1349}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Assets\Material Graph">
-      <UniqueIdentifier>{aebdb90f-4644-4cbb-b7ec-11ddc2dd21e8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Assets\Material Graph\Nodes">
-      <UniqueIdentifier>{68345bd9-6603-49ed-a9bc-3be59d359a3a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Assets\Material Graph\Nodes">
-      <UniqueIdentifier>{cc015c00-bc0d-4ac1-881e-0037289a02a9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Passes">
       <UniqueIdentifier>{0eb82cfc-8383-4dfd-ba9a-17e390e29623}</UniqueIdentifier>
@@ -130,6 +109,39 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Old">
+      <UniqueIdentifier>{16270c6e-5137-466d-b630-7773de029b33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Old\Passes">
+      <UniqueIdentifier>{85cca647-dd04-4782-9cd6-a4ed04aaf688}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Old\Graphs">
+      <UniqueIdentifier>{d0015645-90ac-458e-a1d5-02e2d8ce235c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph">
+      <UniqueIdentifier>{aebdb90f-4644-4cbb-b7ec-11ddc2dd21e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes">
+      <UniqueIdentifier>{68345bd9-6603-49ed-a9bc-3be59d359a3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes\Mesh">
+      <UniqueIdentifier>{7e077b27-102d-40f2-9cc2-486c1466688f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes\Material">
+      <UniqueIdentifier>{44c9eee4-a274-440c-8cbf-cdbdb85bd15f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes\Common">
+      <UniqueIdentifier>{de855379-a81d-48cc-8f85-39086b6bd42b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes\Common\Vector">
+      <UniqueIdentifier>{02235c30-2bb3-4c97-8ea2-06423f2dd733}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Shader Graph">
+      <UniqueIdentifier>{6f3ea7da-0b11-4768-b740-d3781a5d95a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Assets\Shader Graph\Nodes">
+      <UniqueIdentifier>{cc015c00-bc0d-4ac1-881e-0037289a02a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -153,9 +165,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="FPCamera.cpp">
-      <Filter>Source Files\Scene</Filter>
-    </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
@@ -175,7 +184,7 @@
       <Filter>Source Files\Systems\Managers</Filter>
     </ClCompile>
     <ClCompile Include="ExecutionGraph.cpp">
-      <Filter>Source Files\Render\Graphs</Filter>
+      <Filter>Source Files\Old\Graphs</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
       <Filter>Source Files\Common</Filter>
@@ -216,8 +225,8 @@
     <ClCompile Include="TextureAsset.cpp">
       <Filter>Source Files\Assets\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialNode.cpp">
-      <Filter>Source Files\Assets\Material Graph</Filter>
+    <ClCompile Include="ShaderNode.cpp">
+      <Filter>Source Files\Assets\Shader Graph</Filter>
     </ClCompile>
     <ClCompile Include="MaterialTemplate.cpp">
       <Filter>Source Files\Assets\Assets</Filter>
@@ -226,19 +235,19 @@
       <Filter>Source Files\Systems\Managers</Filter>
     </ClCompile>
     <ClCompile Include="VectorScaleNode.cpp">
-      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+      <Filter>Source Files\Assets\Shader Graph\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="VertexDataNode.cpp">
-      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+      <Filter>Source Files\Assets\Shader Graph\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="NormalMapNode.cpp">
-      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+      <Filter>Source Files\Assets\Shader Graph\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="ScalarParameterNode.cpp">
-      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+      <Filter>Source Files\Assets\Shader Graph\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="VectorBreakNode.cpp">
-      <Filter>Source Files\Assets\Material Graph\Nodes</Filter>
+      <Filter>Source Files\Assets\Shader Graph\Nodes</Filter>
     </ClCompile>
     <ClCompile Include="Asset.cpp">
       <Filter>Source Files\Assets</Filter>
@@ -271,10 +280,10 @@
       <Filter>Source Files\Passes</Filter>
     </ClCompile>
     <ClCompile Include="SceneInitPass.cpp">
-      <Filter>Source Files\Render\Passes</Filter>
+      <Filter>Source Files\Old\Passes</Filter>
     </ClCompile>
     <ClCompile Include="SceneRenderPass.cpp">
-      <Filter>Source Files\Render\Passes</Filter>
+      <Filter>Source Files\Old\Passes</Filter>
     </ClCompile>
     <ClCompile Include="UploadPass.cpp">
       <Filter>Source Files\Passes\Initialization</Filter>
@@ -304,6 +313,9 @@
       <Filter>Source Files\Passes\Render</Filter>
     </ClCompile>
     <ClCompile Include="UpdatePass.cpp">
+      <Filter>Source Files\Passes\Initialization</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -336,9 +348,6 @@
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="FPCamera.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
     <ClInclude Include="InstanceManager.h">
@@ -410,17 +419,11 @@
     <ClInclude Include="TextureAsset.h">
       <Filter>Header Files\Assets\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="MaterialNode.h">
-      <Filter>Header Files\Assets\Material Graph</Filter>
-    </ClInclude>
-    <ClInclude Include="TextureSamplerNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialOutputNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
+    <ClInclude Include="ShaderNode.h">
+      <Filter>Header Files\Assets\Shader Graph</Filter>
     </ClInclude>
     <ClInclude Include="NodeTypes.h">
-      <Filter>Header Files\Assets\Material Graph</Filter>
+      <Filter>Header Files\Assets\Shader Graph</Filter>
     </ClInclude>
     <ClInclude Include="MaterialTemplate.h">
       <Filter>Header Files\Assets\Assets</Filter>
@@ -428,23 +431,8 @@
     <ClInclude Include="JsonSerializer.h">
       <Filter>Header Files\Systems\Serializers</Filter>
     </ClInclude>
-    <ClInclude Include="VertexDataNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="VectorScaleNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
-    </ClInclude>
     <ClInclude Include="ImportManager.h">
       <Filter>Header Files\Systems\Managers</Filter>
-    </ClInclude>
-    <ClInclude Include="NormalMapNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="VectorBreakNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
-    </ClInclude>
-    <ClInclude Include="ScalarParameterNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
     </ClInclude>
     <ClInclude Include="Asset.h">
       <Filter>Header Files\Assets</Filter>
@@ -506,33 +494,63 @@
     <ClInclude Include="ShaderBindings.h">
       <Filter>Header Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="VectorMakeNode.h">
-      <Filter>Header Files\Assets\Material Graph\Nodes</Filter>
-    </ClInclude>
     <ClInclude Include="ScenePass.h">
       <Filter>Header Files\Passes\Render</Filter>
     </ClInclude>
     <ClInclude Include="UpdatePass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DisplacementNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="EmitTriangleNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="EmitVertexNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshPrimitiveNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialOutputNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="NormalMapNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="ScalarParameterNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureSamplerNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexDataNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorBreakNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Common\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorMakeNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Common\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorScaleNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Common\Vector</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderGraph.h">
+      <Filter>Header Files\Assets\Shader Graph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PbrPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="PbrVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="LandscapeVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="LandscapePS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Material.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="scratch.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="GridShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="LandscapeMS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

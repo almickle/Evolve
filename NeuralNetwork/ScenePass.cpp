@@ -18,11 +18,18 @@ void ScenePass::Execute( SystemManager& systemManager, const AssetID& sceneID )
 	auto* resourceManager = systemManager.GetResourceManager();
 	auto* srvHeapManager = systemManager.GetSrvHeapManager();
 
+	BeginFrame( renderer, srvHeapManager );
+	DrawActors( assetManager, resourceManager, renderer, sceneID );
+	EndFrame( renderer );
+}
+
+void ScenePass::BeginFrame( Renderer* renderer, DescriptorHeapManager* srvHeapManager )
+{
 	renderer->UpdateCurrentFrameIndex();
 	uint frameIndex = renderer->GetCurrentFrameIndex();
 
-	auto allocator = commandAllocators[frameIndex].Get();
-	auto commandList = commandLists[frameIndex].Get();
+	auto* allocator = commandAllocators[frameIndex].Get();
+	auto* commandList = commandLists[frameIndex].Get();
 
 	allocator->Reset();
 	commandList->Reset( allocator, nullptr );
@@ -56,6 +63,12 @@ void ScenePass::Execute( SystemManager& systemManager, const AssetID& sceneID )
 	commandList->IASetPrimitiveTopology( renderer->GetTopology() );
 	commandList->SetGraphicsRootSignature( renderer->GetRootSignature() );
 	commandList->SetGraphicsRootDescriptorTable( 5, srvHeapManager->GetHeap()->GetGPUDescriptorHandleForHeapStart() );
+}
+
+void ScenePass::DrawActors( AssetManager* assetManager, GpuResourceManager* resourceManager, Renderer* renderer, const AssetID& sceneID )
+{
+	uint frameIndex = renderer->GetCurrentFrameIndex();
+	auto* commandList = commandLists[frameIndex].Get();
 
 	auto* scene = static_cast<Scene*>(assetManager->GetAsset( sceneID ));
 	auto* sManager = scene->GetStaticInstanceManager();
@@ -93,18 +106,22 @@ void ScenePass::Execute( SystemManager& systemManager, const AssetID& sceneID )
 
 		renderer->RenderActorInstances( commandList, psoKeys, vbViews, ibViews, psCbAddresses, instanceCount, heapOffset, true );
 	}
+}
 
-	{
-		D3D12_RESOURCE_BARRIER barrier = {};
-		barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		barrier.Transition.pResource = systemManager.GetRenderer()->GetCurrentBackBuffer();
-		barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-		barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-		barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+void ScenePass::EndFrame( Renderer* renderer )
+{
+	uint frameIndex = renderer->GetCurrentFrameIndex();
+	auto* commandList = commandLists[frameIndex].Get();
 
-		// Transition the back buffer to PRESENT
-		commandList->ResourceBarrier( 1, &barrier );
-	}
+	D3D12_RESOURCE_BARRIER barrier = {};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Transition.pResource = renderer->GetCurrentBackBuffer();
+	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
+	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
+
+	// Transition the back buffer to PRESENT
+	commandList->ResourceBarrier( 1, &barrier );
 
 	commandList->Close();
 }

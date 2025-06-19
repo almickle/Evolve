@@ -2,16 +2,16 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 #include "Types.h"
 
 class VectorMakeNode :
-	public MaterialNode
+	public ShaderNode
 {
 public:
 	VectorMakeNode( const std::string& name = "VectorMakeNode" )
-		: MaterialNode( 3, 1, 0, name )
+		: ShaderNode( 3, 1, 0, name )
 	{
 		AddInput( xInputSlot, NodeSlot{ "x", 0.0f } );
 		AddInput( yInputSlot, NodeSlot{ "y", 0.0f } );

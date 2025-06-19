@@ -86,6 +86,14 @@ void Scene::Deserialize( JsonSerializer& serializer )
 				auto& pos = c.at( "position" );
 				camera->SetPosition( { pos[0].get<float>(), pos[1].get<float>(), pos[2].get<float>() } );
 			}
+			if( c.contains( "forwardVec" ) ) {
+				auto& vec = c.at( "forwardVec" );
+				camera->SetForwardVec( { vec[0].get<float>(), vec[1].get<float>(), vec[2].get<float>() } );
+			}
+			if( c.contains( "rightVec" ) ) {
+				auto& vec = c.at( "rightVec" );
+				camera->SetRightVec( { vec[0].get<float>(), vec[1].get<float>(), vec[2].get<float>() } );
+			}
 			cameras.push_back( std::move( camera ) );
 		}
 

@@ -2,16 +2,16 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 #include "Types.h"
 
 class VertexDataNode :
-	public MaterialNode
+	public ShaderNode
 {
 public:
 	VertexDataNode( const std::string& name = "VertexDataNode" )
-		: MaterialNode( 0, 5, 0, name )
+		: ShaderNode( 0, 5, 0, name )
 	{
 		AddOutput( pixelPosOutputSlot, NodeSlot{ "pixelPos", DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
 		AddOutput( worldPosOutputSlot, NodeSlot{ "worldPos", DirectX::XMFLOAT4{ 0, 0, 0,0 } } );

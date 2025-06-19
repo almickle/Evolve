@@ -1,19 +1,19 @@
 #pragma once
 #include <format>
 #include <string>
-#include "MaterialNode.h"
+#include "ShaderNode.h"
 #include "NodeTypes.h"
 #include "Types.h"
 
 class ScalarParameterNode :
-	public MaterialNode
+	public ShaderNode
 {
 public:
 	ScalarParameterNode( const std::string& name = "ScalarParameterNode" )
-		: MaterialNode( 0, 1, 1, name )
+		: ShaderNode( 0, 1, 1, name )
 	{
 		AddOutput( valueOutputSlot, NodeSlot{ "value", 0.0f } );
-		AddParameter( scalarParameterSlot, NodeParameter( NodeParameterTypes::Scalar, "scalar" ) );
+		AddParameter( scalarParameterSlot, NodeParameter( NodeParameterType::Scalar, "scalar" ) );
 	}
 	~ScalarParameterNode() {}
 public:
