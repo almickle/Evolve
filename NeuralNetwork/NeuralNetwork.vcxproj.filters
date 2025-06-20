@@ -142,6 +142,12 @@
     <Filter Include="Source Files\Assets\Shader Graph\Nodes">
       <UniqueIdentifier>{cc015c00-bc0d-4ac1-881e-0037289a02a9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes\Logic">
+      <UniqueIdentifier>{fc313bf4-f806-47ed-8318-c57f7500aac1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Nodes\Arithmetic">
+      <UniqueIdentifier>{56466603-679a-4d63-9a28-72878e818e72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -273,7 +279,7 @@
     <ClCompile Include="EndFramePass.cpp">
       <Filter>Source Files\Passes\Render</Filter>
     </ClCompile>
-    <ClCompile Include="UIRenderPass.cpp">
+    <ClCompile Include="UIPass.cpp">
       <Filter>Source Files\Passes\Render</Filter>
     </ClCompile>
     <ClCompile Include="GraphPass.cpp">
@@ -458,7 +464,7 @@
     <ClInclude Include="GraphPass.h">
       <Filter>Header Files\Passes</Filter>
     </ClInclude>
-    <ClInclude Include="UIRenderPass.h">
+    <ClInclude Include="UIPass.h">
       <Filter>Header Files\Passes\Render</Filter>
     </ClInclude>
     <ClInclude Include="SystemManager.h">
@@ -468,9 +474,6 @@
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="NodeLibrary.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="System.h">
@@ -538,6 +541,69 @@
     </ClInclude>
     <ClInclude Include="ShaderGraph.h">
       <Filter>Header Files\Assets\Shader Graph</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadInfoNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="AndNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="LessThanNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="OrNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="GreaterThanNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="LessThanOrEqualNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="GreaterThanOrEqualNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="EqualNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="NotEqualNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Logic</Filter>
+    </ClInclude>
+    <ClInclude Include="AddNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="SubtractNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="MultiplyNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="DivideNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="RadicalNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="NegateNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="AbsoluteValueNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="ReciprocalNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="SignNode.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes\Arithmetic</Filter>
+    </ClInclude>
+    <ClInclude Include="NodeLibrary.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="Nodes.h">
+      <Filter>Header Files\Assets\Shader Graph\Nodes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

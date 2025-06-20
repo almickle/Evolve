@@ -10,6 +10,7 @@
 #include "Scene.h"
 #include "ScenePass.h"
 #include "SystemManager.h"
+#include "UIPass.h"
 #include "UpdatePass.h"
 #include "UploadPass.h"
 #include "Window.h"
@@ -57,8 +58,11 @@ void App::Run()
 void App::BuildRenderGraph()
 {
 	auto scenePass = std::make_unique<ScenePass>();
+	auto uiPass = std::make_unique<UIPass>();
+	uiPass->AddDependency( scenePass.get() );
 	systemManager->GetRenderer()->GetRenderGraph()
-		->AddPass( std::move( scenePass ) );
+		->AddPass( std::move( scenePass ) )
+		->AddPass( std::move( uiPass ) );
 
 	for( const auto& pass : systemManager->GetRenderer()->GetRenderGraph()->GetPasses() )
 	{

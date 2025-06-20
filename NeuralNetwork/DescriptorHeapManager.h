@@ -19,6 +19,8 @@ public:
 	void Free( int index );
 	int AllocateReserved();
 	void FreeReserved( int index );
+	void Alloc( D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu );
+	void Free( D3D12_CPU_DESCRIPTOR_HANDLE cpu, D3D12_GPU_DESCRIPTOR_HANDLE gpu );
 public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCpuHandle( int index ) const;
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGpuHandle( int index ) const;

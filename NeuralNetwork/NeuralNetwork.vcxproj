@@ -107,15 +107,15 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\imgui-node-editor;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;$(CoreLibraryDependencies);%(AdditionalDependencies);assimp-vc143-mtd.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Debug;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\x64\Debug;C:\source\libraries\assimp\lib\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImGuiCore.lib;ImGuiDX12.lib;ImGuiWin32.lib;ImGuiNodeEditor.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\source\libraries\ImGuiLibrary\$(Platform)\$(Configuration);C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration);C:\source\libraries\assimp\lib\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
@@ -136,7 +136,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\imgui-node-editor;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -147,8 +147,8 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\source\libraries\imgui\x64\Release;C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\x64\Release;C:\source\libraries\assimp\lib\Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);assimp-vc143-mt.lib;d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImguiDX12.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\source\libraries\ImGuiLibrary\$(Platform)\$(Configuration);C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration);C:\source\libraries\assimp\lib\$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImGuiCore.lib;ImGuiDX12.lib;ImGuiWin32.lib;ImGuiNodeEditor.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
@@ -200,7 +200,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureAsset.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
-    <ClCompile Include="UIRenderPass.cpp" />
+    <ClCompile Include="UIPass.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="SubMesh.cpp" />
     <ClCompile Include="NeuralCluster.cpp" />
@@ -222,7 +222,10 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AbsoluteValueNode.h" />
     <ClInclude Include="Actor.h" />
+    <ClInclude Include="AddNode.h" />
+    <ClInclude Include="AndNode.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="Asset.h" />
     <ClInclude Include="AssetManager.h" />
@@ -231,9 +234,26 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DescriptorHeapManager.h" />
     <ClInclude Include="DisplacementNode.h" />
+    <ClInclude Include="DivideNode.h" />
     <ClInclude Include="EmitTriangleNode.h" />
     <ClInclude Include="EmitVertexNode.h" />
     <ClInclude Include="EndFramePass.h" />
+    <ClInclude Include="EqualNode.h" />
+    <ClInclude Include="GreaterThanNode.h" />
+    <ClInclude Include="GreaterThanOrEqualNode.h" />
+    <ClInclude Include="NegateNode.h" />
+    <ClInclude Include="Nodes.h" />
+    <ClInclude Include="RadicalNode.h" />
+    <ClInclude Include="LessThanNode.h" />
+    <ClInclude Include="LessThanOrEqualNode.h" />
+    <ClInclude Include="MultiplyNode.h" />
+    <ClInclude Include="NotEqualNode.h" />
+    <ClInclude Include="OrNode.h" />
+    <ClInclude Include="PowerNode.h" />
+    <ClInclude Include="ReciprocalNode.h" />
+    <ClInclude Include="SignNode.h" />
+    <ClInclude Include="SubtractNode.h" />
+    <ClInclude Include="ThreadInfoNode.h" />
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="MeshPrimitiveNode.h" />
     <ClInclude Include="ShaderGraph.h" />
@@ -273,7 +293,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="TextureSamplerNode.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
-    <ClInclude Include="UIRenderPass.h" />
+    <ClInclude Include="UIPass.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="SubMesh.h" />
     <ClInclude Include="NeuralCluster.h" />

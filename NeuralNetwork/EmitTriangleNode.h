@@ -11,9 +11,9 @@ public:
 	EmitTriangleNode( const std::string& name = "EmitTriangleNode" )
 		: ShaderNode( 3, 0, 0, name )
 	{
-		AddInput( heightInputSlot, NodeSlot{ "height",  0.0f } );
-		AddInput( scaleInputSlot, NodeSlot{ "scale",  0.0f } );
-		AddInput( positionInputSlot, NodeSlot{ "position",  DirectX::XMFLOAT4{} } );
+		AddInput( conditionInputSlot, NodeSlot{ "condition", false } );
+		AddInput( indexInputSlot, NodeSlot{ "index", uint( 0 ) } );
+		AddInput( triangleInputSlot, NodeSlot{ "triangle", DirectX::XMUINT3{} } );
 	}
 	~EmitTriangleNode() = default;
 public:
@@ -23,28 +23,23 @@ public:
 		auto returnObject = GetReturnObject();
 		auto returnStatement = GetReturnStatement();
 
-		std::string functionBody = std::format( "output.{} = input.{} + (normalize(input.{}) * input.{} * input.{});\n",
-												GetPositionOutputSlot().name,
-												GetPositionInputSlot().name,
-												GetDirectionInputSlot().name,
-												GetHeightInputSlot().name,
-												GetScaleInputSlot().name );
+		std::string functionBody = std::format(
+			"if(!input.{}) return;\n"
+			"tris[input.{}] = input.{};\n",
+			GetConditionInput().name,
+			GetIndexInput().name,
+			GeTriangleInput().name );
 
 		std::string shaderFunction = std::format( "{}{{\n{}\n{}\n{}}}", functionSignature, returnObject, functionBody, returnStatement );
 
 		return shaderFunction;
 	}
 private:
-	NodeSlot GetHeightInputSlot() const { return inputs[heightInputSlot]; }
-	NodeSlot GetScaleInputSlot() const { return outputs[scaleInputSlot]; }
-	NodeSlot GetPositionInputSlot() const { return inputs[positionInputSlot]; }
-	NodeSlot GetDirectionInputSlot() const { return inputs[directionInputSlot]; }
-	NodeSlot GetPositionOutputSlot() const { return outputs[positionOutputSlot]; }
+	NodeSlot GetConditionInput() const { return inputs[conditionInputSlot]; }
+	NodeSlot GetIndexInput() const { return inputs[indexInputSlot]; }
+	NodeSlot GeTriangleInput() const { return inputs[triangleInputSlot]; }
 private:
-	uint heightInputSlot = 0;
-	uint scaleInputSlot = 1;
-	uint positionInputSlot = 2;
-	uint directionInputSlot = 3;
-private:
-	uint positionOutputSlot = 0;
+	uint conditionInputSlot = 0;
+	uint indexInputSlot = 1;
+	uint triangleInputSlot = 2;
 };

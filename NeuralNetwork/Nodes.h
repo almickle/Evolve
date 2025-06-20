@@ -1,0 +1,37 @@
+#pragma once
+#include "AbsoluteValueNode.h"
+#include "AddNode.h"
+#include "DivideNode.h"
+#include "MultiplyNode.h"
+#include "NegateNode.h"
+#include "PowerNode.h"
+#include "RadicalNode.h"
+#include "ReciprocalNode.h"
+#include "SignNode.h"
+#include "SubtractNode.h"
+
+#include "AndNode.h"
+#include "EqualNode.h"
+#include "GreaterThanNode.h"
+#include "GreaterThanOrEqualNode.h"
+#include "LessThanNode.h"
+#include "LessThanOrEqualNode.h"
+#include "NotEqualNode.h"
+#include "OrNode.h"
+
+#include "DisplacementNode.h"
+#include "EmitTriangleNode.h"
+#include "EmitVertexNode.h"
+#include "MeshPrimitiveNode.h"
+#include "ThreadInfoNode.h"
+
+#include "MaterialOutputNode.h"
+#include "NormalMapNode.h"
+#include "VertexDataNode.h"
+
+#include "ScalarParameterNode.h"
+#include "TextureSamplerNode.h"
+
+#include "VectorBreakNode.h"
+#include "VectorMakeNode.h"
+#include "VectorScaleNode.h"

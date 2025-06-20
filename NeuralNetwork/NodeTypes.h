@@ -14,7 +14,33 @@ enum class NodeTypes
 	NormalMap,
 	VectorBreak,
 	ScalarParameter,
-	VectorMakeNode
+	VectorMakeNode,
+	// Logic
+	And,
+	Or,
+	GreaterThan,
+	GreaterThanOrEqual,
+	LessThan,
+	LessThanOrEqual,
+	Equal,
+	NotEqual,
+	// Arithmetic
+	Add,
+	Subtract,
+	Multiply,
+	Divide,
+	Power,
+	Radical,
+	Negate,
+	AbsoluteValue,
+	Reciprocal,
+	Sign,
+	// Mesh
+	Displacement,
+	EmitTriangle,
+	EmitVertex,
+	ThreadInfo,
+	MeshPrimitivePlane
 };
 
 enum class NodeParameterType {
@@ -30,6 +56,7 @@ struct NodeSlot {
 		unsigned int,
 		bool,
 		float,
+		DirectX::XMUINT3,
 		DirectX::XMFLOAT4
 	>;
 	std::string name;
@@ -43,6 +70,8 @@ public:
 				return "int " + name;
 			else if constexpr( std::is_same_v<T, unsigned int> )
 				return "uint " + name;
+			else if constexpr( std::is_same_v<T, DirectX::XMUINT3> )
+				return "uint3 " + name;
 			else if constexpr( std::is_same_v<T, bool> )
 				return "bool " + name;
 			else if constexpr( std::is_same_v<T, float> )

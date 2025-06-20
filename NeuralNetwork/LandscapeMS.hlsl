@@ -38,12 +38,16 @@ groupshared float3 gNrm[64];
 struct ThreadIDs
 {
     uint3 tid : SV_GroupThreadID;
-    uint3 gid : SV_GroupID;
     uint3 dtid : SV_DispatchThreadID;
+    uint3 gid : SV_GroupID;
 };
 
+#define THREADS_X 8
+#define THREADS_Y 8
+#define THREADS_Z 1
+
 [outputtopology("triangle")]
-[numthreads(8, 8, 1)]
+[numthreads(THREADS_X, THREADS_Y, THREADS_Z)]
 void main(ThreadIDs threadIds,
            out vertices VSOutput verts[MaxVerts],
            out indices uint3 tris[MaxTris])
@@ -107,28 +111,36 @@ void main(ThreadIDs threadIds,
         uint triID = base * 2;
         tris[triID] = t0;
         tris[triID + 1] = t1;
-        
     }
+}
+
+uint GetVertexIndex(uint2 coord, uint xres)
+{
+    return xres * coord.y + coord.x;
 }
 
 VSOutput MeshPrimitivePlane(ThreadIDs threadIds, float size, uint2 resolution)
 {    
-    uint x = threadIds.dtid.x;
-    uint y = threadIds.dtid.y;
-    uint2 p0 = uint2(x, y); // Base vertex
-    uint2 p1 = uint2(x + 1, y);
-    uint2 p2 = uint2(x + 1, y + 1);
-    uint2 p3 = uint2(x, y + 1);
+    uint2 gvid = threadIds.dtid.xy;
+    uint2 lvid = threadIds.tid.xy;
+
+    uint2 p0 = uint2(lvid.x, lvid.y);
+    uint2 p1 = uint2(lvid.x + 1, lvid.y);
+    uint2 p2 = uint2(lvid.x + 1, lvid.y + 1);
+    uint2 p3 = uint2(lvid.x, lvid.y + 1);
+    uint i0 = p0.x + p0.y * THREADS_X;
+    uint i1 = p1.x + p1.y * THREADS_X;
+    uint i2 = p2.x + p2.y * THREADS_X;
+    uint i3 = p3.x + p3.y * THREADS_X;
     
-    uint3 t0 = uint3(p0.x, p1.x, p3.x); // Tri 1: p0, p1, p3
-    uint3 t1 = uint3(p0.x, p2.x, p3.x); // Tri 1: p0, p1, p3
+    uint3 t0 = uint3(i0, i1, i3); // Tri 1: p0, p1, p3
+    uint3 t1 = uint3(i0, i2, i3); // Tri 2: p0, p2, p3
     
     
     
     VSOutput output;
 
-    uint2 vid = threadIds.dtid.xy;
-    float2 uv = (float2) vid / float2(resolution - 1);
+    float2 uv = (float2) gvid / float2(resolution - 1);
     float2 gridPos = (uv - 0.5) * size;
     float3 worldPos = float3(gridPos, 0);
 

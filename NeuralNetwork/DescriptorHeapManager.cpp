@@ -1,6 +1,7 @@
 #include <combaseapi.h>
 #include <cstdint>
 #include <d3d12.h>
+#include <d3dx12_root_signature.h>
 #include <mutex>
 #include "DescriptorHeapManager.h"
 #include "Renderer.h"
@@ -79,4 +80,26 @@ D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeapManager::GetGpuHandle( int index ) con
 	D3D12_GPU_DESCRIPTOR_HANDLE handle = heap->GetGPUDescriptorHandleForHeapStart();
 	handle.ptr += (uint64_t)index * descriptorSize;
 	return handle;
+}
+
+// Allocator ImGui callback
+void DescriptorHeapManager::Alloc( D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu, D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu )
+{
+	std::lock_guard<std::mutex> lock( allocMutex );
+	if( freeList.empty() )
+		return;
+
+	int index = freeList.front();
+	freeList.pop();
+
+	*out_cpu = CD3DX12_CPU_DESCRIPTOR_HANDLE( heap->GetCPUDescriptorHandleForHeapStart(), index, descriptorSize );
+	*out_gpu = CD3DX12_GPU_DESCRIPTOR_HANDLE( heap->GetGPUDescriptorHandleForHeapStart(), index, descriptorSize );
+}
+
+// Free by CPU handle (ImGui doesn't tell us index, so we must reverse it)
+void DescriptorHeapManager::Free( D3D12_CPU_DESCRIPTOR_HANDLE cpu, D3D12_GPU_DESCRIPTOR_HANDLE gpu )
+{
+	std::lock_guard<std::mutex> lock( allocMutex );
+	int index = (cpu.ptr - heap->GetCPUDescriptorHandleForHeapStart().ptr) / descriptorSize;
+	freeList.push( index );
 }

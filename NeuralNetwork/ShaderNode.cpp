@@ -111,7 +111,8 @@ std::string ShaderNode::GetReturnObject() const
 
 std::string ShaderNode::GetFunctionSignature() const
 {
-	return GetOutputStructName() + " " + GetFunctionName() + "(" + GetInputStructName() + " input" + ", " + GetParameterStructName() + " parameters" + ", " + "VSOutput vertexData" + ")";
+	auto returnType = outputs.size() > 0 ? GetOutputStructName() : "void";
+	return returnType + " " + GetFunctionName() + "(" + GetInputStructName() + " input" + ", " + GetParameterStructName() + " parameters" + ", " + "VSOutput vertexData" + ")";
 }
 
 std::string ShaderNode::GetReturnStatement() const

@@ -43,10 +43,10 @@ public:
 	void AddParameter( const uint& slot, NodeParameter parameter ) { parameters[slot] = parameter; }
 protected:
 	std::string GetFunctionName() const;
+	std::string GetFunctionSignature() const;
 	std::string GetInputStructName() const;
 	std::string GetOutputStructName() const;
 	std::string GetParameterStructName() const;
-	std::string GetFunctionSignature() const;
 	std::string GetReturnObject() const;
 	std::string GetReturnStatement() const;
 protected:

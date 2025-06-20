@@ -31,12 +31,33 @@ void ImGuiLayer::Init()
 	D3D12_GPU_DESCRIPTOR_HANDLE imguiFontGpuHandle = srvHeapManager->GetGpuHandle( imguiFontSrvIndex );
 
 	ImGui_ImplWin32_Init( window->GetHWND() );
-	ImGui_ImplDX12_Init(
-		renderer->GetDevice(), 3,
-		DXGI_FORMAT_R8G8B8A8_UNORM, srvHeapManager->GetHeap(),
-		srvHeapManager->GetHeap()->GetCPUDescriptorHandleForHeapStart(),
-		srvHeapManager->GetHeap()->GetGPUDescriptorHandleForHeapStart()
-	);
+
+	ImGui_ImplDX12_InitInfo init_info = {};
+	init_info.Device = renderer->GetDevice();
+	init_info.CommandQueue = renderer->GetCommandQueue();
+	init_info.NumFramesInFlight = Renderer::BackBufferCount;
+	init_info.RTVFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	init_info.DSVFormat = DXGI_FORMAT_UNKNOWN;
+	init_info.UserData = srvHeapManager;
+	// Allocating SRV descriptors (for textures) is up to the application, so we provide callbacks.
+	// (current version of the backend will only allocate one descriptor, future versions will need to allocate more)
+	init_info.SrvDescriptorHeap = srvHeapManager->GetHeap();
+	init_info.SrvDescriptorAllocFn = [](
+		ImGui_ImplDX12_InitInfo* initInfo,
+		D3D12_CPU_DESCRIPTOR_HANDLE* out_cpu_handle,
+		D3D12_GPU_DESCRIPTOR_HANDLE* out_gpu_handle )
+		{
+			return static_cast<DescriptorHeapManager*>(initInfo->UserData)->Alloc( out_cpu_handle, out_gpu_handle );
+		};
+	init_info.SrvDescriptorFreeFn = [](
+		ImGui_ImplDX12_InitInfo* initInfo,
+		D3D12_CPU_DESCRIPTOR_HANDLE cpu_handle,
+		D3D12_GPU_DESCRIPTOR_HANDLE gpu_handle )
+		{
+			return static_cast<DescriptorHeapManager*>(initInfo->UserData)->Free( cpu_handle, gpu_handle );
+		};
+
+	ImGui_ImplDX12_Init( &init_info );
 }
 
 void ImGuiLayer::BeginFrame()
