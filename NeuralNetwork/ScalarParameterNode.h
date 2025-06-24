@@ -1,8 +1,8 @@
 #pragma once
 #include <format>
 #include <string>
-#include "ShaderNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
 class ScalarParameterNode :
@@ -10,9 +10,9 @@ class ScalarParameterNode :
 {
 public:
 	ScalarParameterNode( const std::string& name = "ScalarParameterNode" )
-		: ShaderNode( 0, 1, 1, name )
+		: ShaderNode( NodeTypes::ScalarParameter, 0, 1, 1, name )
 	{
-		AddOutput( valueOutputSlot, NodeSlot{ "value", 0.0f } );
+		AddOutput( valueOutputSlot, NodeSlot( "value", 0.0f ) );
 		AddParameter( scalarParameterSlot, NodeParameter( NodeParameterType::Scalar, "scalar" ) );
 	}
 	~ScalarParameterNode() {}

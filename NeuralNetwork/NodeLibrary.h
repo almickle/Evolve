@@ -49,7 +49,7 @@ public:
 		RegisterNode( NodeTypes::NormalMap, std::make_unique<NormalMapNode>() );
 		RegisterNode( NodeTypes::VectorBreak, std::make_unique<VectorBreakNode>() );
 		RegisterNode( NodeTypes::ScalarParameter, std::make_unique<ScalarParameterNode>() );
-		RegisterNode( NodeTypes::VectorMakeNode, std::make_unique<VectorMakeNode>() );
+		RegisterNode( NodeTypes::VectorMake, std::make_unique<VectorMakeNode>() );
 
 		RegisterNode( NodeTypes::Add, std::make_unique<AddNode>() );
 		RegisterNode( NodeTypes::Subtract, std::make_unique<OrNode>() );
@@ -76,14 +76,11 @@ public:
 		RegisterNode( NodeTypes::ThreadInfo, std::make_unique<ThreadInfoNode>() );
 		RegisterNode( NodeTypes::MeshPrimitivePlane, std::make_unique<MeshPlanePrimitiveNode>() );
 	}
-
-	// Register a node type with a node instance
+public:
 	void RegisterNode( const NodeTypes& typeName, std::unique_ptr<ShaderNode> node )
 	{
 		nodes[typeName] = std::move( node );
 	}
-
-	// Get a node by type name (returns nullptr if not found)
 	ShaderNode* GetNode( const NodeTypes& typeName ) const
 	{
 		auto it = nodes.find( typeName );
@@ -92,8 +89,6 @@ public:
 		}
 		return nullptr;
 	}
-
-	// Get all registered node type names
 	std::vector<NodeTypes> GetRegisteredTypes() const
 	{
 		std::vector<NodeTypes> types;
@@ -101,6 +96,14 @@ public:
 			types.push_back( pair.first );
 		}
 		return types;
+	}
+	std::vector<ShaderNode*> GetNodes() const
+	{
+		std::vector<ShaderNode*> nodeList;
+		for( const auto& pair : nodes ) {
+			nodeList.push_back( pair.second.get() );
+		}
+		return nodeList;
 	}
 
 private:

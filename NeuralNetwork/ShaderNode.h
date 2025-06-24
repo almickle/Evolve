@@ -6,8 +6,9 @@
 
 class ShaderNode {
 public:
-	ShaderNode( uint inputCount, uint outputCount, uint parameterCount, const std::string& name = "ShaderNode" )
-		: name( name )
+	ShaderNode( const NodeTypes& type, uint inputCount, uint outputCount, uint parameterCount, const std::string& name = "ShaderNode" )
+		: type( type ),
+		name( name )
 	{
 		inputs.resize( inputCount );
 		outputs.resize( outputCount );
@@ -30,6 +31,8 @@ public:
 	std::string GetParameterSlotName( const uint& slot ) const;
 	uint GetParameterCount() const { return (uint)parameters.size(); };
 public:
+	const std::string& GetName() const { return name; }
+	const NodeTypes& GetType() const { return type; }
 	const std::vector<NodeSlot>& GetInputs() const { return inputs; }
 	const uint GetInputCount() const { return (uint)inputs.size(); }
 	const std::vector<NodeSlot>& GetOutputs() const { return outputs; }
@@ -51,6 +54,7 @@ protected:
 	std::string GetReturnStatement() const;
 protected:
 	std::string name;
+	NodeTypes type;
 	std::vector<NodeSlot> inputs;
 	std::vector<NodeSlot> outputs;
 	std::vector<NodeParameter> parameters;

@@ -9,14 +9,14 @@
 class EmitVertexNode : public ShaderNode {
 public:
 	EmitVertexNode( const std::string& name = "EmitVertexNode" )
-		: ShaderNode( 6, 0, 0, name )
+		: ShaderNode( NodeTypes::EmitVertex, 6, 0, 0, name )
 	{
-		AddInput( pixelPosInputSlot, NodeSlot{ "pixelPos", DirectX::XMFLOAT4{} } );
-		AddInput( worldPosInputSlot, NodeSlot{ "worldPos", DirectX::XMFLOAT4{} } );
-		AddInput( normalInputSlot, NodeSlot{ "normal", DirectX::XMFLOAT4{} } );
-		AddInput( uvInputSlot, NodeSlot{ "uv",  DirectX::XMFLOAT4{} } );
-		AddInput( tangentInputSlot, NodeSlot{ "tangent", DirectX::XMFLOAT4{ 0, 0, 0, 1 } } );
-		AddInput( conditionInputSlot, NodeSlot{ "condition", false } );
+		AddInput( pixelPosInputSlot, NodeSlot( "pixelPos", DirectX::XMFLOAT4{} ) );
+		AddInput( worldPosInputSlot, NodeSlot( "worldPos", DirectX::XMFLOAT4{} ) );
+		AddInput( normalInputSlot, NodeSlot( "normal", DirectX::XMFLOAT4{} ) );
+		AddInput( uvInputSlot, NodeSlot( "uv", DirectX::XMFLOAT4{} ) );
+		AddInput( tangentInputSlot, NodeSlot( "tangent", DirectX::XMFLOAT4{ 0, 0, 0, 1 } ) );
+		AddInput( conditionInputSlot, NodeSlot( "condition", false ) );
 	}
 	~EmitVertexNode() = default;
 public:

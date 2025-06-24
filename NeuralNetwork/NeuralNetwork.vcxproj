@@ -107,14 +107,14 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\imgui-node-editor;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\imgui-node-editor\examples\blueprints-example\utilities;C:\source\libraries\imgui-node-editor;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImGuiCore.lib;ImGuiDX12.lib;ImGuiWin32.lib;ImGuiNodeEditor.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImGuiCore.lib;ImGuiDX12.lib;ImGuiWin32.lib;ImGuiNodeEditor.lib;NodeEditorUtils.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\source\libraries\ImGuiLibrary\$(Platform)\$(Configuration);C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration);C:\source\libraries\assimp\lib\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
@@ -136,7 +136,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\imgui-node-editor;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\source\libraries\DirectXTex\DirectXTex;C:\source\libraries\DirectX-Headers\include\directx;C:\source\libraries\imgui;C:\source\libraries\imgui\backends;C:\source\libraries\imgui-node-editor\examples\blueprints-example\utilities;C:\source\libraries\imgui-node-editor;C:\source\libraries\assimp\include;C:\source\libraries\json\include</AdditionalIncludeDirectories>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -148,7 +148,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\source\libraries\ImGuiLibrary\$(Platform)\$(Configuration);C:\source\libraries\DirectXTex\DirectXTex\Bin\Desktop_2022\$(Platform)\$(Configuration);C:\source\libraries\assimp\lib\$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImGuiCore.lib;ImGuiDX12.lib;ImGuiWin32.lib;ImGuiNodeEditor.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxguid.lib;d3dcompiler.lib;DirectXTex.lib;ImGuiCore.lib;ImGuiDX12.lib;ImGuiWin32.lib;ImGuiNodeEditor.lib;NodeEditorUtils.lib;assimp-vc143-mtd.lib</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ObjectFileOutput>$(ProjectDir)Shaders\%(Filename).cso</ObjectFileOutput>
@@ -172,6 +172,8 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="DescriptorHeapManager.cpp" />
     <ClCompile Include="EndFramePass.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="MeshShader.cpp" />
+    <ClCompile Include="ShaderEditor.cpp" />
     <ClCompile Include="ShaderGraph.cpp" />
     <ClCompile Include="Modifier.cpp" />
     <ClCompile Include="ModifierTemplate.cpp" />
@@ -200,6 +202,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureAsset.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
+    <ClCompile Include="UiNode.cpp" />
     <ClCompile Include="UIPass.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="SubMesh.cpp" />
@@ -241,6 +244,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="EqualNode.h" />
     <ClInclude Include="GreaterThanNode.h" />
     <ClInclude Include="GreaterThanOrEqualNode.h" />
+    <ClInclude Include="MeshShader.h" />
     <ClInclude Include="NegateNode.h" />
     <ClInclude Include="Nodes.h" />
     <ClInclude Include="RadicalNode.h" />
@@ -251,6 +255,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="OrNode.h" />
     <ClInclude Include="PowerNode.h" />
     <ClInclude Include="ReciprocalNode.h" />
+    <ClInclude Include="ShaderEditor.h" />
     <ClInclude Include="SignNode.h" />
     <ClInclude Include="SubtractNode.h" />
     <ClInclude Include="ThreadInfoNode.h" />
@@ -293,6 +298,8 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="TextureSamplerNode.h" />
     <ClInclude Include="ThreadManager.h" />
     <ClInclude Include="Types.h" />
+    <ClInclude Include="UiNode.h" />
+    <ClInclude Include="UiNodeGraph.h" />
     <ClInclude Include="UIPass.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="SubMesh.h" />

@@ -2,8 +2,8 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "ShaderNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
 class VectorBreakNode :
@@ -11,12 +11,12 @@ class VectorBreakNode :
 {
 public:
 	VectorBreakNode( const std::string& name = "VectorBreakNode" )
-		: ShaderNode( 1, 3, 0, name )
+		: ShaderNode( NodeTypes::VectorBreak, 1, 3, 0, name )
 	{
-		AddInput( vectorInputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
-		AddOutput( xOutputSlot, NodeSlot{ "x", 0.0f } );
-		AddOutput( yOutputSlot, NodeSlot{ "y", 0.0f } );
-		AddOutput( zOutputSlot, NodeSlot{ "z", 0.0f } );
+		AddInput( vectorInputSlot, NodeSlot( "vec", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
+		AddOutput( xOutputSlot, NodeSlot( "x", 0.0f ) );
+		AddOutput( yOutputSlot, NodeSlot( "y", 0.0f ) );
+		AddOutput( zOutputSlot, NodeSlot( "z", 0.0f ) );
 	}
 	~VectorBreakNode() {}
 public:

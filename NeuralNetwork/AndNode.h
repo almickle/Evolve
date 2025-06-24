@@ -8,11 +8,11 @@
 class AndNode : public ShaderNode {
 public:
 	AndNode( const std::string& name = "AndNode" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::And, 2, 1, 0, name )
 	{
-		AddInput( conditionAInputSlot, NodeSlot{ "condition_a", false } );
-		AddInput( conditionBInputSlot, NodeSlot{ "condition_b", false } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", false } );
+		AddInput( conditionAInputSlot, NodeSlot( "condition_a", false ) );
+		AddInput( conditionBInputSlot, NodeSlot( "condition_b", false ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", false ) );
 	}
 	~AndNode() = default;
 public:

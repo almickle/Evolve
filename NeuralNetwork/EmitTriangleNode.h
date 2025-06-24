@@ -9,11 +9,11 @@
 class EmitTriangleNode : public ShaderNode {
 public:
 	EmitTriangleNode( const std::string& name = "EmitTriangleNode" )
-		: ShaderNode( 3, 0, 0, name )
+		: ShaderNode( NodeTypes::EmitTriangle, 3, 0, 0, name )
 	{
-		AddInput( conditionInputSlot, NodeSlot{ "condition", false } );
-		AddInput( indexInputSlot, NodeSlot{ "index", uint( 0 ) } );
-		AddInput( triangleInputSlot, NodeSlot{ "triangle", DirectX::XMUINT3{} } );
+		AddInput( conditionInputSlot, NodeSlot( "condition", false ) );
+		AddInput( indexInputSlot, NodeSlot( "index", uint( 0 ) ) );
+		AddInput( triangleInputSlot, NodeSlot( "triangle", DirectX::XMUINT3{} ) );
 	}
 	~EmitTriangleNode() = default;
 public:

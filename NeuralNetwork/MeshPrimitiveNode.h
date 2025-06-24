@@ -9,17 +9,17 @@
 class MeshPlanePrimitiveNode : public ShaderNode {
 public:
 	MeshPlanePrimitiveNode( const std::string& name = "MeshPlanePrimitiveNode" )
-		: ShaderNode( 2, 7, 0, name )
+		: ShaderNode( NodeTypes::MeshPrimitivePlane, 2, 7, 0, name )
 	{
-		AddInput( resInputSlot, NodeSlot{ "resolution", DirectX::XMFLOAT4{} } );
-		AddInput( sizeInputSlot, NodeSlot{ "size", 0.0f } );
-		AddOutput( pixelPosOutputSlot, NodeSlot{ "pixelPos", DirectX::XMFLOAT4{} } );
-		AddOutput( worldPosOutputSlot, NodeSlot{ "worldPos", DirectX::XMFLOAT4{} } );
-		AddOutput( normalOutputSlot, NodeSlot{ "normal", DirectX::XMFLOAT4{} } );
-		AddOutput( uvOutputSlot, NodeSlot{ "uv",  DirectX::XMFLOAT4{} } );
-		AddOutput( tangentOutputSlot, NodeSlot{ "tangent", DirectX::XMFLOAT4{ 0, 0, 0, 1 } } );
-		AddOutput( tri0OutputSlot, NodeSlot{ "triangle_1", DirectX::XMUINT3{} } );
-		AddOutput( tri1OutputSlot, NodeSlot{ "triangle_2", DirectX::XMUINT3{} } );
+		AddInput( resInputSlot, NodeSlot( "resolution", DirectX::XMFLOAT4{} ) );
+		AddInput( sizeInputSlot, NodeSlot( "size", 0.0f ) );
+		AddOutput( pixelPosOutputSlot, NodeSlot( "pixelPos", DirectX::XMFLOAT4{} ) );
+		AddOutput( worldPosOutputSlot, NodeSlot( "worldPos", DirectX::XMFLOAT4{} ) );
+		AddOutput( normalOutputSlot, NodeSlot( "normal", DirectX::XMFLOAT4{} ) );
+		AddOutput( uvOutputSlot, NodeSlot( "uv", DirectX::XMFLOAT4{} ) );
+		AddOutput( tangentOutputSlot, NodeSlot( "tangent", DirectX::XMFLOAT4{ 0, 0, 0, 1 } ) );
+		AddOutput( tri0OutputSlot, NodeSlot( "triangle_1", DirectX::XMUINT3{} ) );
+		AddOutput( tri1OutputSlot, NodeSlot( "triangle_2", DirectX::XMUINT3{} ) );
 	}
 	~MeshPlanePrimitiveNode() = default;
 public:

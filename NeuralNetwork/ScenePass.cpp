@@ -113,15 +113,5 @@ void ScenePass::EndFrame( Renderer* renderer )
 	uint frameIndex = renderer->GetCurrentFrameIndex();
 	auto* commandList = commandLists[frameIndex].Get();
 
-	//D3D12_RESOURCE_BARRIER barrier = {};
-	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	//barrier.Transition.pResource = renderer->GetCurrentBackBuffer();
-	//barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	//barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	//barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
-	//// Transition the back buffer to PRESENT
-	//commandList->ResourceBarrier( 1, &barrier );
-
 	commandList->Close();
 }

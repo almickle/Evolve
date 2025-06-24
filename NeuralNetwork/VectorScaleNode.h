@@ -2,8 +2,8 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "ShaderNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
 class VectorScaleNode :
@@ -11,11 +11,11 @@ class VectorScaleNode :
 {
 public:
 	VectorScaleNode( const std::string& name = "VectorScaleNode" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::VectorScale, 2, 1, 0, name )
 	{
-		AddInput( vectorInputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
-		AddInput( scaleInputSlot, NodeSlot{ "scale", 1.0f } );
-		AddOutput( vectorOutputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
+		AddInput( vectorInputSlot, NodeSlot( "vec", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
+		AddInput( scaleInputSlot, NodeSlot( "scale", 1.0f ) );
+		AddOutput( vectorOutputSlot, NodeSlot( "vec", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
 	}
 	~VectorScaleNode() {}
 public:

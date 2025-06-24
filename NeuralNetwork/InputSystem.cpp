@@ -41,7 +41,7 @@ void InputSystem::CenterMouse()
 	center.x = (rect.right - rect.left) / 2;
 	center.y = (rect.bottom - rect.top) / 2;
 	ClientToScreen( window->GetHWND(), &center );
-	//SetCursorPos( center.x, center.y );
+	SetCursorPos( center.x, center.y );
 
 	// Initialize input state
 	inputState.lastMouseX = center.x;
@@ -50,6 +50,8 @@ void InputSystem::CenterMouse()
 
 void InputSystem::UpdateCameraFromInput( Scene* scene )
 {
+	if( uiLayer->UsingInput() ) return;
+
 	auto* camera = scene->GetActiveCamera();
 	if( !camera ) return;
 

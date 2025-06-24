@@ -8,10 +8,10 @@
 class NegateNode : public ShaderNode {
 public:
 	NegateNode( const std::string& name = "NegateNode" )
-		: ShaderNode( 1, 1, 0, name )
+		: ShaderNode( NodeTypes::Negate, 1, 1, 0, name )
 	{
-		AddInput( valueInputSlot, NodeSlot{ "value", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", float( 0 ) } );
+		AddInput( valueInputSlot, NodeSlot( "value", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", float( 0 ) ) );
 	}
 	~NegateNode() = default;
 public:

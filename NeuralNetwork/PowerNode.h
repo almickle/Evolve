@@ -8,11 +8,11 @@
 class PowerNode : public ShaderNode {
 public:
 	PowerNode( const std::string& name = "PowerNode" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::Power, 2, 1, 0, name )
 	{
-		AddInput( valueAInputSlot, NodeSlot{ "value_a", float( 0 ) } );
-		AddInput( valueBInputSlot, NodeSlot{ "value_b", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", float( 0 ) } );
+		AddInput( valueAInputSlot, NodeSlot( "value_a", float( 0 ) ) );
+		AddInput( valueBInputSlot, NodeSlot( "value_b", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", float( 0 ) ) );
 	}
 	~PowerNode() = default;
 public:

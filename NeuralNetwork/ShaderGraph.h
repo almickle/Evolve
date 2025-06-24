@@ -15,17 +15,18 @@ using Microsoft::WRL::ComPtr;
 
 class ShaderGraph : public Asset
 {
-	ShaderGraph( NodeLibrary& nodeLibrary, const AssetType& assetType, const ShaderType& shaderType, const std::string& name = "MeshShader" )
+protected:
+	ShaderGraph( NodeLibrary& nodeLibrary, const AssetType& assetType, const ShaderType& shaderType, const std::string& name )
 		: Asset( assetType, name ),
 		nodeLibrary( nodeLibrary ),
 		shaderType( shaderType )
 	{
 	}
-	ShaderGraph() = default;
+	virtual ~ShaderGraph() {};
 public:
-	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override = 0;
-	std::string Serialize( JsonSerializer& serializer ) const override = 0;
-	void Deserialize( JsonSerializer& serializer ) override = 0;
+	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override {};
+	std::string Serialize( JsonSerializer& serializer ) const override { return ""; };
+	void Deserialize( JsonSerializer& serializer ) override {};
 public:
 	void AddNode( const NodeTypes& node ) { nodes.push_back( node ); }
 	void AddEdge( const NodeConnection& edge ) { edges.push_back( edge ); }

@@ -8,11 +8,11 @@
 class GreaterThanOrEqualNode : public ShaderNode {
 public:
 	GreaterThanOrEqualNode( const std::string& name = "GreaterThanOrEqual" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::GreaterThanOrEqual, 2, 1, 0, name )
 	{
-		AddInput( valueAInputSlot, NodeSlot{ "value_a", float( 0 ) } );
-		AddInput( valueBInputSlot, NodeSlot{ "value_b", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", false } );
+		AddInput( valueAInputSlot, NodeSlot( "value_a", float( 0 ) ) );
+		AddInput( valueBInputSlot, NodeSlot( "value_b", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", false ) );
 	}
 	~GreaterThanOrEqualNode() = default;
 public:

@@ -9,13 +9,13 @@
 class DisplacementNode : public ShaderNode {
 public:
 	DisplacementNode( const std::string& name = "DisplacementNode" )
-		: ShaderNode( 4, 1, 0, name )
+		: ShaderNode( NodeTypes::Displacement, 4, 1, 0, name )
 	{
-		AddInput( heightInputSlot, NodeSlot{ "height",  0.0f } );
-		AddInput( scaleInputSlot, NodeSlot{ "scale",  0.0f } );
-		AddInput( positionInputSlot, NodeSlot{ "position",  DirectX::XMFLOAT4{} } );
-		AddInput( directionInputSlot, NodeSlot{ "direction",  DirectX::XMFLOAT4{} } );
-		AddOutput( positionOutputSlot, NodeSlot{ "position", DirectX::XMFLOAT4{} } );
+		AddInput( heightInputSlot, NodeSlot( "height", 0.0f ) );
+		AddInput( scaleInputSlot, NodeSlot( "scale", 0.0f ) );
+		AddInput( positionInputSlot, NodeSlot( "position", DirectX::XMFLOAT4{} ) );
+		AddInput( directionInputSlot, NodeSlot( "direction", DirectX::XMFLOAT4{} ) );
+		AddOutput( positionOutputSlot, NodeSlot( "position", DirectX::XMFLOAT4{} ) );
 	}
 	~DisplacementNode() = default;
 public:

@@ -8,11 +8,11 @@
 class OrNode : public ShaderNode {
 public:
 	OrNode( const std::string& name = "OrNode" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::Or, 2, 1, 0, name )
 	{
-		AddInput( conditionAInputSlot, NodeSlot{ "condition_a", false } );
-		AddInput( conditionBInputSlot, NodeSlot{ "condition_b", false } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", false } );
+		AddInput( conditionAInputSlot, NodeSlot( "condition_a", false ) );
+		AddInput( conditionBInputSlot, NodeSlot( "condition_b", false ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", false ) );
 	}
 	~OrNode() = default;
 public:

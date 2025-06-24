@@ -148,6 +148,9 @@
     <Filter Include="Header Files\Assets\Shader Graph\Nodes\Arithmetic">
       <UniqueIdentifier>{56466603-679a-4d63-9a28-72878e818e72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UI\Shader Editor">
+      <UniqueIdentifier>{88a49f79-247a-4491-ad3f-f7fbb147bd79}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -322,6 +325,15 @@
       <Filter>Source Files\Passes\Initialization</Filter>
     </ClCompile>
     <ClCompile Include="ShaderGraph.cpp">
+      <Filter>Source Files\Assets\Shader Graph</Filter>
+    </ClCompile>
+    <ClCompile Include="UiNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderEditor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -500,9 +512,6 @@
     <ClInclude Include="ScenePass.h">
       <Filter>Header Files\Passes\Render</Filter>
     </ClInclude>
-    <ClInclude Include="UpdatePass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DisplacementNode.h">
       <Filter>Header Files\Assets\Shader Graph\Nodes\Mesh</Filter>
     </ClInclude>
@@ -604,6 +613,21 @@
     </ClInclude>
     <ClInclude Include="Nodes.h">
       <Filter>Header Files\Assets\Shader Graph\Nodes</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderEditor.h">
+      <Filter>Header Files\UI\Shader Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="UiNode.h">
+      <Filter>Header Files\UI\Shader Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="UpdatePass.h">
+      <Filter>Header Files\Passes\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="UiNodeGraph.h">
+      <Filter>Header Files\UI\Shader Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshShader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,5 @@
 #pragma once
+#include "ImGuiLayer.h"
 #include "Scene.h"
 #include "System.h"
 #include "SystemManager.h"
@@ -18,7 +19,8 @@ struct InputState {
 class InputSystem : public System {
 public:
 	InputSystem( SystemManager& systemManager )
-		: window( systemManager.GetWindow() )
+		: window( systemManager.GetWindow() ),
+		uiLayer( systemManager.GetUILayer() )
 	{
 	}
 public:
@@ -30,5 +32,6 @@ public:
 private:
 	InputState inputState;
 	Window* window;
+	ImGuiLayer* uiLayer;
 };
 

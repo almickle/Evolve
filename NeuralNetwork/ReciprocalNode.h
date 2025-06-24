@@ -8,10 +8,10 @@
 class ReciprocalNode : public ShaderNode {
 public:
 	ReciprocalNode( const std::string& name = "ReciprocalNode" )
-		: ShaderNode( 1, 1, 0, name )
+		: ShaderNode( NodeTypes::Reciprocal, 1, 1, 0, name )
 	{
-		AddInput( valueInputSlot, NodeSlot{ "value", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", float( 0 ) } );
+		AddInput( valueInputSlot, NodeSlot( "value", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", float( 0 ) ) );
 	}
 	~ReciprocalNode() = default;
 public:

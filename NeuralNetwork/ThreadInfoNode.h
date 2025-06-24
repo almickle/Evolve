@@ -9,14 +9,14 @@
 class ThreadInfoNode : public ShaderNode {
 public:
 	ThreadInfoNode( const std::string& name = "ThreadInfoNode" )
-		: ShaderNode( 0, 6, 0, name )
+		: ShaderNode( NodeTypes::ThreadInfo, 0, 6, 0, name )
 	{
-		AddOutput( tidOutputSlot, NodeSlot{ "tid", DirectX::XMUINT3{} } );
-		AddOutput( dtidOutputSlot, NodeSlot{ "dtid", DirectX::XMUINT3{} } );
-		AddOutput( gidOutputSlot, NodeSlot{ "gid", DirectX::XMUINT3{} } );
-		AddOutput( xThreadsOutputSlot, NodeSlot{ "threads_x", uint( 0 ) } );
-		AddOutput( yThreadsOutputSlot, NodeSlot{ "threads_y", uint( 0 ) } );
-		AddOutput( zThreadsOutputSlot, NodeSlot{ "threads_z", uint( 0 ) } );
+		AddOutput( tidOutputSlot, NodeSlot( "tid", DirectX::XMUINT3{} ) );
+		AddOutput( dtidOutputSlot, NodeSlot( "dtid", DirectX::XMUINT3{} ) );
+		AddOutput( gidOutputSlot, NodeSlot( "gid", DirectX::XMUINT3{} ) );
+		AddOutput( xThreadsOutputSlot, NodeSlot( "threads_x", uint( 0 ) ) );
+		AddOutput( yThreadsOutputSlot, NodeSlot( "threads_y", uint( 0 ) ) );
+		AddOutput( zThreadsOutputSlot, NodeSlot( "threads_z", uint( 0 ) ) );
 	}
 	~ThreadInfoNode() = default;
 public:

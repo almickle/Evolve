@@ -8,11 +8,11 @@
 class SubtractNode : public ShaderNode {
 public:
 	SubtractNode( const std::string& name = "SubtractNode" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::Subtract, 2, 1, 0, name )
 	{
-		AddInput( valueAInputSlot, NodeSlot{ "value_a", float( 0 ) } );
-		AddInput( valueBInputSlot, NodeSlot{ "value_b", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", float( 0 ) } );
+		AddInput( valueAInputSlot, NodeSlot( "value_a", float( 0 ) ) );
+		AddInput( valueBInputSlot, NodeSlot( "value_b", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", float( 0 ) ) );
 	}
 	~SubtractNode() = default;
 public:

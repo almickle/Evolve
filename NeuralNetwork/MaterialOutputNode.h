@@ -2,22 +2,22 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "ShaderNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 
 class MaterialOutputNode : public ShaderNode {
 public:
 	MaterialOutputNode( const std::string& name = "MaterialOutputNode" )
-		: ShaderNode( 7, 1, 0, name )
+		: ShaderNode( NodeTypes::MaterialOutput, 7, 1, 0, name )
 	{
-		AddInput( 0, NodeSlot{ "baseColor", DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f} } );
-		AddInput( 1, NodeSlot{ "metallic", 0.0f } );
-		AddInput( 2, NodeSlot{ "roughness", 1.0f } );
-		AddInput( 3, NodeSlot{ "normal",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
-		AddInput( 4, NodeSlot{ "emissive", DirectX::XMFLOAT4{0.0f, 0.0f, 0.0f, 0.0f} } );
-		AddInput( 5, NodeSlot{ "opacity", 1.0f } );
-		AddInput( 6, NodeSlot{ "ambientOcculusion", 1.0f } );
-		AddOutput( 0, NodeSlot{ "color", DirectX::XMFLOAT4{1.0f, 1.0f, 1.0f, 1.0f} } );
+		AddInput( 0, NodeSlot( "baseColor", DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f } ) );
+		AddInput( 1, NodeSlot( "metallic", 0.0f ) );
+		AddInput( 2, NodeSlot( "roughness", 1.0f ) );
+		AddInput( 3, NodeSlot( "normal", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
+		AddInput( 4, NodeSlot( "emissive", DirectX::XMFLOAT4{ 0.0f, 0.0f, 0.0f, 0.0f } ) );
+		AddInput( 5, NodeSlot( "opacity", 1.0f ) );
+		AddInput( 6, NodeSlot( "ambientOcculusion", 1.0f ) );
+		AddOutput( 0, NodeSlot( "color", DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f } ) );
 	}
 public:
 	std::string GetShaderFunction() override

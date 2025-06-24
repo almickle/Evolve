@@ -2,8 +2,8 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "ShaderNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
 class NormalMapNode :
@@ -11,10 +11,10 @@ class NormalMapNode :
 {
 public:
 	NormalMapNode( const std::string& name = "NormalMapNode" )
-		: ShaderNode( 1, 1, 0, name )
+		: ShaderNode( NodeTypes::NormalMap, 1, 1, 0, name )
 	{
-		AddInput( normalInputSlot, NodeSlot{ "color",  DirectX::XMFLOAT4{ 0, 0, 0, 0} } );
-		AddOutput( normalOutputSlot, NodeSlot{ "normal",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
+		AddInput( normalInputSlot, NodeSlot( "color", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
+		AddOutput( normalOutputSlot, NodeSlot( "normal", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
 	}
 	~NormalMapNode() {}
 public:

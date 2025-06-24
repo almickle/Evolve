@@ -8,10 +8,10 @@
 class AbsoluteValueNode : public ShaderNode {
 public:
 	AbsoluteValueNode( const std::string& name = "AbsoluteValueNode" )
-		: ShaderNode( 1, 1, 0, name )
+		: ShaderNode( NodeTypes::AbsoluteValue, 1, 1, 0, name )
 	{
-		AddInput( valueInputSlot, NodeSlot{ "value", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", float( 0 ) } );
+		AddInput( valueInputSlot, NodeSlot( "value", (float)0 ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", (float)0 ) );
 	}
 	~AbsoluteValueNode() = default;
 public:

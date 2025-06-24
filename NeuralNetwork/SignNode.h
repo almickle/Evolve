@@ -8,10 +8,10 @@
 class SignNode : public ShaderNode {
 public:
 	SignNode( const std::string& name = "SignNode" )
-		: ShaderNode( 1, 1, 0, name )
+		: ShaderNode( NodeTypes::Sign, 1, 1, 0, name )
 	{
-		AddInput( valueInputSlot, NodeSlot{ "value", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", float( 0 ) } );
+		AddInput( valueInputSlot, NodeSlot( "value", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", float( 0 ) ) );
 	}
 	~SignNode() = default;
 public:

@@ -1,11 +1,13 @@
 #include <d3d12.h>
 #include <dxgiformat.h>
+#include <imgui_node_editor.h>
 #include "DescriptorHeapManager.h"
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_win32.h"
 #include "ImGuiLayer.h"
 #include "Renderer.h"
+#include "UiNode.h"
 #include "Window.h"
 
 ImGuiLayer::~ImGuiLayer()
@@ -69,7 +71,32 @@ void ImGuiLayer::BeginFrame()
 
 void ImGuiLayer::RenderUI()
 {
-	ImGui::ShowDemoWindow();
+	if( ImGui::BeginMainMenuBar() )
+	{
+		if( ImGui::BeginMenu( "File" ) )
+		{
+			if( ImGui::MenuItem( "Import" ) ) { /* ... */ }
+			if( ImGui::MenuItem( "Export" ) ) { /* ... */ }
+			if( ImGui::MenuItem( "Save" ) ) { /* ... */ }
+			ImGui::EndMenu();
+		}
+
+		if( ImGui::BeginMenu( "Open" ) )
+		{
+			if( ImGui::MenuItem( "Shader Editor" ) )
+			{
+				SetContext( UiContextType::ShaderEditor );
+			}
+			if( ImGui::MenuItem( "Model Viewer" ) ) { /* ... */ }
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+	}
+
+	if( uiContext.currentContext == UiContextType::ShaderEditor )
+	{
+		shaderEditor.Render();
+	}
 }
 
 
@@ -78,3 +105,9 @@ void ImGuiLayer::EndFrame( ID3D12GraphicsCommandList* commandList )
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData( ImGui::GetDrawData(), commandList );
 }
+
+bool ImGuiLayer::UsingInput() const
+{
+	return ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard;
+}
+

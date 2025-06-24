@@ -8,11 +8,11 @@
 class NotEqualNode : public ShaderNode {
 public:
 	NotEqualNode( const std::string& name = "NotEqualNode" )
-		: ShaderNode( 2, 1, 0, name )
+		: ShaderNode( NodeTypes::NotEqual, 2, 1, 0, name )
 	{
-		AddInput( valueAInputSlot, NodeSlot{ "value_a", float( 0 ) } );
-		AddInput( valueBInputSlot, NodeSlot{ "value_b", float( 0 ) } );
-		AddOutput( resultOutputSlot, NodeSlot{ "result", false } );
+		AddInput( valueAInputSlot, NodeSlot( "value_a", float( 0 ) ) );
+		AddInput( valueBInputSlot, NodeSlot( "value_b", float( 0 ) ) );
+		AddOutput( resultOutputSlot, NodeSlot( "result", false ) );
 	}
 	~NotEqualNode() = default;
 public:

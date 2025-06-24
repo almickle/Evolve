@@ -2,8 +2,8 @@
 #include <DirectXMath.h>
 #include <format>
 #include <string>
-#include "ShaderNode.h"
 #include "NodeTypes.h"
+#include "ShaderNode.h"
 #include "Types.h"
 
 class VectorMakeNode :
@@ -11,12 +11,12 @@ class VectorMakeNode :
 {
 public:
 	VectorMakeNode( const std::string& name = "VectorMakeNode" )
-		: ShaderNode( 3, 1, 0, name )
+		: ShaderNode( NodeTypes::VectorMake, 3, 1, 0, name )
 	{
-		AddInput( xInputSlot, NodeSlot{ "x", 0.0f } );
-		AddInput( yInputSlot, NodeSlot{ "y", 0.0f } );
-		AddInput( zInputSlot, NodeSlot{ "z", 0.0f } );
-		AddOutput( vectorOutputSlot, NodeSlot{ "vec",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
+		AddInput( xInputSlot, NodeSlot( "x", 0.0f ) );
+		AddInput( yInputSlot, NodeSlot( "y", 0.0f ) );
+		AddInput( zInputSlot, NodeSlot( "z", 0.0f ) );
+		AddOutput( vectorOutputSlot, NodeSlot( "vec", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
 	}
 	~VectorMakeNode() {}
 public:

@@ -9,10 +9,10 @@
 class TextureSamplerNode : public ShaderNode {
 public:
 	TextureSamplerNode( const std::string& name = "TextureSamplerNode" )
-		: ShaderNode( 1, 1, 1, name )
+		: ShaderNode( NodeTypes::TextureSampler, 1, 1, 1, name )
 	{
-		AddInput( uvInputSlotIndex, NodeSlot{ "uv",  DirectX::XMFLOAT4{ 0, 0, 0, 0 } } );
-		AddOutput( colorOutputSlotIndex, NodeSlot{ "color", DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f } } );
+		AddInput( uvInputSlotIndex, NodeSlot( "uv", DirectX::XMFLOAT4{ 0, 0, 0, 0 } ) );
+		AddOutput( colorOutputSlotIndex, NodeSlot( "color", DirectX::XMFLOAT4{ 1.0f, 1.0f, 1.0f, 1.0f } ) );
 		AddParameter( textureParameter, NodeParameter( NodeParameterType::Texture, "textureIndex" ) );
 	}
 public:
