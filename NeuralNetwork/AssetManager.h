@@ -18,6 +18,9 @@ class GpuResourceManager;
 class NodeLibrary;
 class ImportManager;
 
+class TextureAsset;
+class ShaderInstance;
+
 class AssetManager : public System {
 	enum class LoadState { NotLoaded, Loading, Loaded };
 public:
@@ -45,16 +48,24 @@ public:
 public:
 	Asset* GetAsset( const AssetID& id );
 	const Asset* GetAsset( const AssetID& id ) const;
+	template<typename T>
+	const T* GetAsset( const AssetID& id ) const;
+	template<typename T>
+	T* GetAsset( const AssetID& id );
 	const std::vector<Asset*> GetAllAssets() const;
 	std::vector<Asset*> GetAllAssets();
+	const std::vector<Asset*> GetAllShaders() const;
+	std::vector<Asset*> GetAllShaders();
+	std::vector<ShaderInstance*> GetShaderInstances( const AssetID& shader ) const;
+	std::vector<TextureAsset*> GetAllTextures();
 private:
-	AssetID GenerateUniqueAssetId();
+	AssetID GenerateUniqueAssetId() const;
 	void PostLoadProcessing();
 private:
 	std::unordered_map<AssetID, std::unique_ptr<Asset>> assetHeap;
 	mutable std::mutex assetHeapMutex;
 	std::unordered_map<AssetID, LoadState> assetLoadState;
-	uint64_t assetIdCounter = 0;
+	uint64_t assetCounter = 0;
 	std::filesystem::path assetDirectory = std::filesystem::path( "Assets" );
 	std::string assetFileExtension = ".json";
 private:
@@ -65,3 +76,19 @@ private:
 	NodeLibrary* nodeLibrary;
 	ImportManager* importManager;
 };
+
+template<typename T>
+const T* AssetManager::GetAsset( const AssetID& id ) const
+{
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	auto it = assetHeap.find( id );
+	return (it != assetHeap.end()) ? static_cast<T*>(it->second.get()) : nullptr;
+}
+
+template<typename T>
+T* AssetManager::GetAsset( const AssetID& id )
+{
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	auto it = assetHeap.find( id );
+	return (it != assetHeap.end()) ? static_cast<T*>(it->second.get()) : nullptr;
+}

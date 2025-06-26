@@ -28,7 +28,7 @@ public:
 		renderer( systemManager.GetRenderer() ),
 		window( systemManager.GetWindow() ),
 		nodeLibrary( systemManager.GetNodeLibrary() ),
-		shaderEditor( ShaderEditor( systemManager.GetNodeLibrary() ) )
+		shaderEditor( ShaderEditor( systemManager.GetNodeLibrary(), systemManager.GetAssetManager(), systemManager.GetRenderer() ) )
 	{
 	}
 	~ImGuiLayer();

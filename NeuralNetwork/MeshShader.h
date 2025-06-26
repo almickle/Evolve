@@ -9,7 +9,7 @@ class MeshShader :
 {
 public:
 	MeshShader( NodeLibrary& nodeLibrary, const std::string& name = "Mesh Shader" )
-		: ShaderGraph( nodeLibrary, AssetType::MeshShader, ShaderType::Mesh, name )
+		: ShaderGraph( nodeLibrary, AssetType::MeshShader, ShaderType::Mesh, name, "" )
 	{
 
 	}

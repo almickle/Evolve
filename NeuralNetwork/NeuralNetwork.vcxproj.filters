@@ -151,6 +151,12 @@
     <Filter Include="Header Files\UI\Shader Editor">
       <UniqueIdentifier>{88a49f79-247a-4491-ad3f-f7fbb147bd79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Assets\Shader Graph\Shaders">
+      <UniqueIdentifier>{f3cc63d4-5850-46c1-9177-bd226ccfbeea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UI\Utility">
+      <UniqueIdentifier>{357a0a15-f396-4c84-94de-8e1e870b945d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -330,10 +336,16 @@
     <ClCompile Include="UiNode.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderEditor.cpp">
+    <ClCompile Include="MeshShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MeshShader.cpp">
+    <ClCompile Include="UiNodeGraph.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderEditor.cpp">
+      <Filter>Source Files\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -627,7 +639,19 @@
       <Filter>Header Files\UI\Shader Editor</Filter>
     </ClInclude>
     <ClInclude Include="MeshShader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Assets\Shader Graph\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>Header Files\Assets\Shader Graph\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderInstance.h">
+      <Filter>Header Files\Assets\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="UiComponents.h">
+      <Filter>Header Files\UI\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Observable.h">
+      <Filter>Header Files\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

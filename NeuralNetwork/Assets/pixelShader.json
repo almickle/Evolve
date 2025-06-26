@@ -1,7 +1,7 @@
 {
   "id": "Asset_1",
-  "name": "materialTemplate",
-  "type": 4,
+  "name": "pixelShader",
+  "type": 9,
   "assetIds": [],
   "nodes": [
     0,

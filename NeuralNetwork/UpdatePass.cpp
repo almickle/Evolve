@@ -9,10 +9,19 @@
 
 void UpdatePass::Execute( SystemManager& systemManager, const AssetID& sceneID )
 {
+	auto* renderer = systemManager.GetRenderer();
 	auto* resourceManager = systemManager.GetResourceManager();
 	auto* assetManager = systemManager.GetAssetManager();
+	auto* srvHeapManager = systemManager.GetSrvHeapManager();
 	auto* scene = static_cast<Scene*>(assetManager->GetAsset( sceneID ));
 	auto* cb = static_cast<ConstantBuffer*>(resourceManager->GetResource( scene->GetSceneBuffer() ));
+
+	auto frameIndex = renderer->GetCurrentFrameIndex();
+	auto* allocator = commandAllocators[frameIndex].Get();
+	auto* commandList = commandLists[frameIndex].Get();
+
+	allocator->Reset();
+	commandList->Reset( allocator, nullptr );
 
 	// Initialize scene constant buffer
 	CameraData camData{
@@ -35,4 +44,16 @@ void UpdatePass::Execute( SystemManager& systemManager, const AssetID& sceneID )
 	};
 
 	cb->Update( &sceneData, sizeof( SceneData ) );
+
+	for( auto* asset : assetManager->GetAllAssets() ) {
+		if( asset->IsDirty() ) {
+			asset->Update( assetManager, resourceManager, srvHeapManager );
+			for( const auto& resourceId : asset->GetAllResourceIDs() )
+			{
+				resourceManager->GetResource( resourceId )->Upload( commandList );
+			}
+			asset->SetIsDirty( false );
+		}
+	}
+	commandList->Close();
 }

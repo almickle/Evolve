@@ -16,17 +16,18 @@ using Microsoft::WRL::ComPtr;
 class ShaderGraph : public Asset
 {
 protected:
-	ShaderGraph( NodeLibrary& nodeLibrary, const AssetType& assetType, const ShaderType& shaderType, const std::string& name )
+	ShaderGraph( NodeLibrary& nodeLibrary, const AssetType& assetType, const ShaderType& shaderType, const std::string& name, const std::string& signature )
 		: Asset( assetType, name ),
 		nodeLibrary( nodeLibrary ),
-		shaderType( shaderType )
+		shaderType( shaderType ),
+		signature( signature )
 	{
 	}
 	virtual ~ShaderGraph() {};
 public:
-	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override {};
-	std::string Serialize( JsonSerializer& serializer ) const override { return ""; };
-	void Deserialize( JsonSerializer& serializer ) override {};
+	void Load( SystemManager* systemManager, JsonSerializer& serializer ) override;
+	std::string Serialize( JsonSerializer& serializer ) const override;
+	void Deserialize( JsonSerializer& serializer ) override;
 public:
 	void AddNode( const NodeTypes& node ) { nodes.push_back( node ); }
 	void AddEdge( const NodeConnection& edge ) { edges.push_back( edge ); }
@@ -34,10 +35,12 @@ public:
 	ComPtr<ID3DBlob>& GetShaderBlob() { return blob; };
 	const std::vector<NodeTypes>& GetNodes() const { return nodes; }
 	const std::vector<NodeConnection>& GetEdges() const { return edges; }
-protected:
-	void Compile( Renderer& renderer );
-private:
+	const ShaderType& GetShaderType() const { return shaderType; }
+public:
 	void GenerateShaderCode();
+	void Compile( Renderer& renderer );
+protected:
+	void AddInclude( const std::string& includeFile ) { includes.push_back( includeFile ); }
 private:
 	std::vector<uint> TopologicalSort() const;
 	std::vector<NodeConnection> GetIncomingEdges( uint nodeIndex ) const;
@@ -56,6 +59,7 @@ private:
 	ShaderType shaderType;
 	std::string shaderCode;
 	std::string signature;
+	std::vector<std::string> includes;
 private:
 	NodeLibrary& nodeLibrary;
 };

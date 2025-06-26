@@ -216,7 +216,7 @@ ResourceID GpuResourceManager::CreateIndexBuffer( const std::vector<uint>& indic
 	return id;
 }
 
-ResourceID GpuResourceManager::CreateConstantBuffer( void* data, uint size, const std::string& name )
+ResourceID GpuResourceManager::CreateConstantBuffer( void* data, uint size, const std::string& name, bool perFrame )
 {
 	auto device = renderer->GetDevice();
 
@@ -239,7 +239,14 @@ ResourceID GpuResourceManager::CreateConstantBuffer( void* data, uint size, cons
 	cb->SetCurrentState( D3D12_RESOURCE_STATE_GENERIC_READ );
 
 	ResourceID id = GenerateUniqueResourceId();
-	RegisterPerFrameResource( id, std::move( cb ) );
+	if( perFrame ) {
+		// Register as a per-frame resource
+		RegisterPerFrameResource( id, std::move( cb ) );
+	}
+	else {
+		// Register as a single resource
+		RegisterResource( id, std::move( cb ) );
+	}
 	return id;
 }
 

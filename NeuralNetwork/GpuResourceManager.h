@@ -40,7 +40,7 @@ public:
 public:
 	ResourceID CreateVertexBuffer( const std::vector<Vertex>& vertices, const std::string& name = "VertexBuffer" );
 	ResourceID CreateIndexBuffer( const std::vector<uint>& vertices, const std::string& name = "IndexBuffer" );
-	ResourceID CreateConstantBuffer( void* data, uint size, const std::string& name = "ConstantBuffer" );
+	ResourceID CreateConstantBuffer( void* data, uint size, const std::string& name = "ConstantBuffer", bool perFrame = false );
 	template<typename T>
 	ResourceID CreateStaticStructuredBuffer( const std::vector<T>& data, const std::string& name = "StructuredBuffer" );
 	template<typename T>

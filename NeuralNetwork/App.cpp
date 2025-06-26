@@ -43,6 +43,7 @@ void App::Run()
 	auto* scene = static_cast<Scene*>(systemManager->GetAssetManager()->GetAsset( sceneID ));
 	auto uploadPass = std::make_unique<UploadPass>();
 	auto updatePass = std::make_unique<UpdatePass>();
+	updatePass->Init( *systemManager );
 	uploadPass->Init( *systemManager );
 	while( !systemManager->GetWindow()->ShouldClose() ) {
 		systemManager->GetWindow()->PollEvents();

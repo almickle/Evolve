@@ -1,5 +1,4 @@
 #pragma once
-#include <imgui_node_editor.h>
 #include <memory>
 #include <utility>
 #include <vector>
@@ -7,13 +6,11 @@
 #include "NodeTypes.h"
 #include "UiNode.h"
 
-using namespace ax;
-
 struct UiNodeLink
 {
 	int id = 0;
-	UiNodePin* inputPin = nullptr;
-	UiNodePin* outputPin = nullptr;
+	UiNodePin* fromPin = nullptr;
+	UiNodePin* toPin = nullptr;
 };
 
 class UiNodeGraph
@@ -26,55 +23,18 @@ public:
 	UiNodeGraph() = default;
 	~UiNodeGraph() = default;
 public:
-	void Render()
-	{
-		for( auto& node : nodes )
-		{
-			node->Render();
-		}
-		for( auto& link : links )
-		{
-			NodeEditor::Link( link->id, link->inputPin->GetID(), link->outputPin->GetID() );
-		}
-	}
+	void Render();
 public:
-	void AddNode( int& uniqueId, const NodeTypes& nodeType, NodeLibrary* nodeLibrary )
-	{
-		auto node = std::make_unique<UiNode>( uniqueId, nodeType, nodeLibrary );
-		nodes.push_back( std::move( node ) );
-	}
-	void AddLink( int& uniqueId, int inputPin, int outputPin )
-	{
-		auto link = std::make_unique<UiNodeLink>();
-		link->id = ++uniqueId;
-		link->inputPin = FindPin( inputPin );
-		link->outputPin = FindPin( outputPin );
-		links.push_back( std::move( link ) );
-	}
+	int AddNode( int& uniqueId, const NodeTypes& nodeType, NodeLibrary* nodeLibrary );
+	int AddLink( int& uniqueId, int fromPin, int toPin );
+	int AddLink( int& uniqueId, const int& fromNode, const int& fromPin, const int& toNode, const int& toPin );
 public:
-	UiNodePin* FindPin( int id )
-	{
-		for( auto& node : nodes )
-		{
-			auto pin = node->FindPin( id );
-			if( pin != nullptr )
-			{
-				return pin;
-			}
-		}
-		return nullptr;
-	}
-	UiNode* GetNode( int id )
-	{
-		for( auto& node : nodes )
-		{
-			if( node->GetID() == id )
-			{
-				return node.get();
-			}
-		}
-		return nullptr;
-	}
+	UiNodePin* FindPin( const int& id );
+	UiNode* GetNode( const int& id );
+	UiNodeLink* GetLink( const int& id );
+	NodeConnection GetConnectionDetails( const int& id );
+	void Format();
+public:
 	std::vector<std::unique_ptr<UiNode>>& GetNodes() { return nodes; };
 	std::vector<std::unique_ptr<UiNodeLink>>& GetLinks() { return links; };
 private:

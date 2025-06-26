@@ -1,15 +1,105 @@
 #include <algorithm>
+#include <exception>
 #include <format>
 #include <queue>
 #include <set>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include "JsonSerializer.h"
 #include "NodeTypes.h"
 #include "Renderer.h"
 #include "ShaderGraph.h"
+#include "SystemManager.h"
 #include "Types.h"
+
+void  ShaderGraph::Load( SystemManager* systemManager, JsonSerializer& serializer )
+{
+	Deserialize( serializer );
+};
+
+std::string ShaderGraph::Serialize( JsonSerializer& serializer ) const
+{
+	serializer.StartDocument();
+	serializer.BeginObject();
+
+	// Meta data and asset ids
+	SerializeBaseAsset( serializer );
+
+	// Nodes
+	serializer.WriteArray( "nodes", nodes );
+
+	// Edges
+	serializer.BeginArray( "edges" );
+	for( const auto& edge : edges ) {
+		serializer.BeginObject();
+		serializer.Write( "fromNode", edge.fromNode );
+		serializer.Write( "fromSlot", edge.fromSlot );
+		serializer.Write( "toNode", edge.toNode );
+		serializer.Write( "toSlot", edge.toSlot );
+		serializer.EndObject();
+	}
+	serializer.EndArray();
+
+	// Parameter Bindings
+	serializer.BeginArray( "parameterBindings" );
+	for( const auto& binding : parameterBindings ) {
+		serializer.BeginObject();
+		serializer.Write( "nodeIndex", binding.nodeIndex );
+		serializer.Write( "parameterIndex", binding.parameterIndex );
+		serializer.Write( "parameterType", static_cast<int>(binding.parameterType) );
+		serializer.Write( "cbufferSlot", binding.cbufferSlot );
+		serializer.EndObject();
+	}
+	serializer.EndArray();
+
+	serializer.EndObject();
+	serializer.EndDocument();
+
+	return serializer.GetString();
+};
+
+void  ShaderGraph::Deserialize( JsonSerializer& serializer )
+{
+	try
+	{
+		// Base asset fields (id, name, type, assetIds, etc.)
+		DeserializeBaseAsset( serializer );
+
+		// Nodes
+		nodes = serializer.ReadArray<NodeTypes>( "nodes" );
+
+		// Edges
+		edges.clear();
+		auto edgeArray = serializer.GetSubObject( "edges" );
+		for( const auto& e : edgeArray ) {
+			NodeConnection edge{};
+			edge.fromNode = e.at( "fromNode" ).get<uint>();
+			edge.fromSlot = e.at( "fromSlot" ).get<uint>();
+			edge.toNode = e.at( "toNode" ).get<uint>();
+			edge.toSlot = e.at( "toSlot" ).get<uint>();
+			edges.push_back( edge );
+		}
+
+		// Parameter Bindings
+		parameterBindings.clear();
+		auto paramArray = serializer.GetSubObject( "parameterBindings" );
+		for( const auto& p : paramArray ) {
+			ParameterBinding binding{};
+			binding.nodeIndex = p.at( "nodeIndex" ).get<uint>();
+			binding.parameterIndex = p.at( "parameterIndex" ).get<uint>();
+			binding.parameterType = static_cast<NodeParameterType>(p.at( "parameterType" ).get<int>());
+			binding.cbufferSlot = p.at( "cbufferSlot" ).get<uint>();
+			parameterBindings.push_back( binding );
+		}
+	}
+	catch( const std::exception& )
+	{
+		throw std::runtime_error( "Failed to deserialize MaterialTemplate" );
+	}
+};
 
 void ShaderGraph::Compile( Renderer& renderer )
 {
@@ -21,13 +111,16 @@ void ShaderGraph::GenerateShaderCode()
 {
 	std::ostringstream oss;
 
-	auto includes = "#include \"Common.hlsli\"\n";
+	for( const auto& include : includes )
+	{
+		oss << "#include \"" << include << "\"\n";
+	}
 	auto inputStructs = GetInputStructs();
 	auto outputStructs = GetOutputStructs();
 	auto parameterStructs = GetParameterStructs();
 	auto shaderFunctions = GetShaderFunctions();
 
-	oss << includes << inputStructs << outputStructs << parameterStructs << shaderFunctions << signature << "\n" << "{";
+	oss << inputStructs << outputStructs << parameterStructs << shaderFunctions << signature << "\n" << "{";
 
 	std::vector<uint> sorted = TopologicalSort();
 	std::vector<std::string> shaderChunks;

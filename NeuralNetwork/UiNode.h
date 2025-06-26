@@ -153,6 +153,11 @@ public:
 		}
 		return nullptr;
 	};
+
+	void SetPosition( const ImVec2& position )
+	{
+		NodeEditor::SetNodePosition( id, position );
+	}
 public:
 	std::string GetName() const { return name; }
 	const uint& GetID() const { return id; }

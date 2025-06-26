@@ -178,6 +178,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="Modifier.cpp" />
     <ClCompile Include="ModifierTemplate.cpp" />
     <ClCompile Include="ScenePass.cpp" />
+    <ClCompile Include="ShaderInstance.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="SystemManager.cpp" />
     <ClCompile Include="TaskManager.cpp" />
@@ -203,6 +204,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClCompile Include="TextureAsset.cpp" />
     <ClCompile Include="ThreadManager.cpp" />
     <ClCompile Include="UiNode.cpp" />
+    <ClCompile Include="UiNodeGraph.cpp" />
     <ClCompile Include="UIPass.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="SubMesh.cpp" />
@@ -247,6 +249,8 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="MeshShader.h" />
     <ClInclude Include="NegateNode.h" />
     <ClInclude Include="Nodes.h" />
+    <ClInclude Include="Observable.h" />
+    <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RadicalNode.h" />
     <ClInclude Include="LessThanNode.h" />
     <ClInclude Include="LessThanOrEqualNode.h" />
@@ -256,6 +260,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="PowerNode.h" />
     <ClInclude Include="ReciprocalNode.h" />
     <ClInclude Include="ShaderEditor.h" />
+    <ClInclude Include="ShaderInstance.h" />
     <ClInclude Include="SignNode.h" />
     <ClInclude Include="SubtractNode.h" />
     <ClInclude Include="ThreadInfoNode.h" />
@@ -317,6 +322,7 @@ xcopy /Y /I /S "$(ProjectDir)\*.hlsl" "$(OutDir)"</Command>
     <ClInclude Include="UploadPass.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="VectorBreakNode.h" />
+    <ClInclude Include="UiComponents.h" />
     <ClInclude Include="VectorMakeNode.h" />
     <ClInclude Include="VectorScaleNode.h" />
     <ClInclude Include="VertexBuffer.h" />

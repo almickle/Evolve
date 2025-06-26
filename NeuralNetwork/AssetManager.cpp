@@ -16,13 +16,14 @@
 #include "ImportManager.h"
 #include "JsonSerializer.h"
 #include "Material.h"
-#include "MaterialTemplate.h"
 #include "Mesh.h"
 #include "Model.h"
 #include "Modifier.h"
 #include "ModifierTemplate.h"
+#include "PixelShader.h"
 #include "Renderer.h"
 #include "Scene.h"
+#include "ShaderInstance.h"
 #include "SubMesh.h"
 #include "SystemManager.h"
 #include "TaskManager.h"
@@ -181,11 +182,11 @@ void AssetManager::PostLoadProcessing()
 		auto type = asset->GetType();
 		switch( type )
 		{
-			case AssetType::MaterialTemplate:
+			case AssetType::PixelShader:
 			{
-				auto* assetRef = static_cast<MaterialTemplate*>(asset);
+				auto* assetRef = static_cast<PixelShader*>(asset);
 				assetRef->GenerateShaderCode();
-				renderer->CompileShader( assetRef->GetShaderCode(), ShaderType::Pixel, assetRef->GetName(), assetRef->GetPixelShaderBlob() );
+				assetRef->Compile( *renderer );
 			}
 			break;
 			case AssetType::ModifierTemplate:
@@ -206,11 +207,11 @@ void AssetManager::PostLoadProcessing()
 			for( uint i = 0; i < model->GetMaterialSlots().size(); i++ )
 			{
 				auto* material = static_cast<Material*>( GetAsset( model->GetMaterialSlots()[i] ) );
-				auto* matTemplate = static_cast<MaterialTemplate*>( GetAsset( material->GetMaterialTemplate() ) );
+				auto* pixelShader = static_cast<PixelShader*>( GetAsset( material->GetShader() ) );
 				auto* modifier = static_cast<Modifier*>( GetAsset( model->GetModifierSlots()[i] ) );
 				auto* modTemplate = static_cast<ModifierTemplate*>( GetAsset( modifier->GetModifierTemplate() ) );
 
-				auto psoKey = renderer->CreatePipelineState( modTemplate->GetVertexShaderBlob(), matTemplate->GetPixelShaderBlob(), modTemplate->GetDomainShaderBlob(), modTemplate->GetHullShaderBlob() );
+				auto psoKey = renderer->CreatePipelineState( modTemplate->GetVertexShaderBlob(), pixelShader->GetShaderBlob(), modTemplate->GetDomainShaderBlob(), modTemplate->GetHullShaderBlob() );
 				model->AddPsoKey( psoKey );
 			}
 		}
@@ -258,9 +259,9 @@ void AssetManager::LoadAsset( const std::string& path, SystemManager* systemMana
 			RegisterAsset( id, std::move( asset ) );
 		}
 		break;
-		case AssetType::MaterialTemplate:
+		case AssetType::PixelShader:
 		{
-			auto asset = std::make_unique<MaterialTemplate>( *nodeLibrary );
+			auto asset = std::make_unique<PixelShader>( *nodeLibrary );
 			asset->Load( systemManager, serializer );
 			auto id = asset->GetAssetID();
 			RegisterAsset( id, std::move( asset ) );
@@ -340,6 +341,7 @@ AssetID AssetManager::RegisterAsset( std::unique_ptr<Asset> asset )
 
 	// Insert into the map
 	assetHeap.emplace( newId, std::move( asset ) );
+	assetCounter++;
 	return newId;
 }
 
@@ -358,7 +360,9 @@ void AssetManager::RegisterAsset( const AssetID& id, std::unique_ptr<Asset> asse
 	}
 
 	// Insert into the map
+	asset->SetAssetID( id );
 	assetHeap.emplace( id, std::move( asset ) );
+	assetCounter++;
 }
 
 void AssetManager::RemoveAsset( const AssetID& id )
@@ -450,7 +454,67 @@ std::vector<Asset*> AssetManager::GetAllAssets()
 	return sorted;
 }
 
-AssetID AssetManager::GenerateUniqueAssetId()
+const std::vector<Asset*> AssetManager::GetAllShaders() const
 {
-	return "Asset_" + std::to_string( assetIdCounter++ );
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	std::vector<Asset*> shaders;
+	for( const auto& pair : assetHeap ) {
+		if( pair.second->GetType() == AssetType::PixelShader ||
+			pair.second->GetType() == AssetType::ModifierTemplate ||
+			pair.second->GetType() == AssetType::MeshShader )
+		{
+			shaders.push_back( pair.second.get() );
+		}
+	}
+	return shaders;
+}
+
+std::vector<Asset*> AssetManager::GetAllShaders()
+{
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	std::vector<Asset*> shaders;
+	for( const auto& pair : assetHeap ) {
+		if( pair.second->GetType() == AssetType::PixelShader ||
+			pair.second->GetType() == AssetType::ModifierTemplate ||
+			pair.second->GetType() == AssetType::MeshShader )
+		{
+			shaders.push_back( pair.second.get() );
+		}
+	}
+	return shaders;
+}
+
+std::vector<ShaderInstance*> AssetManager::GetShaderInstances( const AssetID& shader ) const
+{
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	std::vector<ShaderInstance*> instances;
+	for( const auto& pair : assetHeap ) {
+		if( pair.second->GetType() == AssetType::Material )
+		{
+			auto* instance = static_cast<Material*>(pair.second.get());
+			if( instance->GetShader() == shader ) {
+				instances.push_back( instance );
+			}
+		}
+	}
+	return instances;
+}
+
+std::vector<TextureAsset*> AssetManager::GetAllTextures()
+{
+	std::lock_guard<std::mutex> lock( assetHeapMutex );
+	std::vector<TextureAsset*> textures;
+	for( const auto& pair : assetHeap ) {
+		if( pair.second->GetType() == AssetType::Texture )
+		{
+			auto* texture = static_cast<TextureAsset*>(pair.second.get());
+			textures.push_back( texture );
+		}
+	}
+	return textures;
+}
+
+AssetID AssetManager::GenerateUniqueAssetId() const
+{
+	return "Asset_" + std::to_string( assetCounter );
 }

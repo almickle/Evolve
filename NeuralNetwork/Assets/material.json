@@ -8,7 +8,7 @@
     "Asset_4",
     "Asset_5"
   ],
-  "materialTemplate": "Asset_1",
+  "template": "Asset_1",
   "textureBindings": [
     {
       "slot": 0,

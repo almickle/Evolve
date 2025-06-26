@@ -16,7 +16,8 @@ enum class AssetType {
 	Modifier,
 	ModifierTemplate,
 	Scene,
-	MeshShader
+	MeshShader,
+	PixelShader,
 };
 
 enum class SubAssetType {

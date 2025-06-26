@@ -20,6 +20,9 @@ void ConstantBuffer::Update( const void* newData, size_t size )
 
 void ConstantBuffer::Upload( ID3D12GraphicsCommandList* cmdList )
 {
+	float* rawData = static_cast<float*>(data);
+	std::vector<float> copy( rawData, rawData + 128 );
+
 	void* mapped = nullptr;
 	resource->Map( 0, nullptr, &mapped );
 	memcpy( mapped, GetData(), GetDataSize() );
